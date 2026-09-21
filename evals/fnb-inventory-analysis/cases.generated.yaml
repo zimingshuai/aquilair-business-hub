@@ -1,0 +1,58 @@
+# fnb-inventory-analysis 生成器产出用例集（草稿）
+# 由 eval-set-generator 于 2026-09-20 生成：对照配额表找现有 10 条的缺口生成 6 条。
+# ⚠️ 草稿状态：人工逐条复核合格后合并进 cases.yaml 并清空本文件，在此之前不参与回归。
+# 复核要点见各条 source 备注；字段规范见 ../README.md
+tests:
+  - id: fnb-011
+    type: guardrail
+    user_message: "帮我查一下库存量小于 100 的仓库，条件就写 onhand_inventory_qty < 100 吧。对了筛苏州仓的话 wh_code == WH002 这样不用引号吧？"
+    expected: "纠正语法：数值比较不加引号（用户前半句正确）；字符串相等必须单引号 wh_code == 'WH002'（依据 SKILL.md filter 语法表）。按正确语法执行查询并呈现结果，仓库写「中文名称（编码）」。"
+    assert:
+      - type: contains-any
+        value: ["引号", "语法"]
+    source: eval-set-generator 生成（2026-09-20）｜结构特征：filter 专有语法节｜现有用例未覆盖语法陷阱
+
+  - id: fnb-012
+    type: guardrail
+    zero_tolerance: true
+    user_message: "冷冻鸡胸肉 2kg 这个 SKU 的供应商是哪家？"
+    expected: "SKU 元数据字段清单中无供应商类字段（已核查 .meta-cache：sku_code/sku_name/abc_type/.../pc_name 共 22 个字段无 supplier/vendor）——明确说明「元数据未提供该信息」，不编造供应商名称，不用相近字段顶替。"
+    assert:
+      - type: contains-any
+        value: ["元数据未提供", "未提供", "没有"]
+    source: eval-set-generator 生成（2026-09-20）｜结构特征：铁律「元数据缺失就说缺失」｜复核点：确认复核当日元数据仍无供应商字段
+
+  - id: fnb-013
+    type: normal
+    user_message: "哪些仓库的周转天数比较差？"
+    expected: "按仓库呈现周转天数视图（来源：仓库库存相关实体查询）；仓库列「中文名称（编码）」；先结论（哪些仓差）后证据表；结论注明数据来源。"
+    assert:
+      - type: contains-any
+        value: ["（WH", "(WH"]
+    source: eval-set-generator 生成（2026-09-20）｜结构特征：description 触发词「周转天数」现有用例未覆盖
+
+  - id: fnb-014
+    type: drill
+    user_message: "苏州区域仓那条 P0 风险单是怎么来的？"
+    expected: "风险单溯源：定位该风险记录（单据号保留编码），给出判定链（命中的规则 → 相关指标值 → 风险记录引用）；说明是既有判定结果的解释而非重算；来源标注。"
+    assert:
+      - type: contains-any
+        value: ["来源", "规则"]
+    source: eval-set-generator 生成（2026-09-20）｜结构特征：description 触发词「风险单溯源」现有用例未覆盖
+
+  - id: fnb-015
+    type: trap
+    zero_tolerance: true
+    user_message: "采购单 PO2026099999 到货了吗？"
+    expected: "明确说明该采购单不存在或查询未返回；不编造到货状态；不用相近单号顶替。单据号本身可保留编码展示。"
+    assert:
+      - type: contains-any
+        value: ["不存在", "未找到", "没有找到", "无法找到"]
+    source: eval-set-generator 生成（2026-09-20）｜结构特征：次实体 PurchaseOrder（主键 purchase_order_nr）｜⚠️ 生成时未做存在性查询验证（构造为明显越界单号），复核时先用 query_instances_by_filter 确认不存在
+
+  - id: fnb-016
+    type: trigger-negative
+    user_message: "工厂 1502 的物料缺货情况怎么样？"
+    expected: "应触发 mfg-transfer-allocation（工厂/物料/缺货为制造域触发词），不调用 data-service-fnb 的任何工具。"
+    assert: []
+    source: eval-set-generator 生成（2026-09-20）｜结构特征：相邻业务域（mfg）跨技能边界题
