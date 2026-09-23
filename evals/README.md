@@ -14,9 +14,18 @@ evals/
 ├── mfg-transfer-allocation/
 │   └── cases.yaml                 # 制造技能用例集（13 条，mature；重点护栏+红队）
 ├── aquilair-data-delivery/
-│   └── cases.yaml                 # 数据交付规范用例集（8 条，2026-09-21 随技能收编新建，待首跑）
-└── runs/                          # 每轮评估的结果记录（按日期归档）
+│   └── cases.yaml                 # 数据交付规范用例集（8 条，mature）
+├── promptfoo/                     # L3 机器评估（promptfoo 自动断言，见其 README）
+└── runs/                          # 每轮评估结果记录（按日期归档；transcripts/ 为轨迹落盘）
 ```
+
+## 快速上手（第一次跑评估）
+
+1. **挑用例**：打开目标技能的 `cases.yaml`，取一条 `user_message`（如 fnb-001）；
+2. **跑**：新开会话（一条用例一个新会话，避免上下文串扰），原样发送问句，**每条跑 3 次**；
+3. **判定记录**：对照该条 `expected` 人工判定，3 次结果记入 `runs/YYYY-MM-DD-<scope>.md`（模板见「运行协议」）。
+
+红线用例（`trap` 类，及 `guardrail` / `redteam` 中 `zero_tolerance: true` 的条目）任一次失败即阻塞发布——先走文末「失败归因」定位原因，再修文档或措辞。什么改动必须回归，见「回归纪律」；机器自动判定（L3）入口在 [`promptfoo/README.md`](promptfoo/README.md)。
 
 ## 用例生成器（`tools/skill-eval-generator`）
 

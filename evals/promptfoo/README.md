@@ -1,8 +1,28 @@
-# promptfoo POC（L3 自动化评估）——2026-09-21 验证通过
+# promptfoo（L3 自动化评估）
 
-> 结论先行：**三项验证全部通过，L3 技术路线成立**。评估体系中「改措辞/换模型必回归」的手动协议
-> （每轮 29 条 ×3 次子代理）可逐步由 promptfoo 自动化承接：确定性断言与轨迹顺序断言已可机器判定，
-> 失败退出码非零可直接作 CI 门禁。剩余工作见文末「落地清单」。
+> 用 promptfoo 把 `cases.yaml` 用例转成机器判定：确定性断言 + 轨迹顺序断言 + llm-rubric，失败退出码非零，可直接作发布门禁。技术路线 2026-09-21 POC 验证通过，2026-09-22 真实样本回放与 rubric 校准达标，当前唯一剩余工作是 CI 接线（见文末落地清单）。
+
+## 快速上手
+
+**环境准备**（本目录内，首次）：
+
+```bash
+npm ci          # 安装本地 promptfoo 0.123.1（node_modules 不入库）
+```
+
+rubric 评审（仅 `promptfooconfig.rubric.yaml` / calibration 相关）还需火山方舟 key，从环境变量读，仓库不落密钥：`ARK_API_KEY`（Windows CMD：`setx ARK_API_KEY "<你的key>"`，新开终端生效）。
+
+**按场景选命令**（本目录内，均已实测）：
+
+| 场景 | 命令 |
+| --- | --- |
+| 冒烟：断言引擎与退出码是否正常 | `npx promptfoo eval -c promptfooconfig.smoke.yaml --no-cache` |
+| 用例集变更后重新转出 | `python convert_cases.py` |
+| 回放校准·餐饮 | `npx promptfoo eval -c promptfooconfig.replay.yaml -c tests_fnb-inventory-analysis.yaml --no-cache` |
+| 回放校准·制造 | `npx promptfoo eval -c promptfooconfig.replay.yaml -c tests_mfg-transfer-allocation.yaml --no-cache` |
+| 轨迹断言自检（预期 1 PASS + 1 FAIL、退出码 100） | `npx promptfoo eval -c promptfooconfig.trajectory.yaml --no-cache` |
+
+其余配置（`replay-real` 真实样本回放 / `rubric` 评审 / `gate` 门禁 / `calibration` 校准对拍）同模式运行：`npx promptfoo eval -c <配置名>.yaml --no-cache`；用途见下表与「已验证结论」。
 
 ## 已验证的三项结论
 
@@ -34,15 +54,7 @@ evals/promptfoo/
 └── package.json / node_modules  # promptfoo 0.123.1 本地依赖
 ```
 
-常用命令（在本目录）：
-
-```bash
-python convert_cases.py                       # 用例集变更后重新转出
-npx promptfoo eval -c promptfooconfig.smoke.yaml --no-cache
-npx promptfoo eval -c promptfooconfig.replay.yaml -c tests_fnb-inventory-analysis.yaml --no-cache
-npx promptfoo eval -c promptfooconfig.replay.yaml -c tests_mfg-transfer-allocation.yaml --no-cache
-npx promptfoo eval -c promptfooconfig.trajectory.yaml --no-cache   # 预期 1 PASS + 1 FAIL、退出码 100
-```
+常用命令已收进顶部「快速上手」场景表；组件清单如下：
 
 ## 版本踩坑记录（0.123.x，均已在组件中规避）
 
