@@ -1,0 +1,15 @@
+# aquilair-skills 本地质量门禁（pre-commit 配置）
+# 用途：git commit 前自动校验评估用例集（evals/*/cases*.yaml）的格式 / 编号 / 红线规则，
+#       校验逻辑全部复用 tools/skill-eval-generator/scripts/validate_cases.py，此处不复制任何规则。
+# 触发范围：仅当 evals 下文件名含 cases 的 yaml 变更时触发（脚本自行扫描全量用例文件），
+#           不匹配 evals/promptfoo/ 下的 tests_*.yaml 生成物。
+
+repos:
+  - repo: local
+    hooks:
+      - id: aquilair-cases-validate
+        name: 评估用例集校验
+        entry: python tools/skill-eval-generator/scripts/validate_cases.py
+        language: system
+        files: ^evals/.+cases.*\.yaml$
+        pass_filenames: false

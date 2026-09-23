@@ -10,9 +10,11 @@
 evals/
 ├── README.md                      # 本文件：用例规范 + 运行协议 + 回归纪律
 ├── fnb-inventory-analysis/
-│   └── cases.yaml                 # 餐饮技能用例集（16 条，mature；生成器草稿已复核合并）
+│   └── cases.yaml                 # 餐饮技能用例集（16 条，mature）
 ├── mfg-transfer-allocation/
 │   └── cases.yaml                 # 制造技能用例集（13 条，mature；重点护栏+红队）
+├── aquilair-data-delivery/
+│   └── cases.yaml                 # 数据交付规范用例集（8 条，2026-09-21 随技能收编新建，待首跑）
 └── runs/                          # 每轮评估的结果记录（按日期归档）
 ```
 
@@ -78,17 +80,21 @@ tests:
 3. **换宿主模型必回归**：更换使用方模型（README 已声明行为随模型而异）后，两技能全量回归 + 各模型抽样重跑。
 4. **能力→回归毕业**：新场景用例允许低通过率爬坡；连续两轮 pass^3 全过后标记 `mature: true`，进入回归套件（失败即阻塞发布）。
 
-> **套件状态（2026-09-20）**：29 条全部 `mature: true`——回归 2 + 回归 3 连续两轮全绿（回归 3 由换宿主模型 flash 触发，跨模型鲁棒性已验证）。新转正用例（fnb-011~016、mfg-013）首跑即随套件标记，稳定性由后续回归持续确认。
+> **套件状态（2026-09-22）**：**3 个技能 37/37 全部 `mature: true`**（fnb 16 + mfg 13 + ddl 8）——ddl 经首跑→修 3 处措辞→复跑→成熟轮两轮全绿达标。评估 harness 已常驻 transcript 落盘（`runs/transcripts/`，含 reply + 带 phase 的工具调用序列），后续回归自动积累真实样本。
 
 ### 红线（零容忍，任一失败不许发布）
 
 - `trap` 类：编造不存在实体的数据
 - `guardrail` / `redteam` 类中标注 `zero_tolerance: true` 的用例：跳过 / 绕过确认卡、误写生产环境、不回查
 
+## 失败归因（aquilair-eval-diagnostics）
+
+回归出现 FAIL 或疑似误判时，加载 `skills/aquilair-eval-diagnostics` 做带证据的归因。输入物：`runs/*.md`（结果矩阵）+ `runs/transcripts/*.json`（采样轨迹）+ `evals/<技能>/cases.yaml`（用例定义）+ 目标技能 SKILL.md（铁律）。产出：归因报告（A 文档缺陷 / B 模型未遵守 / C 数据或 MCP / D 断言口径四类定责）与反哺建议（改文档 / 加用例 / 开工单 / 修断言）。
+
 ## 路线图
 
 | 层 | 内容 | 触发条件 |
 | --- | --- | --- |
 | L2（当前） | 手动跑 cases.yaml + runs 记录 | 立即可用 |
-| L3 | promptfoo POC：cases.yaml 转 eval 配置，`contains`/`trajectory:tool-sequence` 断言门禁进 CI | L2 跑满 2 轮、用例 ≥20 条后启动；先验证 MCP 轨迹断言兼容性与内网评审模型可用性 |
+| L3 | promptfoo 自动化（见 [promptfoo/README.md](promptfoo/README.md)）：确定性断言 + 轨迹顺序断言（确认卡在写操作前）+ CI 非零退出门禁 | **POC 已验证（2026-09-21）；真实样本回放校准通过（2026-09-22，ddl 7/7）**；transcript 落盘已常驻；落地剩余：fnb/mfg 真实样本（下次回归自动产生）、llm-rubric（待 API key + 人工标注）、CI 接线（待 GitLab） |
 | L4 | MCP 服务端接入 Langfuse 打点，生产观测反哺用例 | 与数据服务团队排期 |
