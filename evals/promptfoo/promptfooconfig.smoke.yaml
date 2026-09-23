@@ -1,0 +1,27 @@
+# promptfoo 最小冒烟配置（POC 第一步）
+# 目的：验证安装、模板渲染、断言引擎（contains 命中/未命中）、失败时退出码非零（CI 门禁前提）
+# 被测 provider：echo（0.123.x 版为纯 "echo"，不带冒号参数；把渲染后的 prompt 原样返回）
+# 运行：npx promptfoo eval -c promptfooconfig.smoke.yaml
+description: 'aquilair L3 POC 冒烟测试'
+
+prompts:
+  - '{{user_message}}'
+
+providers:
+  - id: echo
+    label: 'echo-回显渲染后prompt'
+
+tests:
+  - description: 'smoke-pass：断言应命中（用户问法含「仓库」二字）'
+    vars:
+      user_message: '各仓库有没有库存风险？'
+    assert:
+      - type: contains-any
+        value: ['（WH', '仓库']
+
+  - description: 'smoke-fail：断言应未命中（echo 只回显问法，不含回答内容——预期 FAIL）'
+    vars:
+      user_message: '江苏仓有什么风险？'
+    assert:
+      - type: contains
+        value: '苏州区域仓'   # 问法里没有这个词，应判 FAIL

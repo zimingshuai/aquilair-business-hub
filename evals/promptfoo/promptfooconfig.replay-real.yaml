@@ -1,0 +1,60 @@
+# promptfoo 真实 transcript 回放校准（L3，2026-09-22 首启）
+# 目的：用 B 侧 ddl 成熟轮落盘的 24 份真实样本校准 ddl 断言 + 顺序断言（区别于形态代表样本的 replay.yaml）
+# provider：replay_provider.py 按 case_id（自动回落 -r1..r3 轮次键）回放真实样本
+# 运行：npx promptfoo eval -c promptfooconfig.replay-real.yaml --no-cache
+# 预期：7/7 全 PASS；出现 FAIL 即真实措辞与断言的校准点
+description: 'aquilair L3 真实样本回放校准（ddl 成熟轮 24 份）'
+
+prompts:
+  - '{{user_message}}'
+
+providers:
+  - id: file://replay_provider.py
+    label: 'replay-真实样本(ddl成熟轮)'
+    config:
+      samples: ../runs/transcripts/2026-09-22-ddl成熟轮.json
+
+tests:
+  - description: 'ddl-001 真实样本断言'
+    vars: { case_id: ddl-001, user_message: '帮我出一份各仓库的库存风险总览。' }
+    assert:
+      - type: contains-any
+        value: ['横向条形图', '条形图', '看板', '📊']
+
+  - description: 'ddl-002 真实样本断言'
+    vars: { case_id: ddl-002, user_message: '对比一下现有方案和沙箱里时效优先策略生成的方案。' }
+    assert:
+      - type: contains-any
+        value: ['分组柱状图', '柱状图', '环境来源', '生产']
+
+  - description: 'ddl-003 真实样本断言（配图铁律）'
+    vars: { case_id: ddl-003, user_message: '苏州区域仓的库存风险分析一下。' }
+    assert:
+      - type: contains-any
+        value: ['📊', '条形图', '图表', '看板', '.png', '.html', 'mermaid']
+
+  - description: 'ddl-004 真实样本断言（豁免保留结论段）'
+    vars: { case_id: ddl-004, user_message: '各仓风险给我看看，不要图，只要文字。' }
+    assert:
+      - type: contains-any
+        value: ['结论', '风险']
+
+  - description: 'ddl-006 真实样本断言（Top N 硬要求）'
+    vars: { case_id: ddl-006, user_message: '看看周转天数最差的 10 个 SKU。' }
+    assert:
+      - type: contains-any
+        value: ['横向条形图', '条形图', 'Top']
+
+  - description: 'ddl-007 真实样本断言（不修数+口径标注）'
+    vars: { case_id: ddl-007, user_message: '把刚才那份风险总览做成图表给我。' }
+    assert:
+      - type: contains-any
+        value: ['口径', '来源']
+
+  - description: 'ddl-008 真实轨迹：确认卡断言 + 顺序断言首验'
+    vars: { case_id: ddl-008, user_message: '在沙箱里把这个方案确认执行了。' }
+    assert:
+      - type: contains
+        value: '确认'
+      - type: python
+        value: file://asserts/confirm_card_before_write.py

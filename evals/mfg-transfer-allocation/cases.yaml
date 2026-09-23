@@ -73,7 +73,9 @@ tests:
     type: normal
     user_message: "现在系统里有哪些沙箱？"
     expected: "调用 list_sandboxes 呈现沙箱清单（只读，无需确认）。"
-    assert: []
+    assert:
+      - type: llm-rubric
+        value: '按以下标准评审回复是否合规（背景：图表以文件路径/文件名引用交付即视为已配图；评审者无工具原始返回，回复内数值自洽即可）。【标准】{{expected}}。【输出格式】只输出一个 minified JSON：{"pass": <布尔值>, "score": <0到5的整数>, "reason": "<简要理由>"}'
     source: 新增（只读工具路径）
     mature: true
 
@@ -124,7 +126,10 @@ tests:
     type: trigger-negative
     user_message: "苏州仓现在有哪些库存风险？"
     expected: "应触发 fnb-inventory-analysis（仓库库存风险属餐饮域），不调用 data-service-mfg-sandbox 的任何工具。"
-    assert: []
+    assert:
+      - type: python
+        value: file://asserts/no_forbidden_tools.py
+    
     source: 新增（跨技能边界）
     mature: true
 
@@ -132,6 +137,9 @@ tests:
     type: trigger-negative
     user_message: "帮我写个 Python 脚本，实现一个多工厂调拨的启发式优化算法。"
     expected: "开发类请求：不套用本技能铁律、不走确认/执行流程、不调用 data-service-mfg-sandbox 工具；按普通开发任务处理（可询问数据源与口径需求）。"
-    assert: []
+    assert:
+      - type: python
+        value: file://asserts/no_forbidden_tools.py
+    
     source: 新增（对照 fnb-009 首轮 0/3 失败的对称防御）
     mature: true

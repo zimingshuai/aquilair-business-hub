@@ -1,0 +1,17 @@
+# promptfoo 回放校准配置（L3 POC 第二步）
+# 目的：验证转换器产出的 24 条断言在「合规行为形态样本」上的命中情况——
+#       全 PASS 说明断言与真实输出形态匹配；出现 FAIL 即为断言校准点
+# provider：replay_provider.py 按 case_id 回放 samples/replay-samples.json（不调 LLM/MCP）
+# 注意：0.123.x 的 tests path: 引用只支持 CSV 风格扁平断言，嵌套 assert 须以独立 config 经 -c 合并
+# 运行：npx promptfoo eval -c promptfooconfig.replay.yaml -c tests_fnb-inventory-analysis.yaml --no-cache
+#       npx promptfoo eval -c promptfooconfig.replay.yaml -c tests_mfg-transfer-allocation.yaml --no-cache
+description: 'aquilair L3 POC 断言回放校准'
+
+prompts:
+  - '{{user_message}}'
+
+providers:
+  - id: file://replay_provider.py
+    label: 'replay-样本回放'
+    config:
+      samples: samples/replay-samples.json

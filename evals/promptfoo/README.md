@@ -1,0 +1,81 @@
+# promptfoo POC（L3 自动化评估）——2026-09-21 验证通过
+
+> 结论先行：**三项验证全部通过，L3 技术路线成立**。评估体系中「改措辞/换模型必回归」的手动协议
+> （每轮 29 条 ×3 次子代理）可逐步由 promptfoo 自动化承接：确定性断言与轨迹顺序断言已可机器判定，
+> 失败退出码非零可直接作 CI 门禁。剩余工作见文末「落地清单」。
+
+## 已验证的三项结论
+
+| # | 验证项 | 结果 | 证据 |
+| --- | --- | --- | --- |
+| 1 | 安装与断言引擎、CI 门禁前提 | ✅ | promptfoo 0.123.1（本地 node_modules，未装全局）；echo provider 冒烟：contains-any 命中 PASS、未命中 FAIL，**失败退出码 100** |
+| 2 | cases.yaml 断言可转换且与合规输出形态匹配 | ✅ | 转换器转出 24 条（fnb 14 + mfg 10，trigger-negative 5 条人工判定不适用机器断言，正确跳过）；样本回放：fnb 28/28、mfg 20/20 全 PASS |
+| 3 | 「确认卡在写操作前」可机器判定并作门禁 | ✅ | python 自定义断言（`asserts/confirm_card_before_write.py`）：合规样本 PASS、违规样本 FAIL 且 reason 精确定位（「未见确认卡；run_supply_demand_allocation 发生在确认前」），端到端退出码 100 |
+| 4 | llm-rubric 与人审校准对拍（judge 可信度） | ✅ | **30/30（100%）**：正样本（ddl 成熟轮真实 transcript）24/24 零误杀、负样本（历史失败现象复刻）6/6 零漏判、零解析失败（`gen_calibration.py` + `promptfooconfig.calibration.yaml`，2026-09-22） |
+| 5 | 断言补全（37 条全机器判定） | ✅ | 7 条 `assert: []` 用例补齐（4 轨迹断言 `asserts/no_forbidden_tools.py` + 3 条 rubric）；gate 验证 7 PASS + 负样本拦截 FAIL、退出码 100（`promptfooconfig.gate.yaml`） |
+
+评审模型（llm-rubric）：**已验证（2026-09-22，火山方舟 OpenAI 兼容端点）**——`promptfooconfig.rubric.yaml` 内联双向冒烟用例（合规判 PASS / 代查代答判 FAIL，评审理由精确到违规点），评审模型 `doubao-seed-2-1-pro-260915`。key 从环境变量 `ARK_API_KEY` 读（`apiKeyEnvar`，仓库不落密钥）。**0.123.x 配置字段踩坑**：`apiKeyEnvar` 与 `apiBaseUrl` 都是 provider `config` 的**顶层字段**（写成 `config.api.baseURL` 嵌套会静默回落到 api.openai.com 超时）；方舟模型名用连字符（`doubao-seed-1-6`，点号 404），可用模型以 `GET /api/v3/models` 为准。**尚未当门禁**：按调研纪律，先做 20~30 条与 B 侧人审结论的校准对拍，judge 与人工对齐后才用于门禁。
+
+## 组件与用法
+
+```
+evals/promptfoo/
+├── convert_cases.py             # cases.yaml -> promptfoo config 转换器（id/description 保留原编号）
+├── replay_provider.py           # 文件回放 provider：按 case_id 回放样本（不调 LLM/MCP）
+├── asserts/
+│   └── confirm_card_before_write.py   # 轨迹断言：确认卡在写操作前（create_sandbox 按技能规定豁免）
+├── samples/replay-samples.json  # 回放样本（POC 为形态代表；L3 落地后由真实 transcript 落盘）
+├── promptfooconfig.smoke.yaml       # 冒烟：echo provider 验断言引擎与退出码
+├── promptfooconfig.replay.yaml      # 回放校准：确定性断言 × 合规样本（形态代表）
+├── promptfooconfig.replay-real.yaml # 真实样本回放校准：B 侧 transcript（2026-09-22 ddl 首批 7/7）
+├── promptfooconfig.rubric.yaml      # llm-rubric 评审（火山方舟 doubao-seed，见上节）
+├── promptfooconfig.trajectory.yaml  # 轨迹断言：含故意违规样本，验证门禁捕获
+├── tests_<技能名>.yaml           # 转换器产物（独立 config 形态，经 -c 合并使用）
+└── package.json / node_modules  # promptfoo 0.123.1 本地依赖
+```
+
+常用命令（在本目录）：
+
+```bash
+python convert_cases.py                       # 用例集变更后重新转出
+npx promptfoo eval -c promptfooconfig.smoke.yaml --no-cache
+npx promptfoo eval -c promptfooconfig.replay.yaml -c tests_fnb-inventory-analysis.yaml --no-cache
+npx promptfoo eval -c promptfooconfig.replay.yaml -c tests_mfg-transfer-allocation.yaml --no-cache
+npx promptfoo eval -c promptfooconfig.trajectory.yaml --no-cache   # 预期 1 PASS + 1 FAIL、退出码 100
+```
+
+## 版本踩坑记录（0.123.x，均已在组件中规避）
+
+1. **echo provider 是纯 `echo`**（不带 `echo:文本` 冒号参数），行为=回显渲染后的 prompt。
+2. **`tests: path:` 引用的 YAML 只支持 CSV 风格扁平断言**（`__expected` 列），嵌套 `assert:` 必须以独立
+   config 形态经多个 `-c` 传入。
+3. **双 `-c` 合并会翻倍 prompts**（第二配置即使无 prompts 也产生组合）——验证类配置做成自包含。
+4. **python 文件断言按模块加载并调用 `get_assert(output, context)`**（不是 sys.argv）；返回值必须是
+   bool/float/`{pass, score, reason}` dict——元组会经 JS 桥转成 `{"0":..,"1":..}` 对象而报错。
+5. **python file provider 的实参形态是 `call_api(prompt, options, context)`**，providers[].config 内容
+   在第二参 `options.config` 里。
+6. **断言的口径必须与 SKILL.md 对齐**：初版把 create_sandbox 归入写操作导致合规样本被判违规——
+   技能明确规定它无需确认、在卡前执行是正确行为（见确认与执行流程第 2 步）。
+7. **llm-rubric 评分输出必须是 JSON**（`{"pass", "score", "reason"}`），非 JSON 记 error 而非判负；
+   格式指令措辞里**不得出现「true 或 false」这类会被模型照抄进 JSON 的字样**（中文「或」破坏解析）。
+8. **判 FAIL 时 reason 会冗余写进结果的 error 字段**——统计一致率须以 `gradingResult.pass` 为准，
+   不能把 error 非空当解析失败（曾因此把 8 条正确 FAIL 误判为 error）。
+9. **rubric 需要视野适配层**（judge 视野 ≠ 人审视野）：图表以文件路径引用交付即视为已配图；
+   确认卡用例是两段式协议（段1 出卡、用户已确认、段2 执行汇报），不得判矛盾；judge 无工具返回，
+   回复内数值自洽即可、不作负向推断；不可逆提示按环境区分（沙箱卡声明可丢弃即达标）。
+   适配层固化在 `gen_calibration.py` 的 RUBRIC_CONTEXT / CASE_RUBRIC_OVERRIDES。
+
+## L3 完整落地清单（剩余工作）
+
+1. ~~transcript 落盘~~ **已常驻（2026-09-22）**：B 侧 `evals/tools/record_transcript.py`，样本落
+   `evals/runs/transcripts/<轮次>.json`（key = `<case_id>-r<N>`，reply + 带 phase 的 tool_calls）；
+   ddl 成熟轮首批 24 份已回传 A 并通过真实样本回放校准（`promptfooconfig.replay-real.yaml`，7/7 PASS）。
+   真实样本暴露并已修的校准点：确认卡标志从「操作确认」放宽为「操作确认 or 确认卡」；
+   `replay_provider.py` 支持轮次键自动回落（case_id 精确 → -r1/-r2/-r3）。fnb/mfg 真实样本随下次回归自动产生。
+2. ~~llm-rubric 校准对拍~~ **已达标（2026-09-22）：30/30（100%）**——正样本 24/24 零误杀、负样本 6/6
+   零漏判；对拍资产：`gen_calibration.py`（含 RUBRIC_CONTEXT 视野适配层与 CASE_RUBRIC_OVERRIDES）、
+   `samples/calibration-negatives.json`（历史失败现象复刻负样本）。**rubric 已可当门禁**。
+3. ~~断言补全~~ **已完成（2026-09-22）**：37/37 用例全部有机器断言——新增 `asserts/no_forbidden_tools.py`
+   （触发反例零调用判定，含负样本拦截验证）+ 3 条 llm-rubric；gate 验证 7 PASS + 1 拦截 FAIL。
+4. **CI 接线（唯一剩余）**：GitLab CI 加 stage 跑 eval 命令（smoke / replay-real / gate / calibration
+   按需），退出码非零即阻塞——与回归纪律衔接，mature 套件失败=不许发布；node_modules 不入库，CI 里 `npm ci` 恢复。

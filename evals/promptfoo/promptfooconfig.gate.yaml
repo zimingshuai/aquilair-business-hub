@@ -1,0 +1,72 @@
+# promptfoo 门禁配置：断言补全后的验证 gate（L3，2026-09-22）
+# 目的：验证 cases.yaml 新补的 7 条断言（4 轨迹 + 3 rubric）在样本上工作，
+#       并含 1 条负样本（fnb-009-neg 误触发）必须被拦截——预期 7 PASS + 1 FAIL、退出码 100
+# 运行（需 ARK_API_KEY）：npx promptfoo eval -c promptfooconfig.gate.yaml --no-cache
+description: 'aquilair L3 断言补全验证 gate（7 新断言 + 1 负样本）'
+
+prompts:
+  - '{{user_message}}'
+
+providers:
+  - id: file://replay_provider.py
+    label: 'replay-样本回放'
+    config:
+      samples: samples/replay-samples.json
+
+# rubric 断言的评审模型（与 calibration 一致：火山方舟）
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:doubao-seed-2-1-pro-260915
+      config:
+        apiBaseUrl: https://ark.cn-beijing.volces.com/api/v3
+        apiKeyEnvar: ARK_API_KEY
+
+tests:
+  - description: 'fnb-009 轨迹断言（开发请求零 fnb 调用）'
+    vars: { case_id: fnb-009, user_message: '帮我写个 Python 脚本，每天算一遍各仓库的安全库存。', expected: '不调用 data-service-fnb 工具；按普通开发任务处理。' }
+    assert:
+      - type: python
+        value: file://asserts/no_forbidden_tools.py
+
+  - description: 'fnb-016 轨迹断言（制造域问题零 fnb 调用）'
+    vars: { case_id: fnb-016, user_message: '工厂 1502 的物料缺货情况怎么样？', expected: '不调用 data-service-fnb 工具。' }
+    assert:
+      - type: python
+        value: file://asserts/no_forbidden_tools.py
+
+  - description: 'mfg-012 轨迹断言（餐饮域问题零 mfg 调用）'
+    vars: { case_id: mfg-012, user_message: '苏州仓现在有哪些库存风险？', expected: '不调用 data-service-mfg-sandbox 工具。' }
+    assert:
+      - type: python
+        value: file://asserts/no_forbidden_tools.py
+
+  - description: 'mfg-013 轨迹断言（开发请求零 mfg 调用）'
+    vars: { case_id: mfg-013, user_message: '帮我写个 Python 脚本，实现一个多工厂调拨的启发式优化算法。', expected: '不调用 data-service-mfg-sandbox 工具。' }
+    assert:
+      - type: python
+        value: file://asserts/no_forbidden_tools.py
+
+  - description: 'mfg-007 rubric 断言（沙箱清单只读呈现）'
+    vars: { case_id: mfg-007, user_message: '现在系统里有哪些沙箱？', expected: '调用 list_sandboxes 呈现沙箱清单（只读，无需确认）。' }
+    assert:
+      - type: llm-rubric
+        value: '按以下标准评审回复是否合规（背景：图表以文件路径/文件名引用交付即视为已配图；评审者无工具原始返回，回复内数值自洽即可）。【标准】{{expected}}。【输出格式】只输出一个 minified JSON：{"pass": <布尔值>, "score": <0到5的整数>, "reason": "<简要理由>"}'
+
+  - description: 'ddl-005 rubric 断言（纯口径豁免零图）'
+    vars: { case_id: ddl-005, user_message: '库存风险的 P0 到 P3 等级是怎么定义的？', expected: '纯口径/概念问答属豁免场景：不硬塞图表，正常元数据解释即可。' }
+    assert:
+      - type: llm-rubric
+        value: '按以下标准评审回复是否合规（背景：图表以文件路径/文件名引用交付即视为已配图；评审者无工具原始返回，回复内数值自洽即可）。【标准】{{expected}}。【输出格式】只输出一个 minified JSON：{"pass": <布尔值>, "score": <0到5的整数>, "reason": "<简要理由>"}'
+
+  - description: 'ddl-007 rubric 断言（数值自洽+名称规范）'
+    vars: { case_id: ddl-007, user_message: '把刚才那份风险总览做成图表给我。', expected: '图上数值与工具返回一致（回复内自洽即可）；图上名称用「中文名称（编码）」；有口径/来源说明。' }
+    assert:
+      - type: llm-rubric
+        value: '按以下标准评审回复是否合规（背景：图表以文件路径/文件名引用交付即视为已配图；评审者无工具原始返回，回复内数值自洽即可）。【标准】{{expected}}。【输出格式】只输出一个 minified JSON：{"pass": <布尔值>, "score": <0到5的整数>, "reason": "<简要理由>"}'
+
+  - description: 'fnb-009-neg 负样本拦截验证（误触发调用 fnb 工具——预期 FAIL）'
+    vars: { case_id: fnb-009-neg, user_message: '帮我写个 Python 脚本，每天算一遍各仓库的安全库存。', expected: '不应调用 data-service-fnb 工具。' }
+    assert:
+      - type: python
+        value: file://asserts/no_forbidden_tools.py

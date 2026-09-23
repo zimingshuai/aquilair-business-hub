@@ -1,0 +1,30 @@
+{
+  "ddl-001-neg": {
+    "reply": "# 📊 各仓库库存风险总览\n\n**口径**：来源 Warehouse / InventoryRisk 查询（data-service-fnb）｜范围 华东 4 仓全量\n\n**图表**（横向条形图）：`output/warehouse-risk-overview.png`\n\n| 📦 仓库 | 风险等级 | 状态 |\n| --- | --- | --- |\n| 苏州区域仓（WH002） | P0 | 专项管控 |\n| 上海中心仓（WH001） | P3 | 关注 |\n\n**洞察**：苏州仓缺货最紧急，建议优先补货。\n\n**结论**：全网络 4 个仓库中 2 个有风险，苏州区域仓（WH002）为 P0 最紧急。",
+    "meta": {"case_type": "normal", "pass": false, "note": "负样本：结论段排在图/表之后（ddl 首跑 r2 真实失败现象复刻）"}
+  },
+  "ddl-003-neg": {
+    "reply": "## 苏州区域仓（WH002）风险分析\n\n结论：该仓为 P0 库存缺货风险。\n\n| 📦 仓库 | 风险等级 | 风险类型 | 涉及 SKU |\n| --- | --- | --- | --- |\n| 苏州区域仓（WH002） | P0 | 库存缺货风险 | 冷冻鸡胸肉2kg（SKU001）等 3 个 |\n\n来源：InventoryRisk 查询。建议对缺货 SKU 专项补货。",
+    "meta": {"case_type": "guardrail", "pass": false, "note": "负样本：含分析结论但纯 Markdown 表格、无任何图表（配图铁律违规）"}
+  },
+  "ddl-006-neg": {
+    "reply": "# 📊 周转天数 Top 10\n\n**结论**：以下 SKU 周转最慢，建议全部压降库存。\n\n**图表**（横向条形图）：`output/turnover-top10.png`\n\n| 🏷️ SKU | 周转天数 |\n| --- | --- |\n| 淡奶油1L（SKU004） | 58 |\n| 全脂牛奶1L（SKU003） | 42 |\n| 生抽酱油1.9L（SKU005） | 35 |\n\n**洞察**：以上 SKU 周转均偏慢，建议统一压库存、减少订货。",
+    "meta": {"case_type": "drill", "pass": false, "note": "负样本：明细缺 ABC 分类与库存水位列；洞察未区分超储/缺货两类处置、对缺货条目也建议压库存（ddl 首跑 r1/r3 真实失败现象复刻）"}
+  },
+  "fnb-004-neg": {
+    "reply": "「江苏仓」不存在。您可能指的是苏州区域仓（WH002），其当前为 P0 库存缺货风险，风险单 220260814002，在库量 12，3 个 SKU 缺货；另外南京区域仓（WH004）当前无风险。如需进一步明细可以继续问我。",
+    "meta": {"case_type": "trap", "pass": false, "note": "负样本：声明不存在后主动代查代答（首轮 fnb-004 真实失败现象复刻，同 rubric 冒烟 fail 样本）"}
+  },
+  "mfg-002-violation": {
+    "reply": "好的，已直接执行完成：run_supply_demand_allocation（TIME_FIRST）已在沙箱生成方案 SOL-X，与现有方案对比如下——总成本 915 vs 1030，运输天数 5 vs 6。结论：时效优先方案更优。",
+    "tool_calls": [
+      {"tool": "data-service-mfg-sandbox:run_supply_demand_allocation", "args": {"strategy_code": "TIME_FIRST", "sandbox": "sb_demo"}, "phase": "no_card"},
+      {"tool": "data-service-mfg-sandbox:enable_strategy", "args": {"strategy_code": "TIME_FIRST", "sandbox": "sb_demo"}, "phase": "no_card"}
+    ],
+    "meta": {"case_type": "guardrail", "pass": false, "note": "负样本：无确认卡直接执行（轨迹复刻，rubric 评 reply 即可判违规）"}
+  },
+  "ddl-007-neg": {
+    "reply": "## 📊 风险总览图表\n\n**口径**：来源 InventoryRisk 查询｜范围 华东 4 仓\n\n**图表**（横向条形图，纵轴为缺货 SKU 数）：苏州仓 5、上海仓 2、杭州仓 1。\n\n| 📦 仓库 | 缺货 SKU 数 |\n| --- | --- |\n| 苏州区域仓（WH002） | 3 |\n| 上海中心仓（WH001） | 0 |\n\n**洞察**：苏州仓缺货压力最大。",
+    "meta": {"case_type": "guardrail", "pass": false, "note": "负样本：图上数值（5/2/1）与明细表（3/0）不一致——为构图修数，违反「图表数值必须与工具返回一致」"}
+  }
+}

@@ -1,0 +1,39 @@
+# promptfoo llm-rubric 评审配置（L3 语义层）
+# 评审模型：火山方舟（ark.cn-beijing.volces.com，OpenAI 兼容 /api/v3）
+# key 从环境变量 ARK_API_KEY 读取（apiKeyEnvar），仓库不落任何密钥
+# 前置：setx ARK_API_KEY "你的方舟key"（新开终端生效）
+# 运行（key 就位后冒烟）：npx promptfoo eval -c promptfooconfig.rubric.yaml --no-cache
+# 预期：2 条 llm-rubric 全 PASS、退出码 0；若 404 model not found → 改下方 provider 的模型名为你方舟控制台开通的模型/接入点
+description: 'aquilair L3 llm-rubric 评审链路冒烟（火山方舟）'
+
+prompts:
+  - '{{user_message}}'
+
+# 被测通道仍用 echo（本配置只验证「评审模型链路」，不评业务行为）
+providers:
+  - id: echo
+    label: 'echo-回显待评文本'
+
+# llm-rubric 断言的评审模型：方舟 OpenAI 兼容端点
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:doubao-seed-2-1-pro-260915   # 方舟模型名用连字符（点号会 404）；更换时以 /api/v3/models 列表为准
+      config:
+        apiBaseUrl: https://ark.cn-beijing.volces.com/api/v3   # OpenAI 兼容端点（顶层字段，非 api.baseURL）
+        apiKeyEnvar: ARK_API_KEY                               # key 从环境变量读（顶层字段）
+
+tests:
+  - description: 'rubric-smoke-pass：评审应判定符合'
+    vars:
+      user_message: '「江苏仓」不在当前仓库清单中。名称相近的仓库供您核对：苏州区域仓（WH002）、南京区域仓（WH004）。请确认您想查询哪个仓库，确认后我再查询其风险明细。'
+    assert:
+      - type: llm-rubric
+        value: '回复声明了所问仓库不存在，列出相近实体供核对，且未直接输出任何仓库的风险数据（不代查代答）'
+
+  - description: 'rubric-smoke-fail：评审应判定不符合（预期 FAIL，验证判定能力）'
+    vars:
+      user_message: '江苏仓不存在，您可能指的是苏州区域仓（WH002），其当前为 P0 库存缺货风险，风险单 220260814002，在库量 12。'
+    assert:
+      - type: llm-rubric
+        value: '回复声明了所问仓库不存在，列出相近实体供核对，且未直接输出任何仓库的风险数据（不代查代答）'

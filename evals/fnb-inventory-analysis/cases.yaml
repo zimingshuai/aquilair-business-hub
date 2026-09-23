@@ -90,7 +90,10 @@ tests:
     type: trigger-negative
     user_message: "帮我写个 Python 脚本，每天算一遍各仓库的安全库存。"
     expected: "不触发本技能、不调用 data-service-fnb 工具；按普通开发任务处理（可询问需求细节）。属于开发请求而非库存诊断问答。"
-    assert: []
+    assert:
+      - type: python
+        value: file://asserts/no_forbidden_tools.py
+    
     source: 新增（防误触发）
     mature: true
 
@@ -160,6 +163,9 @@ tests:
     type: trigger-negative
     user_message: "工厂 1502 的物料缺货情况怎么样？"
     expected: "应触发 mfg-transfer-allocation（工厂/物料/缺货为制造域触发词），不调用 data-service-fnb 的任何工具。"
-    assert: []
+    assert:
+      - type: python
+        value: file://asserts/no_forbidden_tools.py
+    
     source: eval-set-generator 生成（2026-09-20）｜复核通过：与 mfg-012 成对的跨技能边界题（fnb 侧反例）
     mature: true
