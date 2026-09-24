@@ -95,8 +95,8 @@ tests:
     source: 新增（只读工具路径）
   assert:
   - type: llm-rubric
-    value: '按以下标准评审回复是否合规（背景：图表以文件路径/文件名引用交付即视为已配图；评审者无工具原始返回，回复内数值自洽即可）。【标准】{{expected}}。【输出格式】只输出一个 minified JSON：{"pass":
-      <布尔值>, "score": <0到5的整数>, "reason": "<简要理由>"}'
+    value: '按以下标准评审回复是否合规（背景：图表以文件路径/文件名/内联引用（SVG/PNG/HTML/Mermaid）交付即视为已配图；评审者无工具原始返回，回复内数值自洽即可）。【标准】{{expected}}。【输出格式】只输出一个
+      minified JSON：{"pass": <布尔值>, "score": <0到5的整数>, "reason": "<简要理由>"}'
 - description: mfg-008
   vars:
     case_id: mfg-008
