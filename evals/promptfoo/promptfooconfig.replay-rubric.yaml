@@ -1,0 +1,28 @@
+# promptfoo 回放 + llm-rubric 组合配置（L3，2026-09-24 补齐）
+# 目的：replay.yaml 只配了文件回放 provider，tests 文件中 llm-rubric 断言（mfg-007 等）
+#       在该配置下无评审模型，回落默认 openai 端点报 OPENAI_API_KEY 未设。
+#       本配置 = replay 的回放 provider + rubric.yaml 的方舟评审模型，补齐组合链路。
+# 前置：环境变量 ARK_API_KEY（火山方舟 key，setx 设置后新开终端生效）
+# 运行：npx promptfoo eval -c promptfooconfig.replay-rubric.yaml -c tests_mfg-transfer-allocation.yaml --no-cache
+#       （tests 文件可换 tests_fnb-inventory-analysis.yaml / tests_aquilair-data-delivery.yaml）
+# 预期：含 llm-rubric 的用例经方舟评审通过；确定性断言行为与 replay.yaml 一致
+description: 'aquilair L3 回放校准（含 llm-rubric 方舟评审）'
+
+prompts:
+  - '{{user_message}}'
+
+# 被测通道：文件回放（不调业务 LLM/MCP），样本源与 replay.yaml 相同
+providers:
+  - id: file://replay_provider.py
+    label: 'replay-样本回放'
+    config:
+      samples: samples/replay-samples.json
+
+# llm-rubric 断言的评审模型：方舟 OpenAI 兼容端点（与 promptfooconfig.rubric.yaml 保持一致）
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:doubao-seed-2-1-pro-260915   # 方舟模型名用连字符（点号会 404）；更换时以 /api/v3/models 列表为准
+      config:
+        apiBaseUrl: https://ark.cn-beijing.volces.com/api/v3   # OpenAI 兼容端点（顶层字段，非 api.baseURL）
+        apiKeyEnvar: ARK_API_KEY                               # key 从环境变量读（顶层字段）
