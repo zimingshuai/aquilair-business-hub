@@ -1,0 +1,71 @@
+{
+  "name": "aquilair-supply-chain-advisor",
+  "version": "1.1.1",
+  "description": "Aquilair central advisor for F&B supply chain inventory diagnosis and multi-plant material transfer: delivers inventory health reports, shortage response plans, transfer optimization schemes and sandbox simulation conclusions, with visual dashboards for all data deliverables. Now ships all six Aquilair skills including the meta-skills for routing, authoring and eval diagnostics.",
+  "author": {
+    "name": "Aquilair Team"
+  },
+  "license": "Proprietary - Aquilair internal distribution, intranet use only",
+  "keywords": [
+    "supply-chain",
+    "inventory",
+    "transfer",
+    "sandbox",
+    "aquilair",
+    "fnb",
+    "manufacturing",
+    "skill-factory"
+  ],
+  "agents": ["./agents/aquilair-supply-chain-advisor.md"],
+  "skills": [
+    "./skills/fnb-inventory-analysis",
+    "./skills/mfg-transfer-allocation",
+    "./skills/aquilair-data-delivery",
+    "./skills/aquilair-skill-router",
+    "./skills/aquilair-skill-authoring",
+    "./skills/aquilair-eval-diagnostics"
+  ],
+
+  "expertType": "agent",
+  "agentName": "aquilair-supply-chain-advisor",
+
+  "displayName": {
+    "en": "Aquilair",
+    "zh": "天鹰·供应链中枢"
+  },
+  "profession": {
+    "en": "F&B Supply Chain Inventory & Multi-Plant Transfer Advisor",
+    "zh": "餐饮供应链库存与多工厂调拨顾问"
+  },
+  "displayDescription": {
+    "en": "Focuses on F&B supply chain inventory diagnosis and multi-plant material transfer, delivering diagnostic reports, transfer plans and sandbox simulation conclusions, with visual dashboards for all data deliverables.",
+    "zh": "专注餐饮供应链库存诊断与多工厂调拨，输出诊断报告、调拨方案与沙箱推演结论，数据交付配可视化看板。"
+  },
+  "avatar": "avatars/expert.png",
+  "categoryId": "12-IndustryConsultant",
+  "defaultInitPrompt": {
+    "zh": "各仓库目前有哪些库存风险？给我一份带看板的诊断报告",
+    "en": "What inventory risks exist across warehouses? Give me a diagnostic report with a dashboard."
+  },
+  "plugin": "aquilair-supply-chain-advisor",
+  "tags": [
+    { "en": "Inventory Diagnosis", "zh": "库存诊断" },
+    { "en": "Multi-Plant Transfer", "zh": "多工厂调拨" },
+    { "en": "Sandbox Simulation", "zh": "沙箱推演" },
+    { "en": "Skill Factory", "zh": "技能工厂" }
+  ],
+  "quickPrompts": [
+    {
+      "en": "What inventory risks exist across warehouses? Give me a diagnostic report with a dashboard.",
+      "zh": "各仓库目前有哪些库存风险？给我一份带看板的诊断报告"
+    },
+    {
+      "en": "A plant reported a material shortage - match available transferable stock and generate a transfer plan.",
+      "zh": "上海工厂反馈缺货，帮我匹配可调出物料并生成调拨方案"
+    },
+    {
+      "en": "Regenerate the plan in sandbox with a time-first strategy and compare it with the current one.",
+      "zh": "在沙箱里用时效优先策略重新生成方案，和现有方案对比"
+    }
+  ]
+}
