@@ -1,6 +1,6 @@
 # promptfoo（L3 自动化评估）
 
-> 用 promptfoo 把 `cases.yaml` 用例转成机器判定：确定性断言 + 轨迹顺序断言 + llm-rubric，失败退出码非零，可直接作发布门禁。技术路线 2026-09-21 POC 验证通过，2026-09-22 真实样本回放与 rubric 校准达标，当前唯一剩余工作是 CI 接线（见文末落地清单）。
+> 用 promptfoo 把 `cases.yaml` 用例转成机器判定：确定性断言 + 轨迹顺序断言 + llm-rubric，失败退出码非零，可直接作发布门禁。技术路线 2026-09-21 POC 验证通过，2026-09-22 真实样本回放与 rubric 校准达标，CI 接线已改道 pre-commit 本地门禁落地（见文末落地清单）。
 
 ## 快速上手
 
@@ -40,22 +40,20 @@ rubric 评审（`promptfooconfig.rubric.yaml` / `replay-rubric` / `gate` / calib
 
 ### 换评审模型（发版交接必读）
 
-评审模型名 `doubao-seed-2-1-pro-260915` **硬编码在 5 处**，漏改任一处 = 各配置评审口径不一致：
+评审模型名**单一事实源**：`set_rubric_model.py` 的 `DEFAULT_MODEL`（全仓唯一硬编码点）。覆盖优先级：命令行参数 > 环境变量 `ARK_RUBRIC_MODEL` > `DEFAULT_MODEL`。
 
-| # | 文件 | 位置 |
-| --- | --- | --- |
-| 1 | `promptfooconfig.rubric.yaml` | `defaultTest.options.provider.id` |
-| 2 | `promptfooconfig.replay-rubric.yaml` | 同上 |
-| 3 | `promptfooconfig.gate.yaml` | 同上 |
-| 4 | `promptfooconfig.calibration.yaml` | **生成物**：不手改，改 #5 后 `python gen_calibration.py` 重新生成 |
-| 5 | `gen_calibration.py` | `RUBRIC_PROVIDER` 字典 `'id'` 键（约 42 行；RUBRIC_CONTEXT 适配层同文件） |
+> 为什么不用配置内环境变量引用：promptfoo 0.123 不解析 provider id 中的 `${VAR}`（2026-09-24 实测：字面量被原样发给 API，方舟返回 404），故由脚本同步各配置文件中的模型名。
 
-更换四步：
+```bash
+python set_rubric_model.py <新模型名>     # 或 export ARK_RUBRIC_MODEL=<新模型名> 后无参运行
+```
 
-1. **找全落点**（防新增漂移，勿只信上表）：`grep -rn "doubao-seed" --include="*.yaml" --include="*.py" .`
-2. **5 处全改**：provider id 格式 `openai:chat:<模型名>`——方舟模型名用连字符（点号 404），可用模型以 `GET /api/v3/models`（带 `ARK_API_KEY`）为准；若换其他 OpenAI 兼容服务，同段的 `apiBaseUrl` / `apiKeyEnvar` 一并同步。
-3. **冒烟验证**：`npx promptfoo eval -c promptfooconfig.rubric.yaml --no-cache`——预期 2 条内嵌用例方向正确（合规 PASS / 违规 FAIL）且退出码 0；若 404 model not found 即模型名/端点没改对。
-4. **重新校准对拍**：30/30 对拍结论**只对当前模型有效**——换模型 = 换 judge，须重跑 `gen_calibration.py` 转出 + `npx promptfoo eval -c promptfooconfig.calibration.yaml --no-cache` 与人审结论对齐（≥ 20~30 条、正负样本都过）后，rubric 才能继续当门禁。
+脚本自动完成：① 同步 3 个手维护配置（`rubric` / `replay-rubric` / `gate`）的 provider id（幂等，与现值一致不写文件）；② 经 `gen_calibration.py` 重新生成 `promptfooconfig.calibration.yaml`（**生成物不手改**，命令行模型名经 `ARK_RUBRIC_MODEL` 传导给生成器）；③ 打印后续必做步骤。模型名规范：方舟模型名用连字符（点号 404），可用模型以 `GET /api/v3/models`（带 `ARK_API_KEY`）为准；若换其他 OpenAI 兼容服务商，各配置 `defaultTest.options.provider.config` 段的 `apiBaseUrl` / `apiKeyEnvar` 需一并手改。
+
+换模型后两步必做（脚本运行结束也会提示）：
+
+1. **冒烟**：`npx promptfoo eval -c promptfooconfig.rubric.yaml --no-cache`——预期 2 条内嵌用例方向正确（合规 PASS / 违规 FAIL）且退出码 0；404 model not found 即模型名/端点没改对。
+2. **重新校准对拍**：30/30 对拍结论**只对当前模型有效**——换模型 = 换 judge，须重跑 `npx promptfoo eval -c promptfooconfig.calibration.yaml --no-cache` 与人审结论对齐（正负样本一致率达标）后，rubric 才能继续当门禁。
 
 ## 组件与用法
 
@@ -71,6 +69,7 @@ evals/promptfoo/
 ├── promptfooconfig.replay-real.yaml # 真实样本回放校准：B 侧 transcript（2026-09-22 ddl 首批 7/7）
 ├── promptfooconfig.replay-rubric.yaml # 回放 + 方舟 rubric 评审组合（用例集含 llm-rubric 的回放回归用这个）
 ├── promptfooconfig.rubric.yaml      # llm-rubric 评审（火山方舟 doubao-seed，见上节；换评审模型的冒烟入口）
+├── set_rubric_model.py              # 一键切换评审模型（DEFAULT_MODEL 单一事实源，见「换评审模型」节）
 ├── promptfooconfig.trajectory.yaml  # 轨迹断言：含故意违规样本，验证门禁捕获
 ├── tests_<技能名>.yaml           # 转换器产物（独立 config 形态，经 -c 合并使用）
 └── package.json / node_modules  # promptfoo 0.123.1 本地依赖
@@ -112,5 +111,8 @@ evals/promptfoo/
    `samples/calibration-negatives.json`（历史失败现象复刻负样本）。**rubric 已可当门禁**。
 3. ~~断言补全~~ **已完成（2026-09-22）**：37/37 用例全部有机器断言——新增 `asserts/no_forbidden_tools.py`
    （触发反例零调用判定，含负样本拦截验证）+ 3 条 llm-rubric；gate 验证 7 PASS + 1 拦截 FAIL。
-4. **CI 接线（唯一剩余）**：GitLab CI 加 stage 跑 eval 命令（smoke / replay-real / gate / calibration
-   按需），退出码非零即阻塞——与回归纪律衔接，mature 套件失败=不许发布；node_modules 不入库，CI 里 `npm ci` 恢复。
+4. ~~CI 接线~~ **已改道落地（决策：弃 GitLab CI 服务器，改 pre-commit 本地门禁）**：
+   `.pre-commit-config.yaml` 的「评估用例集校验」钩子（复用 `tools/skill-eval-generator/scripts/validate_cases.py`，
+   evals 下 `cases*.yaml` 变更即触发）在 commit 前拦截用例格式 / 编号 / 红线问题；
+   promptfoo eval 级门禁（smoke / replay-real / replay-rubric / gate / calibration）仍按需本地手动跑——
+   发版前至少跑 gate 与本次改动技能的回放回归。

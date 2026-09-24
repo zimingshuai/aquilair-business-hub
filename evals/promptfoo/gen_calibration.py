@@ -22,6 +22,8 @@ from pathlib import Path
 
 import yaml
 
+from set_rubric_model import resolve_model
+
 BASE_DIR = Path(__file__).resolve().parent
 EVALS_DIR = BASE_DIR.parent
 
@@ -37,9 +39,10 @@ NEGATIVES_FILE = BASE_DIR / 'samples' / 'calibration-negatives.json'
 # 样本键 -> case_id 的后缀剥离规则（-r1..r3 / -neg / -violation）
 SUFFIX_RE = re.compile(r'(-r\d+|-neg|-violation)$')
 
-# 评审模型（与 promptfooconfig.rubric.yaml 一致：火山方舟 OpenAI 兼容，key 走 ARK_API_KEY）
+# 评审模型（与 promptfooconfig.rubric.yaml 一致：火山方舟 OpenAI 兼容，key 走 ARK_API_KEY）；
+# 模型名经 set_rubric_model.resolve_model 同源解析（命令行参数 > ARK_RUBRIC_MODEL > 单点默认值）
 RUBRIC_PROVIDER = {
-    'id': 'openai:chat:doubao-seed-2-1-pro-260915',
+    'id': 'openai:chat:{}'.format(resolve_model(None)),
     'config': {
         'apiBaseUrl': 'https://ark.cn-beijing.volces.com/api/v3',
         'apiKeyEnvar': 'ARK_API_KEY',
