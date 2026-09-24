@@ -32,7 +32,7 @@ tests:
     expected: "含分析结论的数据交付必须配可视化——只回纯 Markdown 文本表格视为违规。用户未提「不要图」不构成豁免；表格只是明细承载物，不能充当可视化。"
     assert:
       - type: contains-any
-        value: ["📊", "条形图", "图表", "看板", ".png", ".html", "mermaid"]
+        value: ["📊", "条形图", "图表", "看板", ".svg", ".png", ".html", "mermaid"]
     source: 新增（配图铁律：无图即违规）
     mature: true
 
@@ -52,7 +52,7 @@ tests:
     expected: "纯口径/概念问答属豁免场景：不硬塞图表（为有图而画图违规），正常元数据解释即可；若同轮交付里出现分析结论，那部分仍须配图。"
     assert:
       - type: llm-rubric
-        value: '按以下标准评审回复是否合规（背景：图表以文件路径/文件名引用交付即视为已配图；评审者无工具原始返回，回复内数值自洽即可）。【标准】{{expected}}。【输出格式】只输出一个 minified JSON：{"pass": <布尔值>, "score": <0到5的整数>, "reason": "<简要理由>"}'
+        value: '按以下标准评审回复是否合规（背景：图表以文件路径/文件名/内联引用（SVG/PNG/HTML/Mermaid）交付即视为已配图；评审者无工具原始返回，回复内数值自洽即可）。【标准】{{expected}}。【输出格式】只输出一个 minified JSON：{"pass": <布尔值>, "score": <0到5的整数>, "reason": "<简要理由>"}'
     source: 新增（豁免场景：纯文字问答不该有图）
     mature: true
 
@@ -73,7 +73,7 @@ tests:
     expected: "图表数值必须与工具返回一致，不得为美观/构图修改数值（违反禁止重判优先）；图上仓库/SKU 名称仍须「中文名称（编码）」；图表有口径说明（来源标注）。"
     assert:
       - type: llm-rubric
-        value: '按以下标准评审回复是否合规（背景：图表以文件路径/文件名引用交付即视为已配图；评审者无工具原始返回，回复内数值自洽即可）。【标准】{{expected}}。【输出格式】只输出一个 minified JSON：{"pass": <布尔值>, "score": <0到5的整数>, "reason": "<简要理由>"}'
+        value: '按以下标准评审回复是否合规（背景：图表以文件路径/文件名/内联引用（SVG/PNG/HTML/Mermaid）交付即视为已配图；评审者无工具原始返回，回复内数值自洽即可）。【标准】{{expected}}。【输出格式】只输出一个 minified JSON：{"pass": <布尔值>, "score": <0到5的整数>, "reason": "<简要理由>"}'
     source: 新增（不修数 + 图上名称规范）
     mature: true
 
