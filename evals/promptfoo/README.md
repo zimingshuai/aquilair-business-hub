@@ -10,7 +10,7 @@
 npm ci          # 安装本地 promptfoo 0.123.1（node_modules 不入库）
 ```
 
-rubric 评审（仅 `promptfooconfig.rubric.yaml` / calibration 相关）还需火山方舟 key，从环境变量读，仓库不落密钥：`ARK_API_KEY`（Windows CMD：`setx ARK_API_KEY "<你的key>"`，新开终端生效）。
+rubric 评审（`promptfooconfig.rubric.yaml` / `replay-rubric` / `gate` / calibration 相关）还需火山方舟 key，从环境变量读，仓库不落密钥：`ARK_API_KEY`（Windows CMD：`setx ARK_API_KEY "<你的key>"`，新开终端生效）。
 
 **按场景选命令**（本目录内，均已实测）：
 
@@ -20,6 +20,7 @@ rubric 评审（仅 `promptfooconfig.rubric.yaml` / calibration 相关）还需�
 | 用例集变更后重新转出 | `python convert_cases.py` |
 | 回放校准·餐饮 | `npx promptfoo eval -c promptfooconfig.replay.yaml -c tests_fnb-inventory-analysis.yaml --no-cache` |
 | 回放校准·制造 | `npx promptfoo eval -c promptfooconfig.replay.yaml -c tests_mfg-transfer-allocation.yaml --no-cache` |
+| 回放校准·含 rubric 评审（用例集含 llm-rubric 时用这个） | `npx promptfoo eval -c promptfooconfig.replay-rubric.yaml -c tests_mfg-transfer-allocation.yaml --no-cache`（tests 文件可换 fnb / ddl） |
 | 轨迹断言自检（预期 1 PASS + 1 FAIL、退出码 100） | `npx promptfoo eval -c promptfooconfig.trajectory.yaml --no-cache` |
 
 其余配置（`replay-real` 真实样本回放 / `rubric` 评审 / `gate` 门禁 / `calibration` 校准对拍）同模式运行：`npx promptfoo eval -c <配置名>.yaml --no-cache`；用途见下表与「已验证结论」。
@@ -33,8 +34,28 @@ rubric 评审（仅 `promptfooconfig.rubric.yaml` / calibration 相关）还需�
 | 3 | 「确认卡在写操作前」可机器判定并作门禁 | ✅ | python 自定义断言（`asserts/confirm_card_before_write.py`）：合规样本 PASS、违规样本 FAIL 且 reason 精确定位（「未见确认卡；run_supply_demand_allocation 发生在确认前」），端到端退出码 100 |
 | 4 | llm-rubric 与人审校准对拍（judge 可信度） | ✅ | **30/30（100%）**：正样本（ddl 成熟轮真实 transcript）24/24 零误杀、负样本（历史失败现象复刻）6/6 零漏判、零解析失败（`gen_calibration.py` + `promptfooconfig.calibration.yaml`，2026-09-22） |
 | 5 | 断言补全（37 条全机器判定） | ✅ | 7 条 `assert: []` 用例补齐（4 轨迹断言 `asserts/no_forbidden_tools.py` + 3 条 rubric）；gate 验证 7 PASS + 负样本拦截 FAIL、退出码 100（`promptfooconfig.gate.yaml`） |
+| 6 | 含 rubric 的全量回放回归（replay-rubric 组合） | ✅ | 2026-09-24 可视化泛化改造回归：fnb 32/32、mfg 26/26（含 mfg-007 rubric 方舟评审）、ddl-005/007 rubric 评审 PASS；纯 `replay.yaml` 无评审模型，含 llm-rubric 的回放一律用 `replay-rubric` |
 
-评审模型（llm-rubric）：**已验证（2026-09-22，火山方舟 OpenAI 兼容端点）**——`promptfooconfig.rubric.yaml` 内联双向冒烟用例（合规判 PASS / 代查代答判 FAIL，评审理由精确到违规点），评审模型 `doubao-seed-2-1-pro-260915`。key 从环境变量 `ARK_API_KEY` 读（`apiKeyEnvar`，仓库不落密钥）。**0.123.x 配置字段踩坑**：`apiKeyEnvar` 与 `apiBaseUrl` 都是 provider `config` 的**顶层字段**（写成 `config.api.baseURL` 嵌套会静默回落到 api.openai.com 超时）；方舟模型名用连字符（`doubao-seed-1-6`，点号 404），可用模型以 `GET /api/v3/models` 为准。**尚未当门禁**：按调研纪律，先做 20~30 条与 B 侧人审结论的校准对拍，judge 与人工对齐后才用于门禁。
+评审模型（llm-rubric）：**已验证（2026-09-22，火山方舟 OpenAI 兼容端点）**——`promptfooconfig.rubric.yaml` 内联双向冒烟用例（合规判 PASS / 代查代答判 FAIL，评审理由精确到违规点），评审模型 `doubao-seed-2-1-pro-260915`。key 从环境变量 `ARK_API_KEY` 读（`apiKeyEnvar`，仓库不落密钥）。**0.123.x 配置字段踩坑**：`apiKeyEnvar` 与 `apiBaseUrl` 都是 provider `config` 的**顶层字段**（写成 `config.api.baseURL` 嵌套会静默回落到 api.openai.com 超时）；方舟模型名用连字符（`doubao-seed-1-6`，点号 404），可用模型以 `GET /api/v3/models` 为准。**门禁资格**：2026-09-22 已完成 30/30 校准对拍（见落地清单 2），rubric 可当门禁；**换评审模型后资格作废**，须按下节重跑对拍。
+
+### 换评审模型（发版交接必读）
+
+评审模型名 `doubao-seed-2-1-pro-260915` **硬编码在 5 处**，漏改任一处 = 各配置评审口径不一致：
+
+| # | 文件 | 位置 |
+| --- | --- | --- |
+| 1 | `promptfooconfig.rubric.yaml` | `defaultTest.options.provider.id` |
+| 2 | `promptfooconfig.replay-rubric.yaml` | 同上 |
+| 3 | `promptfooconfig.gate.yaml` | 同上 |
+| 4 | `promptfooconfig.calibration.yaml` | **生成物**：不手改，改 #5 后 `python gen_calibration.py` 重新生成 |
+| 5 | `gen_calibration.py` | `RUBRIC_PROVIDER` 字典 `'id'` 键（约 42 行；RUBRIC_CONTEXT 适配层同文件） |
+
+更换四步：
+
+1. **找全落点**（防新增漂移，勿只信上表）：`grep -rn "doubao-seed" --include="*.yaml" --include="*.py" .`
+2. **5 处全改**：provider id 格式 `openai:chat:<模型名>`——方舟模型名用连字符（点号 404），可用模型以 `GET /api/v3/models`（带 `ARK_API_KEY`）为准；若换其他 OpenAI 兼容服务，同段的 `apiBaseUrl` / `apiKeyEnvar` 一并同步。
+3. **冒烟验证**：`npx promptfoo eval -c promptfooconfig.rubric.yaml --no-cache`——预期 2 条内嵌用例方向正确（合规 PASS / 违规 FAIL）且退出码 0；若 404 model not found 即模型名/端点没改对。
+4. **重新校准对拍**：30/30 对拍结论**只对当前模型有效**——换模型 = 换 judge，须重跑 `gen_calibration.py` 转出 + `npx promptfoo eval -c promptfooconfig.calibration.yaml --no-cache` 与人审结论对齐（≥ 20~30 条、正负样本都过）后，rubric 才能继续当门禁。
 
 ## 组件与用法
 
@@ -48,7 +69,8 @@ evals/promptfoo/
 ├── promptfooconfig.smoke.yaml       # 冒烟：echo provider 验断言引擎与退出码
 ├── promptfooconfig.replay.yaml      # 回放校准：确定性断言 × 合规样本（形态代表）
 ├── promptfooconfig.replay-real.yaml # 真实样本回放校准：B 侧 transcript（2026-09-22 ddl 首批 7/7）
-├── promptfooconfig.rubric.yaml      # llm-rubric 评审（火山方舟 doubao-seed，见上节）
+├── promptfooconfig.replay-rubric.yaml # 回放 + 方舟 rubric 评审组合（用例集含 llm-rubric 的回放回归用这个）
+├── promptfooconfig.rubric.yaml      # llm-rubric 评审（火山方舟 doubao-seed，见上节；换评审模型的冒烟入口）
 ├── promptfooconfig.trajectory.yaml  # 轨迹断言：含故意违规样本，验证门禁捕获
 ├── tests_<技能名>.yaml           # 转换器产物（独立 config 形态，经 -c 合并使用）
 └── package.json / node_modules  # promptfoo 0.123.1 本地依赖
@@ -72,7 +94,8 @@ evals/promptfoo/
    格式指令措辞里**不得出现「true 或 false」这类会被模型照抄进 JSON 的字样**（中文「或」破坏解析）。
 8. **判 FAIL 时 reason 会冗余写进结果的 error 字段**——统计一致率须以 `gradingResult.pass` 为准，
    不能把 error 非空当解析失败（曾因此把 8 条正确 FAIL 误判为 error）。
-9. **rubric 需要视野适配层**（judge 视野 ≠ 人审视野）：图表以文件路径引用交付即视为已配图；
+9. **rubric 需要视野适配层**（judge 视野 ≠ 人审视野）：图表以文件路径/文件名/内联引用（SVG/PNG/HTML/Mermaid）
+   交付即视为已配图；
    确认卡用例是两段式协议（段1 出卡、用户已确认、段2 执行汇报），不得判矛盾；judge 无工具返回，
    回复内数值自洽即可、不作负向推断；不可逆提示按环境区分（沙箱卡声明可丢弃即达标）。
    适配层固化在 `gen_calibration.py` 的 RUBRIC_CONTEXT / CASE_RUBRIC_OVERRIDES。
