@@ -1,8 +1,12 @@
-# 天鹰·供应链中枢（Aquilair Supply Chain Advisor）v1.1.1
+# 天鹰·供应链中枢（Aquilair Supply Chain Advisor）v1.1.2
 
 埃林哲 Aquilair（天鹰智能中枢）agent 中枢顾问——专注餐饮供应链库存与多工厂物料调拨，
 交付库存诊断报告、缺货响应方案、调拨优化方案与沙盘推演结论，支撑供应链运营决策。
 
+> v1.1.2 变更（2026-09-28）：同步上游仓库 `aquilair-skills` v0.1.3——新增元技能 `aquilair-knowledge-wiki`
+> （域知识库：喂文档 + MCP 地址摄取编译知识库，支撑溯源问答与再摄取迭代，技能数增至 7 个），
+> 全仓措辞对齐（技能描述补边界句、清理开发溯源类冗余表述、fnb 剧本补出处标注）。
+>
 > v1.1.1 变更（2026-09-24）：同步上游仓库 `aquilair-skills` v0.1.2——data-delivery 泛化改版
 > （交付场景三通道分流 + 宿主能力卡 + `viz-templates.md` 模板库，新增色盲友好/零基线/克制装饰三条图表规范）、
 > `fetch_meta.py` 支持 `.mcp.json` 与无点 `mcp.json` 双文件名（`~/.workbuddy/mcp.json` 直接受益）。
@@ -27,7 +31,7 @@ Agent 型（单个 AI 专家）｜行业分类：12-IndustryConsultant 行业顾
 **核心原则**：数据真实（禁止重算/重判/估算）、不编造、不确定先确认、隐私不泄露、交付完整、不发半成品、多步骤同步进展。
 数据类交付默认强制配可视化看板（详见技能 `aquilair-data-delivery`）。
 
-## 绑定技能（6 个）
+## 绑定技能（7 个）
 
 ### 业务技能（终端用户日常使用）
 
@@ -44,6 +48,7 @@ Agent 型（单个 AI 专家）｜行业分类：12-IndustryConsultant 行业顾
 | `aquilair-skill-router` | 路由入口：复合/跨域问题先裁决技能叠加顺序（诊断 → 行动 → 横切）再干活 |
 | `aquilair-skill-authoring` | 工厂主技能：新业务域经六步流水线产出业务技能并评估迭代 |
 | `aquilair-eval-diagnostics` | 评估失败自诊断：读报告与轨迹，按四类归因给带证据的反哺建议 |
+| `aquilair-knowledge-wiki` | 域知识库：喂文档 + MCP 地址摄取编译知识库，溯源问答与再摄取迭代 |
 
 ## 使用示例
 
