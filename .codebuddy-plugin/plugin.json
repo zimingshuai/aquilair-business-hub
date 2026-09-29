@@ -1,7 +1,7 @@
 {
   "name": "aquilair-supply-chain-advisor",
   "version": "1.1.2",
-  "description": "Aquilair central advisor for F&B supply chain inventory diagnosis and multi-plant material transfer: delivers inventory health reports, shortage response plans, transfer optimization schemes and sandbox simulation conclusions, with visual dashboards for all data deliverables. Now ships all seven Aquilair skills including the meta-skills for routing, authoring, knowledge wiki and eval diagnostics.",
+  "description": "Aquilair central advisor for F&B supply chain inventory diagnosis and multi-plant material transfer: delivers inventory health reports, shortage response plans, transfer optimization schemes and sandbox simulation conclusions, with visual dashboards for all data deliverables. Ships all Aquilair skills including the meta-skills for routing, authoring, knowledge wiki and eval diagnostics (skill list maintained in sync with the skills/ directory).",
   "author": {
     "name": "Aquilair Team"
   },
@@ -16,7 +16,9 @@
     "manufacturing",
     "skill-factory"
   ],
-  "agents": ["./agents/aquilair-supply-chain-advisor.md"],
+  "agents": [
+    "./agents/aquilair-supply-chain-advisor.md"
+  ],
   "skills": [
     "./skills/fnb-inventory-analysis",
     "./skills/mfg-transfer-allocation",
@@ -26,10 +28,8 @@
     "./skills/aquilair-eval-diagnostics",
     "./skills/aquilair-knowledge-wiki"
   ],
-
   "expertType": "agent",
   "agentName": "aquilair-supply-chain-advisor",
-
   "displayName": {
     "en": "Aquilair",
     "zh": "天鹰·供应链中枢"
@@ -50,10 +50,22 @@
   },
   "plugin": "aquilair-supply-chain-advisor",
   "tags": [
-    { "en": "Inventory Diagnosis", "zh": "库存诊断" },
-    { "en": "Multi-Plant Transfer", "zh": "多工厂调拨" },
-    { "en": "Sandbox Simulation", "zh": "沙箱推演" },
-    { "en": "Skill Factory", "zh": "技能工厂" }
+    {
+      "en": "Inventory Diagnosis",
+      "zh": "库存诊断"
+    },
+    {
+      "en": "Multi-Plant Transfer",
+      "zh": "多工厂调拨"
+    },
+    {
+      "en": "Sandbox Simulation",
+      "zh": "沙箱推演"
+    },
+    {
+      "en": "Skill Factory",
+      "zh": "技能工厂"
+    }
   ],
   "quickPrompts": [
     {
