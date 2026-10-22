@@ -23,10 +23,10 @@ Agent 型（单个 AI 专家）｜行业分类：12-IndustryConsultant 行业顾
 
 | 职责 | 说明 | 数据环境 |
 | --- | --- | --- |
-| 库存健康诊断 | 仓群风险总览（P0-P3）、SKU 周转、ABC 分类、缺货明细、判定依据溯源 | `data-service-fnb`（只读） |
-| 缺货响应处理 | 接收工厂缺货反馈，联动各工厂物料库存匹配可调出物料，给出初步响应方案 | `data-service-mfg-sandbox` |
-| 调拨方案生成 | 多工厂物料调拨方案：调拨路径、数量、时效预期 + 方案评估 | `data-service-mfg-sandbox` |
-| 沙箱推演验证 | What-if 模拟推演，评估执行风险与预期效果，确认后才在生产执行 | `data-service-mfg-sandbox` |
+| 库存健康诊断 | 仓群风险总览（P0-P3）、SKU 周转、ABC 分类、缺货明细、判定依据溯源 | `aquilair-mcp`（fnb 本体项目，只读） |
+| 缺货响应处理 | 接收工厂缺货反馈，联动各工厂物料库存匹配可调出物料，给出初步响应方案 | `aquilair-mcp`（mfg 本体项目） |
+| 调拨方案生成 | 多工厂物料调拨方案：调拨路径、数量、时效预期 + 方案评估 | `aquilair-mcp`（mfg 本体项目） |
+| 沙箱推演验证 | What-if 分支模拟推演，评估执行风险与预期效果，确认后才在生产执行 | `aquilair-mcp`（mfg 本体项目） |
 
 **核心原则**：数据真实（禁止重算/重判/估算）、不编造、不确定先确认、隐私不泄露、交付完整、不发半成品、多步骤同步进展。
 数据类交付默认强制配可视化看板（详见技能 `aquilair-data-delivery`）。
@@ -66,16 +66,15 @@ Agent 型（单个 AI 专家）｜行业分类：12-IndustryConsultant 行业顾
 
 ## 前置条件
 
-两个数据服务部署在公司内网，需在能访问下列端点的环境（内网 / VPN）下使用：
+MCP 数据网关部署在公司内网，需在能访问下列端点的环境（内网 / VPN）下使用（OAuth Bearer 鉴权；两个业务技能各自使用固定 workspace）：
 
 ```
-data-service-fnb           https://aquilair-mcp0.idcs.elitescloud.com/mcp
-data-service-mfg-sandbox   https://aquilair-mcp1.idcs.elitescloud.com/mcp
+aquilair-mcp               https://aquilair.idcs.elitescloud.com/mcp-service/mcp
 ```
 
-宿主环境需注册这两个 MCP 服务（本包的 `.mcp.json` 为标准格式，供 `fetch_meta.py` 解析服务地址）。
+宿主环境需注册该 MCP 网关（本包的 `.mcp.json` 为标准格式，供 `fetch_meta.py` 解析服务地址）。
 
-首次使用建议先验证元数据预取（两个都应打印「====元数据缓存就绪====」）：
+首次使用建议先验证元数据预取（网关需凭证：环境变量 `AQUILAIR_MCP_TOKEN` 或 `--token`；两个都应打印「====元数据缓存就绪====」）：
 
 ```bash
 python skills/fnb-inventory-analysis/scripts/fetch_meta.py
@@ -85,7 +84,7 @@ python skills/mfg-transfer-allocation/scripts/fetch_meta.py
 ## ⚠️ 边界
 
 - **写护栏是提示词约束**：确认卡纪律靠模型自觉遵守。**请勿通过本通道执行生产环境写入**
-  （`execute_solution` 在生产环境是不可逆的真实库存变更）；沙箱内推演可放心验证。
+  （`execute_solution` 在生产环境是不可逆的真实库存变更；action-service 当前未部署动作，待就绪后此警告生效）；沙箱分支内推演可放心验证。
 - 本专家处理的是业务问答；编写库存/调拨相关脚本、系统、报表等**开发类请求**按普通开发任务处理。
 
 ## 头像
