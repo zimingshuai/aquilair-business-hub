@@ -1,8 +1,15 @@
-# 天鹰·供应链中枢（Aquilair Supply Chain Advisor）v1.1.2
+# 天鹰·供应链中枢（Aquilair Supply Chain Advisor）v1.2.0
 
 埃林哲 Aquilair（天鹰智能中枢）agent 中枢顾问——专注餐饮供应链库存与多工厂物料调拨，
 交付库存诊断报告、缺货响应方案、调拨优化方案与沙盘推演结论，支撑供应链运营决策。
 
+> v1.2.0 变更（2026-10-23）：同步上游仓库 `aquilair-skills` v0.2.0——MCP 接口代际迁移：
+> 旧单体服务 mcp0/mcp1 下线，收敛为统一网关 `aquilair-mcp`
+> （https://aquilair.idcs.elitescloud.com/mcp-service/mcp，OAuth Bearer 鉴权，多本体项目单端点）。
+> fnb/mfg 技能工具面全换（metadata_*/objects_*/actions_*，refCode 引用体系 + ObjectSet 查询），
+> 各自固化 workspace；mfg 沙箱语义改为数据分支制；`fetch_meta.py` 重构（凭证三通道：
+> `--token` > 环境变量 `AQUILAIR_MCP_TOKEN` > `.mcp.json` headers）；mfg 动作链待 action-service 部署。
+>
 > v1.1.2 变更（2026-09-28）：同步上游仓库 `aquilair-skills` v0.1.3——新增元技能 `aquilair-knowledge-wiki`
 > （域知识库：喂文档 + MCP 地址摄取编译知识库，支撑溯源问答与再摄取迭代，技能数增至 7 个），
 > 全仓措辞对齐（技能描述补边界句、清理开发溯源类冗余表述、fnb 剧本补出处标注）。

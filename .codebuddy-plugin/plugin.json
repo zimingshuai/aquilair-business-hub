@@ -1,6 +1,6 @@
 {
   "name": "aquilair-supply-chain-advisor",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "Aquilair central advisor for F&B supply chain inventory diagnosis and multi-plant material transfer: delivers inventory health reports, shortage response plans, transfer optimization schemes and sandbox simulation conclusions, with visual dashboards for all data deliverables. Ships all Aquilair skills including the meta-skills for routing, authoring, knowledge wiki and eval diagnostics (skill list maintained in sync with the skills/ directory).",
   "author": {
     "name": "Aquilair Team"
