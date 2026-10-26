@@ -1,0 +1,8 @@
+{
+  "name": "aquilair-business-hub",
+  "description": "天鹰智能中枢（Aquilair）智能应用中枢：库存诊断、多工厂调拨、数据交付规范与技能路由入口，安装后自动注册 MCP 数据网关连接。",
+  "version": "0.3.0",
+  "author": {
+    "name": "Aquilair Team"
+  }
+}

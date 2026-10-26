@@ -1,7 +1,7 @@
 {
   "name": "aquilair-supply-chain-advisor",
-  "version": "1.2.0",
-  "description": "Aquilair central advisor for F&B supply chain inventory diagnosis and multi-plant material transfer: delivers inventory health reports, shortage response plans, transfer optimization schemes and sandbox simulation conclusions, with visual dashboards for all data deliverables. Ships all Aquilair skills including the meta-skills for routing, authoring, knowledge wiki and eval diagnostics (skill list maintained in sync with the skills/ directory).",
+  "version": "1.3.0",
+  "description": "Aquilair central advisor for F&B supply chain inventory diagnosis and multi-plant material transfer: delivers inventory health reports, shortage response plans, transfer optimization schemes and sandbox simulation conclusions, with visual dashboards for all data deliverables. Ships the business skills for inventory, transfer, data delivery and routing (skill list maintained in sync with the plugins/business-hub/skills directory; skill-authoring meta-skills ship in the aquilair-skill-forge plugin).",
   "author": {
     "name": "Aquilair Team"
   },
@@ -14,19 +14,16 @@
     "aquilair",
     "fnb",
     "manufacturing",
-    "skill-factory"
+    "data-delivery"
   ],
   "agents": [
-    "./agents/aquilair-supply-chain-advisor.md"
+    "./plugins/business-hub/agents/aquilair-supply-chain-advisor.md"
   ],
   "skills": [
-    "./skills/fnb-inventory-analysis",
-    "./skills/mfg-transfer-allocation",
-    "./skills/aquilair-data-delivery",
-    "./skills/aquilair-skill-router",
-    "./skills/aquilair-skill-authoring",
-    "./skills/aquilair-eval-diagnostics",
-    "./skills/aquilair-knowledge-wiki"
+    "./plugins/business-hub/skills/fnb-inventory-analysis",
+    "./plugins/business-hub/skills/mfg-transfer-allocation",
+    "./plugins/business-hub/skills/aquilair-data-delivery",
+    "./plugins/business-hub/skills/aquilair-skill-router"
   ],
   "expertType": "agent",
   "agentName": "aquilair-supply-chain-advisor",
@@ -61,10 +58,6 @@
     {
       "en": "Sandbox Simulation",
       "zh": "沙箱推演"
-    },
-    {
-      "en": "Skill Factory",
-      "zh": "技能工厂"
     }
   ],
   "quickPrompts": [

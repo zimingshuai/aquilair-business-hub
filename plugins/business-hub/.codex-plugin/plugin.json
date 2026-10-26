@@ -1,0 +1,19 @@
+{
+  "name": "aquilair-business-hub",
+  "version": "0.3.0",
+  "description": "天鹰智能中枢（Aquilair）智能应用中枢：库存诊断、多工厂调拨、数据交付规范与技能路由入口，安装后自动注册 MCP 数据网关连接。",
+  "author": {
+    "name": "Aquilair Team"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Aquilair 智能应用中枢",
+    "shortDescription": "库存诊断、多工厂调拨、数据交付规范与技能路由，附 MCP 数据网关连接。",
+    "longDescription": "源自 aquilair-skills 仓库（与 Claude Code 插件 .claude-plugin 同源派生）：终端业务技能（库存诊断/多工厂调拨/数据交付/技能路由），技能随 skills/ 目录动态收录，清单以仓库为准。技能开发侧元技能在 aquilair-skill-forge 插件。",
+    "developerName": "Aquilair Team",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "各仓库有没有库存风险？"
+  },
+  "mcpServers": "./.mcp.json"
+}

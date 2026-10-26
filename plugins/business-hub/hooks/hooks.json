@@ -1,0 +1,16 @@
+{
+  "description": "会话启动与压缩后自动注入 Aquilair 技能路由引导（hooks/bootstrap.md）",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}
