@@ -1,7 +1,10 @@
-"""校验 aquilair-skills 评估用例集的格式与一致性。
+"""校验评估用例集（cases*.yaml）的格式与一致性。
+
+vendored 说明：本副本源自 aquilair-skill-forge 仓库 skill-eval-generator/scripts/validate_cases.py，
+上游演进时须同步本文件。
 
 主要 Input：一个或多个 cases*.yaml 文件路径；不传参数时自动定位仓库根
-（向上查找 .claude-plugin/plugin.json 标记）并扫描 evals/*/cases*.yaml。
+（向上查找 .claude-plugin/marketplace.json 标记）并扫描 evals/*/cases*.yaml。
 主要 Output：中文校验报告（stdout）；发现错误时退出码为 1，可直接作为 CI 质量门禁。
 """
 

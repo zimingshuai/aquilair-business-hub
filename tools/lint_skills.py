@@ -4,8 +4,8 @@
 主要 Output：控制台中文巡检报告（按技能列 PASS/WARN/FAIL）+ 进程退出码
 （存在 ERROR 返回 1，可挂 pre-commit / CI；仅 WARN 返回 0 不阻断）。
 
-机检十项（语义项——矛盾/过时/术语漂移——见
-plugins/skill-forge/skills/aquilair-skill-authoring/references/lint.md 的人工巡检清单）：
+机检十项（语义项——矛盾/过时/术语漂移——见 aquilair-skill-forge 仓库
+skills/aquilair-skill-authoring/references/lint.md 的人工巡检清单）：
   C1  frontmatter name 与目录名一致
   C2  description 含「Use when」触发句式与边界句（not for / 不属于）
   C3  SKILL.md 行数 50~120（触发即全文加载，超限摊薄注意力）
@@ -175,7 +175,7 @@ def lint_repo(repo_root: Path) -> tuple[list[dict[str, list[tuple[str, str, str]
     Returns:
         (逐技能问题清单 [{技能名: 问题列表}]，仓库级问题列表)。
     """
-    #   1. 资产清点与分类事实源读取（双插件目录：business-hub 业务 + skill-forge 元技能）
+    #   1. 资产清点与分类事实源读取（扫 plugins/*/skills 目录，本仓库单插件，写法兼容多插件）
     # skill_dirs：技能名 -> 技能目录路径映射（跨双插件目录收集，新技能零改动纳入）
     skill_dirs: dict[str, Path] = {}
     for skills_root in sorted(p for p in (repo_root / "plugins").glob("*/skills") if p.is_dir()):

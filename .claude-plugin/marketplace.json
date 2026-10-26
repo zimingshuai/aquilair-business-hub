@@ -1,0 +1,22 @@
+{
+  "name": "aquilair",
+  "owner": {
+    "name": "Aquilair Team"
+  },
+  "plugins": [
+    {
+      "name": "aquilair-business-hub",
+      "source": "./plugins/business-hub",
+      "description": "库存诊断、多工厂调拨、数据交付规范与技能路由入口，附 MCP 数据网关连接",
+      "version": "0.3.0",
+      "displayName": "Aquilair Business Hub",
+      "displayName_i18n": {
+        "zh-CN": "Aquilair 智能应用中枢"
+      },
+      "description_i18n": {
+        "zh-CN": "终端业务技能：库存诊断、多工厂调拨、数据交付与技能路由，安装后自动注册 MCP 数据网关连接"
+      },
+      "category": "productivity"
+    }
+  ]
+}
