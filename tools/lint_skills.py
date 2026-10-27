@@ -186,8 +186,10 @@ def lint_repo(repo_root: Path) -> tuple[list[dict[str, list[tuple[str, str, str]
     readme_text = (repo_root / "README.md").read_text(encoding="utf-8")
     business, meta = parse_readme_categories(readme_text, known_skills)
     router_text = (skill_dirs["aquilair-skill-router"] / "SKILL.md").read_text(encoding="utf-8")
-    mcp_path = repo_root / "plugins" / "business-hub" / ".mcp.json"
-    mcp_services = set(json.loads(mcp_path.read_text(encoding="utf-8")).get("mcpServers", {})) if mcp_path.is_file() else set()
+    # mcp_services：扫全部插件目录 .mcp.json 收集登记服务（与 forge 仓同款写法，避免两仓副本分叉）
+    mcp_services = set()
+    for mcp_path in sorted((repo_root / "plugins").glob("*/.mcp.json")):
+        mcp_services |= set(json.loads(mcp_path.read_text(encoding="utf-8")).get("mcpServers", {}))
     evals_dir = repo_root / "evals"
     #   2. 逐技能机检（未进 README 任何章节的目录视为业务技能候选，按 C6 报错）
     per_skill: list[dict[str, list[tuple[str, str, str]]]] = []
