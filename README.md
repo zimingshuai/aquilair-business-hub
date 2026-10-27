@@ -27,7 +27,8 @@
 | Claude Code | 插件一键装齐（技能 + MCP + hook） | 下文「方式一」 |
 | ZCode | 插件市场 UI 添加 | 下文「方式一」 |
 | Codex | 插件市场两条命令 | 下文「方式二」 |
-| 其他 Agent Skills 客户端 | 技能目录拷贝 + MCP 手配 | 下文「方式三」 |
+| 其他 Agent Plugins 兼容智能体 | 同 Claude Code 路线：添加本仓库为插件市场源，装 `aquilair-business-hub`（技能 + MCP + hook 一体装齐） | 下文「方式一」 |
+| 其他 Agent Skills 兼容客户端 | 技能目录拷贝 + MCP 手配 | 下文「方式三」 |
 | WorkBuddy / 豆包 / 企业自建 | 人设 + 技能组合接入 | [`plugins/business-hub/agents/README.md`](plugins/business-hub/agents/README.md) |
 
 装完先做一遍「安装后验证」，再投入使用。
@@ -44,7 +45,7 @@
 
 ## 安装
 
-### 方式一：Claude Code / ZCode 插件（推荐——技能 + MCP + hook 一次装齐）
+### 方式一：Agent Plugins 兼容宿主（Claude Code / ZCode 及其他兼容智能体，推荐——技能 + MCP + hook 一次装齐）
 
 **Claude Code**——执行（`<仓库地址>` 换成本地仓库路径或公司 GitLab URL）：
 
