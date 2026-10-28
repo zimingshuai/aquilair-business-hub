@@ -1,7 +1,11 @@
-# 天鹰·供应链中枢（Aquilair Supply Chain Advisor）v1.2.0
+# 天鹰·供应链中枢（Aquilair Supply Chain Advisor）v1.4.0
 
 埃林哲 Aquilair（天鹰智能中枢）agent 中枢顾问——专注餐饮供应链库存与多工厂物料调拨，
 交付库存诊断报告、缺货响应方案、调拨优化方案与沙盘推演结论，支撑供应链运营决策。
+
+> v1.4.0 变更（2026-10-28）：同步上游 hub 0.3.1——data-delivery 出图通道路由化：出图优先走宿主
+> 可视化工具（WorkBuddy 为平台原生组件 `show_widget` / `present_files`；豆包 doubao-visualization、
+> ZCode visualize 见上游文档），viz-templates 模板降为兜底。（补登：v1.3.0 = 同步上游双仓拆分版 hub 0.3.0。）
 
 > v1.2.0 变更（2026-10-23）：同步上游仓库 `aquilair-skills` v0.2.0——MCP 接口代际迁移：
 > 旧单体服务 mcp0/mcp1 下线，收敛为统一网关 `aquilair-mcp`
@@ -67,8 +71,8 @@ Agent 型（单个 AI 专家）｜行业分类：12-IndustryConsultant 行业顾
 
 - 本环境**无 hooks 机制**，上游仓库的 SessionStart 路由注入不生效，
   路由退化为技能 description 自动触发；复合问题由 `aquilair-skill-router` 承担裁决。
-- 配图通道按宿主能力等价映射：内联单图走 `show_widget`，多图/交互走 HTML 看板 + `present_files`，
-  留档再出 PNG 文件（见 `aquilair-data-delivery` 第五章）。
+- 出图通道：WorkBuddy 走平台原生组件——内联单图 `show_widget`，多图/交互 HTML 看板 + `present_files`
+  预览，留档再出 PNG 文件（路由探测序与跨通道数据纪律见 `aquilair-data-delivery` 第五节）。
 - 元数据预取脚本改用上游通用版（向上搜索 `.mcp.json`），无需宿主特化路径补丁。
 
 ## 前置条件

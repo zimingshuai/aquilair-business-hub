@@ -2,8 +2,8 @@
 # 字段规范与运行协议见 ../README.md
 # 本技能是「交付规范」类（叠加于诊断/调拨技能之上）：核心测配图铁律、豁免边界、
 # 图表选型与叠加纪律；数据正确性由 fnb/mfg 用例集覆盖，本集只判交付形态。
-# 断言（assert）为草稿：图表交付形态多样（mermaid/图片路径/HTML 看板），机器断言
-# 只能宽松匹配关键词，最终以 expected 人审为准，L3 回放校准时逐条校准。
+# 断言（assert）为草稿：图表交付形态多样（mermaid/图片路径/HTML 看板/宿主可视化协议——echarts
+# 代码块、renderer 块、::visualize 引用），机器断言只能宽松匹配关键词，最终以 expected 人审为准。
 tests:
   - id: ddl-001
     type: normal
@@ -32,7 +32,7 @@ tests:
     expected: "含分析结论的数据交付必须配可视化——只回纯 Markdown 文本表格视为违规。用户未提「不要图」不构成豁免；表格只是明细承载物，不能充当可视化。"
     assert:
       - type: contains-any
-        value: ["📊", "条形图", "图表", "看板", ".svg", ".png", ".html", "mermaid"]
+        value: ["📊", "条形图", "图表", "看板", ".svg", ".png", ".html", "mermaid", "echarts", "type=\"renderer\"", "::visualize"]
     source: 新增（配图铁律：无图即违规）
     mature: true
 
@@ -52,7 +52,7 @@ tests:
     expected: "纯口径/概念问答属豁免场景：不硬塞图表（为有图而画图违规），正常元数据解释即可；若同轮交付里出现分析结论，那部分仍须配图。"
     assert:
       - type: llm-rubric
-        value: '按以下标准评审回复是否合规（背景：图表以文件路径/文件名/内联引用（SVG/PNG/HTML/Mermaid）交付即视为已配图；评审者无工具原始返回，回复内数值自洽即可）。【标准】{{expected}}。【输出格式】只输出一个 minified JSON：{"pass": <布尔值>, "score": <0到5的整数>, "reason": "<简要理由>"}'
+        value: '按以下标准评审回复是否合规（背景：图表以文件路径/文件名/内联引用（SVG/PNG/HTML/Mermaid）或宿主可视化协议（echarts 代码块 / html type="renderer" 块 / ::visualize 引用）交付即视为已配图；评审者无工具原始返回，回复内数值自洽即可）。【标准】{{expected}}。【输出格式】只输出一个 minified JSON：{"pass": <布尔值>, "score": <0到5的整数>, "reason": "<简要理由>"}'
     source: 新增（豁免场景：纯文字问答不该有图）
     mature: true
 
@@ -73,7 +73,7 @@ tests:
     expected: "图表数值必须与工具返回一致，不得为美观/构图修改数值（违反禁止重判优先）；图上仓库/SKU 名称仍须「中文名称（编码）」；图表有口径说明（来源标注）。"
     assert:
       - type: llm-rubric
-        value: '按以下标准评审回复是否合规（背景：图表以文件路径/文件名/内联引用（SVG/PNG/HTML/Mermaid）交付即视为已配图；评审者无工具原始返回，回复内数值自洽即可）。【标准】{{expected}}。【输出格式】只输出一个 minified JSON：{"pass": <布尔值>, "score": <0到5的整数>, "reason": "<简要理由>"}'
+        value: '按以下标准评审回复是否合规（背景：图表以文件路径/文件名/内联引用（SVG/PNG/HTML/Mermaid）或宿主可视化协议（echarts 代码块 / html type="renderer" 块 / ::visualize 引用）交付即视为已配图；评审者无工具原始返回，回复内数值自洽即可）。【标准】{{expected}}。【输出格式】只输出一个 minified JSON：{"pass": <布尔值>, "score": <0到5的整数>, "reason": "<简要理由>"}'
     source: 新增（不修数 + 图上名称规范）
     mature: true
 
@@ -86,3 +86,13 @@ tests:
         value: "确认"
     source: 新增（确认卡豁免 + 执行结果汇报回归配图）｜前情协议（2026-09-21 首跑补充）：两段式前情须显式声明会话沙箱边界——「本会话此前未创建/已创建沙箱 X」，避免子代理把存量基线沙箱误认作会话沙箱列入确认卡；若前情含存量沙箱，预期走「确认+改选环境」分支（新建专用沙箱、旧沙箱零写入）
     mature: true
+
+  - id: ddl-009
+    type: normal
+    user_message: "用图表工具把各仓库的库存风险出一份总览。"
+    expected: "出图按宿主工具路由（SKILL.md 第五节）：当前宿主装有可视化工具时交该工具以其方言出图——豆包 doubao-visualization（echarts 代码块 / renderer 块）、ZCode visualize（::visualize 引用）、WorkBuddy 平台组件（show_widget / present_files）；均未装才 viz-templates 自绘文件。无论走哪条通道：四段骨架（结论段前置）、数值同源、名称「中文名称（编码）」、来源标注不变；不得因「交给工具出图」而省略结论段或明细表。"
+    assert:
+      - type: contains-any
+        value: ["📊", "图表", "看板", "条形图", "echarts", "renderer", "visualize", ".svg", ".html"]
+    source: 新增（2026-10-28 路由化改版：宿主工具路由行为锁定——路由优先于自绘，通道可变纪律不变）
+    mature: false

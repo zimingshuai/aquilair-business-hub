@@ -43,6 +43,17 @@
 
 - **（可选）Python 3**：首用元数据预取脚本 `fetch_meta.py` 需要；不跑脚本技能也能用（MCP 会话内拉元数据），只是首答稍慢。
 
+## 可视化工具（按宿主选装）
+
+数据类交付强制配图（技能 `aquilair-data-delivery` 铁律）；出图优先路由到当前宿主已装的可视化工具，均未装时自动套技能内置 viz-templates 模板兜底自绘——**不装不影响基本使用**：
+
+| 宿主 | 可视化工具 | 安装方式 |
+| --- | --- | --- |
+| 豆包 | `doubao-visualization` 技能 | 本仓库 [`vendors/doubao-visualization.zip`](vendors/doubao-visualization.zip)（平台技能机制导入） |
+| ZCode | `visualize` 官方插件 | 插件市场搜索安装（与 `aquilair-business-hub` 同一市场源） |
+| WorkBuddy | 平台原生组件 | 无需安装（`show_widget` / `present_files`） |
+| Claude Code / Codex / 其他 | —（走兜底模板） | — |
+
 ## 安装
 
 ### 方式一：Agent Plugins 兼容宿主（Claude Code / ZCode 及其他兼容智能体，推荐——技能 + MCP + hook 一次装齐）
@@ -149,6 +160,7 @@ aquilair-business-hub/
 ├── .claude-plugin/            # 市场清单（marketplace.json，单插件条目）
 ├── .codebuddy-plugin/         # WorkBuddy 专家包清单（双语展示元数据，v1.x 独立版本线）
 ├── avatars/                   # WorkBuddy 专家头像
+├── vendors/                   # 宿主专属分发资产（doubao-visualization 豆包出图技能包，不随插件分发）
 ├── plugins/business-hub/      # 插件本体
 │   ├── .claude-plugin/ .zcode-plugin/ .codex-plugin/   # 三宿主插件清单
 │   ├── .mcp.json              # MCP 数据网关连接（全仓库唯一地址源）

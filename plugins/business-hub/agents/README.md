@@ -23,11 +23,11 @@
 
 | 宿主 | 接入方法 | 已验证 |
 | --- | --- | --- |
-| **ZCode** | **推荐插件**（2026-09-24 实测，拆分后双插件）：「插件市场 → 添加 → 添加插件市场」粘贴本仓库根目录 → 「个人 → aquilair」按需安装 `aquilair-business-hub`（业务 4 技能 + MCP + SessionStart hook 一次装齐）与 `aquilair-skill-forge`（技能工厂元技能，开发者装）；更新走「市场源刷新 → 插件详情更新」。人设拷至 `~/.zcode/agents/`（插件清单不含 agents，subagent 人设需单独拷）。备选：技能拷 `~/.zcode/skills/` + `plugins/business-hub/.mcp.json` 抄 `~/.agents/mcp.json`（新会话生效） | ✅ 2026-09-24 插件闭环（双插件结构待实测） |
+| **ZCode** | **推荐插件**（2026-09-24 实测，拆分后双插件）：「插件市场 → 添加 → 添加插件市场」粘贴本仓库根目录 → 「个人 → aquilair」按需安装 `aquilair-business-hub`（业务 4 技能 + MCP + SessionStart hook 一次装齐）与 `aquilair-skill-forge`（技能工厂元技能，开发者装）；更新走「市场源刷新 → 插件详情更新」。**出图建议同市场加装官方 `visualize` 插件**（Gen UI 内联渲染，见第六节）。人设拷至 `~/.zcode/agents/`（插件清单不含 agents，subagent 人设需单独拷）。备选：技能拷 `~/.zcode/skills/` + `plugins/business-hub/.mcp.json` 抄 `~/.agents/mcp.json`（新会话生效） | ✅ 2026-09-24 插件闭环（双插件结构待实测） |
 | **Claude Code** | 人设拷至 `~/.claude/agents/`（或项目 `.claude/agents/`）；插件方式 `/plugin marketplace add <本仓库>`；技能目录拷 `~/.claude/skills/`；MCP 加进 `claude mcp add` 或项目 `.mcp.json` | ✅ 插件格式即为此设计 |
 | **Codex** | 插件市场两条命令（Codex CLI 0.154.0 实测，拆分后双插件）：`codex plugin marketplace add <仓库地址>` → `codex plugin add aquilair-business-hub@aquilair`（业务技能 + MCP + SessionStart hook 全自动装齐；开发者再加装 `aquilair-skill-forge@aquilair`）——0.15x 兼容 Claude Code 市场清单。备选：技能目录拷 `~/.codex/skills/` + MCP 手写 `~/.codex/config.toml`（片段见主 README「MCP 手动配置」节） | ✅ 2026-09-24 验证（双插件结构待实测） |
 | **WorkBuddy / CodeBuddy** | 已有适配版（`my-experts` 市场里的 `aquilair-supply-chain-advisor` 专家包）：`.codebuddy-plugin/plugin.json` + `plugins/business-hub/agents/*.md`（frontmatter 加 displayName/profession/maxTurns/skills）+ 业务技能 + avatars。**适配资产已入库本仓库**（`.codebuddy-plugin/` 清单与包内 README、`avatars/` 头像，v1.x 独立版本线；只随 business-hub 业务技能，不含 forge 元技能），WorkBuddy 侧目录是分发副本 | ✅ 运行中（v1.3.0 对齐 hub 0.3.0） |
-| **豆包工作伙伴 / 豆包智能体** | 平台无文件导入：新建智能体 → 把 `aquilair-supply-chain-advisor.md` **正文**（frontmatter 以下）粘贴为系统提示词 → 技能按平台「沉淀为技能」机制录入（`aquilair-data-delivery` 源自豆包侧，天然兼容） | 🟡 平台操作（[功能手册](https://aily.feishu.cn)） |
+| **豆包工作伙伴 / 豆包智能体** | 平台无文件导入：新建智能体 → 把 `aquilair-supply-chain-advisor.md` **正文**（frontmatter 以下）粘贴为系统提示词 → 技能按平台「沉淀为技能」机制录入（`aquilair-data-delivery` 源自豆包侧，天然兼容）；**出图技能另装**：本仓库 `vendors/doubao-visualization.zip` 按平台技能机制导入（`echarts` / `renderer` 出图方言，见第六节） | 🟡 平台操作（[功能手册](https://aily.feishu.cn)） |
 | **企业自建 agent**（Dify / Coze / 自研） | 同上：正文作系统提示词；MCP 端点见 `.mcp.json`（需内网可达）；技能文件可作为知识库/工作流提示词挂载 | 🟡 按平台能力 |
 
 ## 四、frontmatter 字段对照（新宿主适配只需补元数据）
@@ -53,19 +53,20 @@
 > 4. 在本环境的 MCP 配置中注册 `plugins/business-hub/.mcp.json` 里的统一数据网关 `aquilair-mcp`（需内网可达）；
 > 5. 验证：问「各仓库有没有库存风险？」应触发 fnb 技能；问「工厂缺货情况」应触发 mfg 技能；验证清单见仓库 `evals/`（37 条评估用例全部 mature，其中护栏/红队用例零容忍）。
 
-## 六、可视化交付通道（桌面端形态）
+## 六、可视化出图通道（宿主工具路由）
 
-> 数据类交付的可视化通道按宿主**实际使用形态**（桌面 app）选择；规范与模板见
-> [skills/aquilair-data-delivery/SKILL.md](../skills/aquilair-data-delivery/SKILL.md) 第五节与
-> [skills/aquilair-data-delivery/references/viz-templates.md](../skills/aquilair-data-delivery/references/viz-templates.md)。
+> 数据类交付的出图通道按宿主路由到**该宿主已安装的可视化工具**；路由探测序与跨通道数据纪律的
+> 单一事实源在 [skills/aquilair-data-delivery/SKILL.md](../skills/aquilair-data-delivery/SKILL.md) 第五节；
+> 宿主无可视化工具时套 [viz-templates.md](../skills/aquilair-data-delivery/references/viz-templates.md) 兜底自绘。
 
-| 宿主 | 单图直呈 | 多图/交互看板 | 依据 |
-| --- | --- | --- | --- |
-| **WorkBuddy/豆包** | `show_widget` 内联图表 | 生成 HTML 看板 + `present_files` 预览 | 宿主原生 |
-| **ZCode（桌面）** | SVG/PNG 文件 + 图片内联直呈（2026-09-24 实测 ✅） | 单文件 HTML 看板 + browser-use 新建标签页 | 本仓实测 |
-| **Claude 桌面/Cowork** | live artifacts（HTML 写盘即运行） | 同左（多图/交互均宜 artifacts） | 官方文档 |
-| **ChatGPT app（Codex）** | 图片内联/图像查看（app 内） | 单文件 HTML 看板（文件引用/附件；canvas 开放度待实测） | 2026-07 起 Codex 并入统一 app |
-| **文档宿主（GitLab/GitHub）** | — | Mermaid 代码块（pie 成熟、xychart 已支持） | 平台渲染 |
+| 宿主 | 可视化工具（安装方式） | 出图方言 / 通道 |
+| --- | --- | --- |
+| **豆包** | `doubao-visualization` 技能（仓库 `vendors/doubao-visualization.zip`，平台技能机制导入） | `echarts` 代码块 / `html type="renderer"` 块 |
+| **ZCode** | `visualize` 官方插件（插件市场，建议随本插件一并安装） | HTML fragment + `::visualize` 引用（Gen UI 内联渲染） |
+| **WorkBuddy** | 平台原生组件（无需安装） | `show_widget` 内联图表 / `present_files` 预览 |
+| **Claude Code / Codex** | 未指定宿主工具（走兜底） | viz-templates：SVG 文件内联直呈 / HTML 看板 |
+| **Claude 桌面 / Cowork** | live artifacts | HTML 写盘即运行 |
+| **文档宿主（GitLab/GitHub）** | — | Mermaid 代码块（pie 成熟、xychart 已支持） |
 
 > PNG 仅留档/嵌入 docx-pptx 场景；对话内交付不默认生成 PNG。
 

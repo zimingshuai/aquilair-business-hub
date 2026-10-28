@@ -1,6 +1,6 @@
 ---
 name: aquilair-data-delivery
-description: 数据类交付可视化规范（Playbook）。Use when producing ANY data-bearing deliverable——库存诊断报告、仓群/工厂风险总览、SKU 周转对比、缺货响应方案、调拨方案对比、沙箱推演评估、Top N 排行、可调出量对比、风险等级分布。核心铁律：只回纯 Markdown 文本表格 = 违规，必须配可视化图表或看板。not for 无数据交付物的回复——纯文字问答、协议式确认卡等豁免场景不适用本规范。Originated from user feedback on 2026-09-17（"把这个偏好写进指令"），2026-09-20 决策卡确认从 constraints 拆分为独立 Playbook；2026-09-21 自 WorkBuddy 收编为宿主无关版本。
+description: 数据类交付可视化规范（Playbook）。Use when producing ANY data-bearing deliverable——库存诊断报告、仓群/工厂风险总览、SKU 周转对比、缺货响应方案、调拨方案对比、沙箱推演评估、Top N 排行、可调出量对比、风险等级分布。核心铁律：只回纯 Markdown 文本表格 = 违规，必须配可视化图表或看板；出图优先路由到当前宿主已装的可视化工具（doubao-visualization / visualize / WorkBuddy 组件），均未装时套 viz-templates 模板兜底。not for 无数据交付物的回复——纯文字问答、协议式确认卡等豁免场景不适用本规范。Originated from user feedback on 2026-09-17（"把这个偏好写进指令"），2026-09-20 决策卡确认从 constraints 拆分为独立 Playbook；2026-09-21 自 WorkBuddy 收编为宿主无关版本；2026-10-28 出图通道路由化改版。
 license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 ---
 
@@ -22,7 +22,7 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 交付前逐条自查，**命中即违规，回头补图**：
 
 1. 本次交付含分析结论吗？含 → 继续 2。
-2. 交付物里有图表 / 看板 / 内联图片（SVG/PNG）/ 网页看板吗？没有 → **几乎肯定违规**，按第五节通道补图后再输出。
+2. 交付物里有图表 / 看板 / 内联图片（SVG/PNG）/ 网页看板 / 宿主可视化输出（`echarts` 代码块、`html type="renderer"` 块、`::visualize` 引用）吗？没有 → **几乎肯定违规**，按第五节通道补图后再输出。
 3. 图表数据来源标注了吗？没有 → 补「来源：实体名（环境）」。
 4. 图表与结论一致吗？图上的数必须等于工具返回的数，不得为美观改动数值。
 
@@ -53,33 +53,30 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 
 **Top N / 排名类交付两项硬要求**：①明细表须含分类维度与库存水位（如 ABC 分类、在库量），不得只列排名与指标；②洞察须区分**「超储条目」与「缺货条目」两类处置**——榜单中周转快但缺货的条目不应建议压库存，须单列补货处置并在图上做视觉强调（如红描边）。
 
-## 五、技术路径（通道优先序 + 宿主能力卡）
+## 五、出图通道（宿主可视化工具优先，模板兜底）
 
-> 2026-09-24 泛化改版：原始规范源自豆包侧 `aily-data-visualizer`（matplotlib + plotly 生成 PNG → `aily-cli image upload` → 评论内联）。现按「桌面 app 为实际使用形态」重定义：**不以「生成图片文件」为默认实现**，按交付场景分流选通道。依据与实测记录见 `aquilair-knowledge/research/2026-09-24-dataviz-cross-host.md`。
+> 2026-10-28 路由化改版：本规范只裁定「必须配图」与数据纪律，「怎么画」优先交给**当前宿主已安装的可视化工具**，本技能不复制工具自身规范。演进史：2026-09-21 收编豆包侧 `aily-data-visualizer`（matplotlib 渲 PNG，已证伪为慢脆路径）→ 2026-09-24 泛化改版（场景分流 + 自带模板）→ 本轮渲染职责外置（工具随宿主按需安装）。
 
-**通道按场景分流**：
+**路由探测序**（按序探测当前会话可用能力，首次命中即定通道；工具缺失不修环境、不现场安装，直接落下一层）：
 
-| 交付场景 | 通道优先序 | 说明 |
+| 层 | 探测信号（当前会话可见） | 出图通道 |
 | --- | --- | --- |
-| 单图·对话内直呈 | 宿主原生内联组件（`show_widget`）> **SVG 文件 + 图片内联** > HTML 单图页 | 首选形态；SVG 一次 Write 即成、零 Python 依赖 |
-| 多图·交互看板 | 宿主原生预览（artifacts / canvas / `present_files`）> **单文件 HTML 看板**（零依赖默认，CDN 可达时用 ECharts 增强） | 图表 > 2 张或需筛选/下钻时 |
-| 留档·嵌入文档 | PNG（docx/pptx 嵌入、正式归档）> Mermaid 代码块（md 文档 / GitLab PR 内嵌） | 对话内交付不走 PNG |
+| 1 | 技能列表含 `doubao-visualization`（豆包侧安装） | 图表交该技能：精确数值（趋势/占比/排行/对比）→ 其 `echarts` 代码块；结构图解 / 看板 → 其 `html type="renderer"` 块 |
+| 2 | 技能列表含 `visualize`（ZCode 官方插件） | 图表交该技能：HTML fragment 写宿主可视化目录 + `::visualize` 引用。其「用户要表格就直接给表格」条款与本案冲突时**铁律优先**（业务数据交付必须配图） |
+| 3 | 宿主原生展示组件（WorkBuddy `show_widget` / `present_files`） | 内联单图走组件；多图 / 交互走 HTML 看板 + 文件预览 |
+| 4 | 以上均无 | **viz-templates 兜底自绘**：SVG 单图 / 零依赖 HTML 看板（套模板，不从零手写） |
 
-**为什么不再默认 PNG**：写 Python 脚本渲染 PNG 是最慢、最易碎的路径——依赖 matplotlib 环境健康（2026-09-24 实测本机因 NumPy 2.x 二进制冲突即坏）、需手算布局坐标、需派 visual-judge 视觉验收，单轮 3~5 分钟；PIL 直绘更慢。SVG/HTML 是文本格式，一次 Write 生成，模板保证结构与配色，免 Python、免渲染、免逐图验收。仅以下情况走 PNG：用户点名要图片文件、嵌入 docx/pptx、正式归档。
+**留档例外**：嵌入 docx/pptx、正式归档走 PNG；文档宿主（GitLab / GitHub）走 Mermaid 代码块——留档与对话内直呈无关，不因路由改变。
 
-**宿主能力卡**（按实际使用形态绘制；新宿主在此表补一行，不新增映射列）：
+**跨通道数据纪律**（任何工具出图都必须满足；与工具自身规范冲突时以下列为准）：
 
-| 宿主（实际形态） | 图片内联 | 原生组件 / 预览 | HTML 打开方式 |
-| --- | --- | --- | --- |
-| WorkBuddy / 豆包（app） | ✅ | `show_widget` 内联图表 / `present_files` | 内置预览 |
-| ZCode（桌面 app） | ✅（2026-09-24 实测，PNG/SVG 均可） | browser-use 新建标签页 | 图片内联直呈 / browser-use / 链接 |
-| Claude 桌面 / Cowork | ✅ | live artifacts（HTML 写盘即运行，支持 Mermaid） | artifacts |
-| ChatGPT app（Codex） | ✅（app 内图像查看） | canvas（开放度待实测，保守按文件 + 附件交付） | 文件引用 / 附件 |
-| 文档宿主（GitLab / GitHub） | — | — | Mermaid 代码块渲染 |
+1. 数值同源——图上数值 = 工具返回值，禁止为构图修数（「禁止重判」优先）。
+2. 名称规范——仓库/工厂/物料/SKU 一律「中文名称（编码）」。
+3. 来源标注——图 / 看板必含口径（来源实体 + 环境 + 日期）。
+4. 看板骨架——第三节四段结构不变，单图也须结论先行。
+5. 配色语义按 [`references/dashboard-playbook.md`](references/dashboard-playbook.md) 第二节；宿主工具锁定主题时（echarts 禁显式配色 / visualize 主题 token）交由宿主主题，不强行内联色值——色盲冗余编码改用符号（⚠/✓）、条长差或描边样式实现。
 
-**模板强制**：SVG 与 HTML 一律从 [`references/viz-templates.md`](references/viz-templates.md) 套模板（含配色、来源标注、四段骨架），不得从零手写布局；模板覆盖不了的特殊图形才允许自绘，且配色与来源标注规范必须保持。
-
-> **工具不可用时换等价通道，不修环境**：默认通道（SVG/HTML）本身零 Python 依赖，一般无环境问题；仅 PNG 场景（matplotlib 坏、字体缺）适用此条——不反复安装/降级依赖，改走 SVG 模板或 PIL 直绘等价交付（2026-09-21 ddl 首跑实测：15/15 应配图采样全部经等价通道完成交付）。
+> **工具不可用时换等价通道，不修环境**：探测序本身就是分层降级路径——宿主工具未装即落下一层；仅 PNG 留档场景（matplotlib 坏、字体缺）适用换等价实现——改走 SVG 模板或 PIL 直绘（2026-09-21 ddl 首跑实测：15/15 应配图采样全部经等价通道完成交付）。
 
 ## 六、边界说明（豁免场景）
 
@@ -97,5 +94,6 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 
 ## 按需加载
 
-- **需要生成 SVG 单图或 HTML 看板时**：读 [`references/viz-templates.md`](references/viz-templates.md) 套模板，不从零自绘。
-- **需要完整看板模板、配色与分场景示例**时：读 [`references/dashboard-playbook.md`](references/dashboard-playbook.md)。
+- **宿主可视化工具已装（第五节第 1/2 层命中）**：加载对应技能（`doubao-visualization` / `visualize`），按其自身规范出图；本技能只做交付自检（第二节）与数据纪律核对（第五节）。
+- **兜底自绘（第五节第 4 层）**：读 [`references/viz-templates.md`](references/viz-templates.md) 套模板，不从零自绘。
+- **看板骨架、配色与分场景示例**：读 [`references/dashboard-playbook.md`](references/dashboard-playbook.md)。
