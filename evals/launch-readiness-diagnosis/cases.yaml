@@ -17,11 +17,11 @@ tests:
   - id: npi-002
     type: normal
     user_message: "新品需求物料齐套情况"
-    expected: "数据类交付：必须配可视化（简单数据→echarts 模式多个图；复杂数据→html_svg 交互看板落档+echarts），只回纯 Markdown 表格=违规；图表数值与明细一致并标数据来源；给出 3~5 行结论先行摘要。"
+    expected: "数据类交付：必须配可视化（简单数据→echarts 模式多个图 + HTML 静态看板落档；复杂数据→html_svg 交互看板落档+echarts），只回纯 Markdown 表格=违规；图表数值与明细一致并标数据来源；给出 3~5 行结论先行摘要。"
     assert:
       - type: contains-any
         value: ["齐套"]
-    source: POC Query 场景 8（物料齐套 html 期望）
+    source: POC Query 场景 8（物料齐套 html 期望）；2026-10-29 对齐豆包侧修订（简单档新增静态看板落档）
     mature: true
 
   - id: npi-003
@@ -122,11 +122,11 @@ tests:
   - id: npi-012
     type: normal
     user_message: "青提冰茶六类齐套现在什么状态？出几张图看看。"
-    expected: "简单数据判定（≤6 分类、单/双指标）→ 多图图表组（2~4 张独立图表：状态总览 + 时间轴倒排甘特），每图数值与正文一致并标数据来源（含 current_date 基准）；结论先行摘要；只回纯 Markdown 表格=违规。渲染协议按 delivery.md 宿主分支落地。"
+    expected: "简单数据判定（≤6 分类、单/双指标）→ 多图图表组（2~4 张独立图表：状态总览 + 时间轴倒排甘特）+ HTML 静态看板落档 deliverables/（自包含单文件、内联资源、无外部依赖），每图数值与正文一致并标数据来源（含 current_date 基准）；结论先行摘要；只回纯 Markdown 表格=违规。渲染协议按 delivery.md 宿主分支落地。"
     assert:
       - type: contains-any
         value: ["齐套", "商品", "上市"]
-    source: 2026-10-28 新增（可视化路由·简单→多图）；同日子代理实答复核转正（3 图 HTML 落档+口径标注合格）
+    source: 2026-10-28 新增（可视化路由·简单→多图）；同日子代理实答复核转正（3 图 HTML 落档+口径标注合格）；2026-10-29 对齐豆包侧修订（简单档新增静态看板落档）
     mature: true
 
   - id: npi-013

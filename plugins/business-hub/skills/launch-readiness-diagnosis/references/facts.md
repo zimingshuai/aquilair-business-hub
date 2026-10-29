@@ -170,6 +170,13 @@
 - **10-29 实测三项全通**（workspace 新品上市保障）：eq property=dish_id value=926001 → 仅 NP009 ✓；containsAnyTerm property=dish_name value=青提 → 仅 NP009 ✓（**中文模糊可用**）；and children=[Q0006+未齐套] → SQ0006_01~06 六条 ✓。property 直接用属性 code 即可（fnb 文档建议 PROP_ refCode，本 workspace 实测 code 兼容——两者皆可，以 code 更省一步）。
 - 历史三轮结论（eq 有效→静默忽略→显式 422）全部作废为「语法错误的下游表现」；「where 一律不可用、结果侧筛选」的铁律**废止**，替换为「filter 包裹语法 + 过滤后抽查」。SKILL.md 已同步。
 
+## 10-29 修订（豆包侧会话同步）：简单档新增 HTML 静态看板落档
+
+- **来源**：用户在豆包会话对技能做的同日优化，核心变更一处——**简单档交付从「只出多图」升级为「多图 + HTML 静态看板落档」**，复杂档不变（交互看板 + 落档 + 数值图）。至此两档交付均须落档。
+- **落档要求**：自包含单文件 HTML（内联 CSS/脚本、无外部依赖、静态首屏完整可读）→ `deliverables/`；看板/图表与落档 HTML 同一份数据、同一口径；语义色约定（绿=已齐套 红=不通过 黄=待核查）覆盖静态看板。
+- **验收口径**：全仓「简单→（echarts）多图」表述均须含 HTML 静态看板落档（残留 0 处）；母仓与 hub 同步触点：SKILL.md / delivery.md / facts.md / cases.yaml npi-002·npi-012 / agent 人设三处（另修人设 where 旧口径残留）。
+- 豆包侧另建议（未执行）：青提冰茶数据样板交付验证新路由；npi-012/013 类草稿用例转正后跑全量回归（本仓 13 条已全 mature 且经实答验证，不受影响）。
+
 ## 待实测清单（剩余项）
 
 - [x] ~~objects_get / objects_links / objects_relation_counts~~（links 已测返空；objects_get 与 query 返回结构等价、get 未单独跑；relation_counts 未测——links 既空，计数意义有限）

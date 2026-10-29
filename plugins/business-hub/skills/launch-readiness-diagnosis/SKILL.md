@@ -50,7 +50,7 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 4. **溯源**：依赖边追溯，区分自身未完成 vs 受上游影响，可并行标注。
 5. **排顺序**：先修检查类问题，再修已确认上游根因；**风险台账（risk_owner/状态/缓解措施）直接引用**，台账未覆盖处如实注明无期限数据。
 6. **定档位**：按上市决策枚举组织（通过条件是否满足/有条件通过与延期的触发事实）。
-7. **交付**：结论先行；诊断四段式（六类概况/问题明细/处理顺序/执行信息）；**数据呈现必配可视化**（简单→多图；复杂→交互看板+落档，规范见 [`references/delivery.md`](references/delivery.md)）。
+7. **交付**：结论先行；诊断四段式（六类概况/问题明细/处理顺序/执行信息）；**数据呈现必配可视化**（简单→多图+静态看板落档；复杂→交互看板+落档，规范见 [`references/delivery.md`](references/delivery.md)）。
 
 ## 输出规范
 
@@ -65,3 +65,4 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 - **计划总览、参考品分析、预测口径、分周需求**：[`references/plan-playbook.md`](references/plan-playbook.md)——因子链模板、口径三分离陷阱、双就绪日处理。
 - **物料缺口、供需分配、首批采购与成本、到货跟踪、备货建议**：[`references/material-purchase.md`](references/material-purchase.md)——物料链路剧本与到货口径。
 - **实体关系、37 规则分类、上市决策枚举**：[`references/domain-model.md`](references/domain-model.md)；**工具坑/脏数据/服务状态**：[`references/facts.md`](references/facts.md)。
+- **数据交付可视化（复杂度路由、图型对照、落档要求、宿主渲染协议）**：[`references/delivery.md`](references/delivery.md)。
