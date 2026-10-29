@@ -20,10 +20,11 @@
     "./plugins/business-hub/agents/aquilair-supply-chain-advisor.md"
   ],
   "skills": [
+    "./plugins/business-hub/skills/aquilair-data-delivery",
+    "./plugins/business-hub/skills/aquilair-skill-router",
     "./plugins/business-hub/skills/fnb-inventory-analysis",
     "./plugins/business-hub/skills/mfg-transfer-allocation",
-    "./plugins/business-hub/skills/aquilair-data-delivery",
-    "./plugins/business-hub/skills/aquilair-skill-router"
+    "./plugins/business-hub/skills/launch-readiness-diagnosis"
   ],
   "expertType": "agent",
   "agentName": "aquilair-supply-chain-advisor",
