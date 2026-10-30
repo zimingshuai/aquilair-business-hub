@@ -8,7 +8,7 @@
       "name": "aquilair-business-hub",
       "source": "./plugins/business-hub",
       "description": "库存诊断、多工厂调拨、数据交付规范与技能路由入口，附 MCP 数据网关连接",
-      "version": "0.3.2",
+      "version": "0.3.3",
       "displayName": "Aquilair Business Hub",
       "displayName_i18n": {
         "zh-CN": "Aquilair 智能应用中枢"

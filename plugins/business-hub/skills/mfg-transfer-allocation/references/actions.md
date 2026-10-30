@@ -1,6 +1,6 @@
 # 业务 Action 参考（执行前必读）
 
-> **接口现状（2026-10-22）**：动作执行已迁移至统一网关 `aquilair-mcp:actions_run`（必填 `workspace_id`，参数 `action_id` + `parameters` + `branch`）。action-service 当前未在本 workspace 部署任何动作（实测 404 资源不存在），本表 8 个 Action 的参数与确认规则**保留备用、待服务端就绪即生效**；就绪前涉及生成/评估/确认/执行调拨的请求须如实说明待部署，禁止用查询到的历史方案数据冒充新生成的方案。
+> **接口现状（2026-10-30 回归实测更新）**：动作执行走统一网关 `aquilair-mcp:actions_run`（必填 `workspace_id`，参数 `action_id` + `parameters` + `branch`），动作清单以 `metadata_list_actions` 实时返回为准。⚠️ **已知服务端缺陷（工单跟进中，修复即删本条）**：生成类动作（告警并生成调拨方案）定义损坏、确认类动作跨实体批次违规——执行前先实测再承诺，失败如实报告服务端缺陷，禁止用查询到的历史方案数据冒充新生成的方案。
 
 > 本文件由 SKILL.md 按需引入：准备执行任何动作（`actions_run`）前读取。**如实时元数据（`metadata_list_actions`）与下表冲突，以实时元数据为准**；元数据发现动作不自动扩充允许范围。
 

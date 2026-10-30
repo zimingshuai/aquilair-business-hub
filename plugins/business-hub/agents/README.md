@@ -55,17 +55,15 @@
 
 ## 六、可视化出图通道（宿主工具路由）
 
-> 数据类交付的出图通道按宿主路由到**该宿主已安装的可视化工具**；路由探测序与跨通道数据纪律的
-> 单一事实源在 [skills/aquilair-data-delivery/SKILL.md](../skills/aquilair-data-delivery/SKILL.md) 第五节；
-> 宿主无可视化工具时套 [viz-templates.md](../skills/aquilair-data-delivery/references/viz-templates.md) 兜底自绘。
+> 数据类交付的复杂度两档与落档纪律、出图通道按宿主路由到**该宿主已安装的可视化工具**；单一事实源在
+> [skills/aquilair-data-delivery/SKILL.md](../skills/aquilair-data-delivery/SKILL.md) 第三/四节（2026-10-29 起两档上收为横切标准）；
+> 目标宿主（豆包 / WorkBuddy / ZCode）均有可视化工具，工具全未装时按其第四节「零依赖 HTML 直呈」降级。
 
 | 宿主 | 可视化工具（安装方式） | 出图方言 / 通道 |
 | --- | --- | --- |
 | **豆包** | `doubao-visualization` 技能（仓库 `vendors/doubao-visualization.zip`，平台技能机制导入） | `echarts` 代码块 / `html type="renderer"` 块 |
 | **ZCode** | `visualize` 官方插件（插件市场，建议随本插件一并安装） | HTML fragment + `::visualize` 引用（Gen UI 内联渲染） |
 | **WorkBuddy** | 平台原生组件（无需安装） | `show_widget` 内联图表 / `present_files` 预览 |
-| **Claude Code / Codex** | 未指定宿主工具（走兜底） | viz-templates：SVG 文件内联直呈 / HTML 看板 |
-| **Claude 桌面 / Cowork** | live artifacts | HTML 写盘即运行 |
 | **文档宿主（GitLab/GitHub）** | — | Mermaid 代码块（pie 成熟、xychart 已支持） |
 
 > PNG 仅留档/嵌入 docx-pptx 场景；对话内交付不默认生成 PNG。

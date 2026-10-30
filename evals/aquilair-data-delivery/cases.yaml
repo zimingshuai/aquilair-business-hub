@@ -8,7 +8,7 @@ tests:
   - id: ddl-001
     type: normal
     user_message: "帮我出一份各仓库的库存风险总览。"
-    expected: "触发 fnb 查数并叠加本规范：四段式交付——①口径行（来源/时间/范围/指标定义四要素齐全）；②横向条形图（仓群风险默认选型）；③明细表（仓库写「中文名称（编码）」）；④洞察结语（落到建议动作）。结论在图之前。"
+    expected: "触发 fnb 查数并叠加本规范：四段式交付——①口径行（来源/时间/范围/指标定义四要素齐全）；②对比类图表（条形图/柱状图，2026-10-29 起选型松绑由模型判选）；③明细表（仓库写「中文名称（编码）」）；④洞察结语（落到建议动作）。结论在图之前。"
     assert:
       - type: contains-any
         value: ["横向条形图", "条形图", "看板", "📊"]
@@ -59,7 +59,7 @@ tests:
   - id: ddl-006
     type: drill
     user_message: "看看周转天数最差的 10 个 SKU。"
-    expected: "Top N 排名选型：周转天数 Top 10 横向条形图，标签为「SKU 中文名（编码）」（图上禁止只写编码）；明细表含 ABC 分类/周转天数/库存量；洞察区分「周转慢=超储」与「周转快但缺货」两类处置。"
+    expected: "Top N 排名交付：周转天数 Top 10 条形图类对比图（2026-10-29 起图型松绑），标签为「SKU 中文名（编码）」（图上禁止只写编码）；明细表含 ABC 分类/周转天数/库存量；洞察区分「周转慢=超储」与「周转快但缺货」两类处置。"
     assert:
       - type: contains-any
         value: ["横向条形图", "条形图", "Top"]
@@ -90,9 +90,9 @@ tests:
   - id: ddl-009
     type: normal
     user_message: "用图表工具把各仓库的库存风险出一份总览。"
-    expected: "出图按宿主工具路由（SKILL.md 第五节）：当前宿主装有可视化工具时交该工具以其方言出图——豆包 doubao-visualization（echarts 代码块 / renderer 块）、ZCode visualize（::visualize 引用）、WorkBuddy 平台组件（show_widget / present_files）；均未装才 viz-templates 自绘文件。无论走哪条通道：四段骨架（结论段前置）、数值同源、名称「中文名称（编码）」、来源标注不变；不得因「交给工具出图」而省略结论段或明细表。"
+    expected: "出图按宿主工具路由（SKILL.md 第四节，2026-10-29 三层）：当前宿主装有可视化工具时交该工具以其方言出图——豆包 doubao-visualization（echarts 代码块 / renderer 块）、ZCode visualize（::visualize 引用）、WorkBuddy 平台组件（show_widget / present_files）；均未装则零依赖 HTML 直呈。无论走哪条通道：结论段前置、数值同源、名称「中文名称（编码）」、来源标注不变；不得因「交给工具出图」而省略结论段或明细表。"
     assert:
       - type: contains-any
         value: ["📊", "图表", "看板", "条形图", "echarts", "renderer", "visualize", ".svg", ".html"]
-    source: 新增（2026-10-28 路由化改版：宿主工具路由行为锁定——路由优先于自绘，通道可变纪律不变）
+    source: 新增（2026-10-28 路由化改版）｜2026-10-29 修订：兜底层裁撤后同步（三层探测 + 零依赖直呈降级）
     mature: false

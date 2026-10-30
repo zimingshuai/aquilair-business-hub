@@ -28,7 +28,7 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 | `metadata_list_object_types` / `metadata_list_actions` / `metadata_list_rules` / `metadata_list_algorithms` | 元数据四清单（规则与动作链以元数据为唯一权威；18→37 规则、算法空） |
 | `actions_run` | 运行检查程序（写操作，确认卡；项目发布态才可执行，当前 409） |
 
-**查询 DSL 与工具坑见 [`references/facts.md`](references/facts.md)（实测事实卡片）**：objectType 传实体 code、`type:"base"` 必填；**过滤用 filter 包裹语法**（2026-10-29 确立，此前四天误判为"平台不可用"）：`object_set={"type":"filter","objectSet":{<base 节点>},"where":{...}}`，where 键名为 **`property`**（不是 field！）传属性 code；算子：eq/neq/lt/lte/gt/gte/in/containsAnyTerm（中文模糊）/containsAllTerms/and/or/not（组合用 **`children`**）——过滤后仍须抽查返回与条件一致。分页 nextPageToken；select 传属性 code；大表必须过滤分页。
+**查询 DSL 与接口行为手册见 [`references/facts.md`](references/facts.md)**：objectType 传实体 code、`type:"base"` 必填；**过滤用 filter 包裹语法**（2026-10-29 确立，此前四天误判为"平台不可用"）：`object_set={"type":"filter","objectSet":{<base 节点>},"where":{...}}`，where 键名为 **`property`**（不是 field！）传属性 code；算子：eq/neq/lt/lte/gt/gte/in/containsAnyTerm（中文模糊）/containsAllTerms/and/or/not（组合用 **`children`**）——过滤后仍须抽查返回与条件一致。分页 nextPageToken；select 传属性 code；大表必须过滤分页。
 
 ## 铁律（Gotchas）
 
@@ -44,9 +44,9 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 
 ## 工作流程（七步）
 
-1. **锁计划**：从请求解析计划标识，唯一才前进（历史计划与执行中计划混合时先澄清）；首次拉元数据四清单，会话内复用。
+1. **锁计划与探查循环**：从请求解析计划标识，唯一才前进（历史计划与执行中计划混合时先澄清）。**以 MCP 实时查询为唯一事实源——不信任何快照、文档记录值或记忆值**，按探查循环推进：① 先读元数据，弄清实体/属性/关系/规则（`metadata_list_object_types` 轻量起步，属性级再 `metadata_object_neighborhood` 按需拉）→ ② 结合用户问题规划查询路径（串行或并行）→ ③ `objects_query` 取实例数据 → ④ **观察结果是否足以回答**：不足则迭代（换字段实名/扩过滤/下钻关联/补拉元数据），**终止判据 = 足以回答用户问题即停，不追求穷尽数据**。查询报错先读错误码修正（42201→查属性实名，42200→查 DSL 结构）；元数据会话内复用。
 2. **取事实**：按问题域取数——计划/参考品（links）/六类齐套与子项（query+口径原文）/风险台账（links）/物料需求与在途（query）。
-3. **分类**：四类问题逐项归类，分别列不通过与待核查；单元级回写与行级数值矛盾（SQ0003_04 vs 物料缺口 43,740.71）如实列待业务确认。
+3. **分类**：问题逐项归类，分别列不通过与待核查；单元级回写与行级数值矛盾（SQ0003_04 vs 物料缺口 43,740.71）如实列待业务确认。
 4. **溯源**：依赖边追溯，区分自身未完成 vs 受上游影响，可并行标注。
 5. **排顺序**：先修检查类问题，再修已确认上游根因；**风险台账（risk_owner/状态/缓解措施）直接引用**，台账未覆盖处如实注明无期限数据。
 6. **定档位**：按上市决策枚举组织（通过条件是否满足/有条件通过与延期的触发事实）。
@@ -64,5 +64,5 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 - **六类齐套诊断、阻塞溯源、处理顺序、复查**：[`references/readiness-playbook.md`](references/readiness-playbook.md)——七步剧本、四类判别、依赖追溯、场景对照。
 - **计划总览、参考品分析、预测口径、分周需求**：[`references/plan-playbook.md`](references/plan-playbook.md)——因子链模板、口径三分离陷阱、双就绪日处理。
 - **物料缺口、供需分配、首批采购与成本、到货跟踪、备货建议**：[`references/material-purchase.md`](references/material-purchase.md)——物料链路剧本与到货口径。
-- **实体关系、37 规则分类、上市决策枚举**：[`references/domain-model.md`](references/domain-model.md)；**工具坑/脏数据/服务状态**：[`references/facts.md`](references/facts.md)。
+- **实体业务语义、判定链、决策枚举、编码字典、规则公式口径**：[`references/domain-model.md`](references/domain-model.md)（只载元数据查不到的业务语义，清单现查）；**接口行为手册（DSL 语法/工具行为/服务状态/元数据缺陷/脏数据模式）**：[`references/facts.md`](references/facts.md)（不快照数据实态，数值现查）。
 - **数据交付可视化（复杂度路由、图型对照、落档要求、宿主渲染协议）**：[`references/delivery.md`](references/delivery.md)。

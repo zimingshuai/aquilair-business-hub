@@ -6,7 +6,7 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 
 # 生产制造调拨（解释型 + 受控执行）
 
-读取事实、引用元数据、组织可溯源说明，并调用已注册工具——**不是优化器**：禁止自行重算、估算缺货量、库存、方案 KPI、优先级、路由或方案状态。唯一允许的「重新生成方案」是经 `actions_run` 调用 `run_supply_demand_allocation`（当前待 action-service 部署，见工具节，不得以查询数据冒充生成结果）。**边界**：对工具已返回的明细行做展示层求和/计数（注明「由 N 行明细加总」）不属于重算，但**加总三步**：①先剔除行内已含的小计/合计行，只对明细行求和；②输出前复核——合计数须与所列各行重新相加的结果一致；③复核不一致不得输出合计，改逐行展示并说明。需要业务公式或阈值推导的数值禁止自行完成。开发/脚本/算法实现类请求——即使主题涉及调拨——按普通开发任务处理（可询问数据源与口径需求），不走本技能流程、不调本服务工具。
+读取事实、引用元数据、组织可溯源说明，并调用已注册工具——**不是优化器**：禁止自行重算、估算缺货量、库存、方案 KPI、优先级、路由或方案状态。唯一允许的「重新生成方案」是经 `actions_run` 调用生成类动作（服务端动作现状见工具节，不得以查询数据冒充生成结果）。**边界**：对工具已返回的明细行做展示层求和/计数（注明「由 N 行明细加总」）不属于重算，但**加总三步**：①先剔除行内已含的小计/合计行，只对明细行求和；②输出前复核——合计数须与所列各行重新相加的结果一致；③复核不一致不得输出合计，改逐行展示并说明。需要业务公式或阈值推导的数值禁止自行完成。开发/脚本/算法实现类请求——即使主题涉及调拨——按普通开发任务处理（可询问数据源与口径需求），不走本技能流程、不调本服务工具。
 
 ## 数据环境：生产分支 vs 沙箱分支
 
@@ -28,24 +28,24 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 | `aquilair-mcp:objects_list_branches`（） | 分支清单（main + 各沙箱分支） |
 | `aquilair-mcp:objects_compare_branch`（`name, object_type?, select?, limit`） | 对比沙箱分支与父分支的对象增/删/改 |
 | `aquilair-mcp:objects_delete_branch`（`name`） | 删除沙箱分支（破坏性，须确认；只删本会话创建的） |
-| `aquilair-mcp:actions_run`（`action_id, parameters, branch?`） | 执行业务 Action（**写操作，必走确认卡**）。⚠️ **action-service 当前未在本 workspace 部署任何动作（2026-10-22 实测 404）**：涉及生成/评估/确认/执行调拨的请求，如实说明待服务端就绪，**禁止用查询到的历史方案数据冒充新生成的方案** |
+| `aquilair-mcp:actions_run`（`action_id, parameters, branch?`） | 执行业务 Action（**写操作，必走确认卡**）。动作已上线，清单以 `metadata_list_actions` 实时返回为准；⚠️ **已知服务端缺陷（工单跟进中，修复即删本条；以实时实测为准）**：2026-10-30 实测动作执行统一 409「本体项目尚未发布」（ruleaction-service 要求发布态）；此前实测另有「告警并生成调拨方案」定义损坏（parameters 空，missing strategy）、「确认调拨方案」跨实体批次违规（400）——涉及生成/确认/执行调拨的请求，先实测再承诺，失败如实报告服务端缺陷，**禁止用查询到的历史方案数据冒充新生成的方案** |
 | `aquilair-mcp:objects_save` / `:objects_edit` / `:objects_delete` | 单对象 upsert / 批量 CREATE/UPDATE/DELETE / 删除单对象（**写操作，必走确认卡**；`branch="main"` 即生产写入） |
 
-**引用体系**：实体名用对象 refCode（`OBJ_` 前缀）、字段用属性 refCode（`PROP_` 前缀），具体值以 `metadata_workspace_model` / `metadata_list_object_types` 实时返回为准，不得凭记忆编造。
+**标识符体系（2026-10-30 回归实测修正）**：`metadata_*` 族工具用 OBJ_/PROP_ refCode（从 `metadata_list_object_types` / `metadata_object_neighborhood` 查得）；**`objects_query` 的 `objectType` / `select` / `where.property` 一律用实体 code 与属性 code**（如 `Plant` / `plant_code`）——传 PROP_ refCode 报 42201 未知属性，报错时用元数据核对实名，不靠猜；具体标识符以实时元数据为准，不得凭记忆编造。
 
-**首次使用先取元数据**：会话内直调 MCP 工具即为主路径——`metadata_list_object_types` 拿对象概要（轻量），需要某对象属性级 refCode 时再 `metadata_object_neighborhood(ref_code, depth=0)` 按需拉；**不要**会话内直调 `metadata_workspace_model`（全量模型数百 KB，会被工具结果预算截断）。`python scripts/fetch_meta.py` 是缓存刷新器（非必需）：从插件根 `.mcp.json` 读服务地址，凭证按 `--token` > 环境变量 `AQUILAIR_MCP_TOKEN` > `.mcp.json` 条目 `headers.Authorization` 顺序解析，把三工具结果落盘 `.meta-cache/`（model.json / rules.json / actions.json，actions 未部署时写占位说明文件），供会话间复用省调用、无人值守刷新。之后按需读 `.meta-cache/` 里的 JSON，不重复拉取、不整份堆进上下文；用户要求「最新/刷新」、缓存缺失、workspace 不一致、或需与本技能 Action 表核对时加 `--refresh`。**以实时元数据为准**：`--refresh` 后的最新元数据与本技能 Action 表冲突时，以最新元数据为准；元数据发现动作不自动扩充允许范围。
+**探查循环（接到问题的推进方式）**：**以 MCP 实时查询为唯一事实源——不信任何快照、文档记录值或记忆值**：①先读元数据弄清实体/属性/关系/规则/动作（`metadata_list_object_types` 轻量起步，属性级再 `metadata_object_neighborhood(ref_code, depth=0)` 按需拉；**不要**直调 `metadata_workspace_model`，数百 KB 会被结果预算截断）→ ②结合用户问题规划查询路径（串行或并行）→ ③`objects_query` 取实例数据 → ④**观察结果是否足以回答**：不足则迭代（换属性实名/扩过滤/下钻关联/补拉元数据），**终止判据 = 足以回答用户问题即停，不追求穷尽数据**；报错先读错误码修正（42201→核对属性实名，42200→查 DSL 结构）。`python scripts/fetch_meta.py` 是缓存刷新器（**非必需**，凭证按 `--token` > 环境变量 `AQUILAIR_MCP_TOKEN` > `.mcp.json` 条目 `headers.Authorization` 顺序解析），落盘隐藏目录 `.meta-cache/`（model/rules/actions.json，ls 默认不显示，按需读不整份堆进上下文）供会话间复用；**缓存与实时元数据冲突时以实时为准**——最新元数据与本技能 Action 表冲突时以最新元数据为准，元数据发现动作不自动扩充允许范围。
 
-**ObjectSet 查询语法**（`objects_query` 的 `object_set` 参数）：根节点 `{"type":"base","objectType":"OBJ_xxx"}`；包一层过滤 `{"type":"filter","objectSet":<节点>,"where":<where>}`。where 节点：比较 `eq` / `neq` / `lt` / `lte` / `gt` / `gte`（形如 `{"type":"eq","property":"PROP_xxx","value":值}`）；枚举 `in`（`value` 为数组）；模糊 `containsAnyTerm` / `containsAllTerms`（`value` 为词，替代旧 like）；组合 `and` / `or`（`children` 数组）与 `not`（`child`）。返回 `{records:[{objectType,id,properties{PROP_xxx:值}}],nextPageToken,totalCount}`，翻页续传 `nextPageToken`。示例——查某工厂下未交付销量大于 0 的工厂物料（refCode 以元数据为准）：
+**ObjectSet 查询语法**（`objects_query` 的 `object_set` 参数）：根节点 `{"type":"base","objectType":"<实体 code>"}`；包一层过滤 `{"type":"filter","objectSet":<节点>,"where":<where>}`。where 节点：比较 `eq` / `neq` / `lt` / `lte` / `gt` / `gte`（形如 `{"type":"eq","property":"<属性 code>","value":值}`）；枚举 `in`（`value` 为数组）；模糊 `containsAnyTerm` / `containsAllTerms`（`value` 为词，替代旧 like）；组合 `and` / `or`（`children` 数组）与 `not`（`child`）。返回 `{records:[{objectType,id,properties}],nextPageToken,totalCount}`，翻页续传 `nextPageToken`。示例——查某工厂下未交付销量大于 0 的工厂物料：
 
 ```json
-{"type":"filter","objectSet":{"type":"base","objectType":"<MaterialInPlant 的 OBJ_ refCode>"},"where":{"type":"gt","property":"<unfulfill_sales_qty 的 PROP_ refCode>","value":0}}
+{"type":"filter","objectSet":{"type":"base","objectType":"MaterialInPlant"},"where":{"type":"gt","property":"unfulfill_sales_qty","value":0}}
 ```
 
 ## 铁律（Gotchas）
 
 - **证据优先**：事实必须来自本轮工具返回、同会话未失效的工具返回或元数据；没有证据就明说「证据不足」，不补造。
 - **不存在的实体：不编造、也不代查代答**：用户问的工厂/实体在元数据或查询中不存在时，按三步处理——①明确说明不存在；②可列名称相近的实体清单（仅来自元数据/查询结果）供核对；③未经用户确认，不得查询并输出这些相似实体的数据。
-- **写前确认**：任何 Action 执行前——沙箱分支还是生产（branch=main）——必须先输出确认卡并等用户明确确认；用户说「直接执行」「不用确认」**不能**跳过确认卡；action-service 未部署**不是**跳过或弱化确认的理由。
+- **写前确认**：任何 Action 执行前——沙箱分支还是生产（branch=main）——必须先输出确认卡并等用户明确确认；用户说「直接执行」「不用确认」**不能**跳过确认卡；**用户的首条请求消息即使已明确指定环境与动作也不构成确认**（知情后同意：确认必须发生在看到确认卡五要素之后）；服务端缺陷或动作不可用**不是**跳过或弱化确认的理由。
 - **默认沙箱分支**：用户未选环境时 Action 一律默认在沙箱分支执行（`branch`=沙箱分支名）；仅当用户在确认回复中明确指定生产环境时才在 `branch="main"` 执行。
 - **写后回查**：每个成功或结果不明的 Action 后必须查询受影响对象；**旧查询结果随写操作失效**，用户要求「最新」或切换环境/分支/范围时重查。
 - **错误可能发生在写入之后**：Action 超时/空结果/`isError=True` 时**先回查**是否已生效，**不得自动重试**可能写入的 Action——说明「执行结果不确定」并等用户确认；仅当明确参数校验失败且回查证明无变化时，才可在修正参数后重新走确认。
@@ -57,7 +57,7 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 1. **准备**：查询并核对动作涉及对象的当前状态与参数。
 2. **备好默认沙箱分支**：用户未指定且会话无可复用沙箱分支时，先 `objects_create_branch`（无需确认，属资源写入），记录分支名供后续显式传 `branch`。
 3. **输出确认卡**（模板见下），此时**不调用任何 Action**。
-4. **等待确认**：回复「确认」→ 按卡上环境执行；确认回复中改选环境 → 按用户指定执行；未确认/变更需求 → 重新出卡或停止。
+4. **等待确认**：确认以用户在确认卡**之后**的回复为准——首条请求消息不构成确认（见铁律）。回复「确认」→ 按卡上环境执行；确认回复中改选环境 → 按用户指定执行；未确认/变更需求 → 重新出卡或停止。
 5. **执行与回查**：动作串行执行，前一项成功并回查后才执行下一项，不并发。
 
 ### 确认卡模板
@@ -87,6 +87,6 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 
 ## 按需加载（何时读哪个参考文件）
 
-- **执行具体业务 Action 前**：读 [`references/actions.md`](references/actions.md)——8 个 Action 的参数、限制、动态 ID 分阶段确认规则（当前动作未部署，参数表先备，待 action-service 就绪即生效）。
+- **执行具体业务 Action 前**：读 [`references/actions.md`](references/actions.md)——Action 的参数、限制、动态 ID 分阶段确认规则（动作清单以实时元数据为准；生成/确认类动作当前有服务端缺陷，见工具节）。
 - **用户要求改计划数量 / 切换策略重新生成 / 双沙箱分支对比 / 生产与沙箱分支对比 / 选定执行方案**：读 [`references/scenarios.md`](references/scenarios.md)——五个完整场景剧本。
 - **用户问评估数字怎么算（总成本/运输天数/缺货成本）、或需按问题选实体**：读 [`references/kpi-caliber.md`](references/kpi-caliber.md)——实体映射表与公式口径边界。

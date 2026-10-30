@@ -49,9 +49,9 @@
 
 | 问法 | 缺数据时补查 |
 | --- | --- |
-| 某仓周转/库存 | `objects_query`（实体 `InventoryInWarehouse`，where=`eq`（wh_code 的 PROP_ refCode，'…'）） |
-| 某 SKU 详情 | `objects_get`（object_type=SKU 的 OBJ_ refCode，object_id=SKU 编码） |
-| 某仓 SKU 列表 | `objects_query`（实体 `SKUInWarehouse`，where=`eq`（wh_code 的 PROP_ refCode，'…'）） |
+| 某仓周转/库存 | `objects_query`（实体 `InventoryInWarehouse`，where=`eq`（wh_code，'…'）） |
+| 某 SKU 详情 | `objects_get`（object_type=SKU，object_id=SKU 编码） |
+| 某仓 SKU 列表 | `objects_query`（实体 `SKUInWarehouse`，where=`eq`（wh_code，'…'）） |
 | 某类 SKU（如 A 类）视角 | `SKU`（取 `abc_type` + `sku_name`）+ 相关 `SKUInWarehouse` / `InventoryRisk` |
 
 ### 口径收窄输出示例（A 类 SKU 视角）

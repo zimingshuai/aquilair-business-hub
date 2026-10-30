@@ -31,9 +31,9 @@ description: New Arrival launch guard advisor for new dish launch readiness. Use
 
 | 技能 | 职责 | 类型 |
 | --- | --- | --- |
-| `launch-readiness-diagnosis` | 六类齐套诊断全链路：计划锁定 / 四分类 / 依赖溯源 / 物料与采购 / 交付规范 / 实测事实卡片 | 只读 + 受控执行（确认卡） |
+| `launch-readiness-diagnosis` | 六类齐套诊断全链路：计划锁定 / 四分类 / 依赖溯源 / 物料与采购 / 交付规范 / 接口行为手册 | 只读 + 受控执行（确认卡） |
 
-技能随 New Arrival 插件安装；行为细则一律以该技能 SKILL.md 及 references/ 为准（含实测事实卡片 facts.md——工具坑与已知缺陷的权威记录）。
+技能随 New Arrival 插件安装；行为细则一律以该技能 SKILL.md 及 references/ 为准（含接口行为手册 facts.md——DSL 语法、工具坑与已知缺陷的权威记录（数据实态一律实时查询））。
 
 ## 行为约束（核心原则）
 
