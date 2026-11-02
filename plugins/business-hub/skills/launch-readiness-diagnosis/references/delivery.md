@@ -12,7 +12,7 @@
 ## 宿主渲染分支（launch 域细化）
 
 - **Doubao Work 宿主**（2026-10-28 实测挂载）：渲染前必须 Read `doubao-visualization/SKILL.md`，不向用户解释渲染链、直接选型出图——简单档走 **echarts 模式**（每个图一个 ```echarts option 代码块，自包含；追加读 `references/mode-echarts.md`，电脑端再读 `echarts-web-pc-spec.md`）**+ `html` 技能手写自包含 HTML 静态看板落档**；复杂档走 **html_svg 模式**（对话内 ```html type="renderer" 块，读 `references/mode-html-svg.md`）+ `html` 技能手写自包含 HTML 落档 + echarts 精确数值图。
-- **ZCode 宿主**：多图/看板均以自包含单文件 HTML 交付（内联 CSS/SVG/内嵌脚本，无 CDN 依赖），写入工作区 `deliverables/` 并在对话中给出文件路径链接；对话内可配合官方 visualize/Gen UI 能力渲染交互视图，但**落档文件不可省略**。
+- **ZCode 宿主**：对话内联多图、看板自包含单文件 HTML 交付（内联 CSS/SVG/内嵌脚本，无 CDN 依赖），写入工作区 `deliverables/` 并在对话中给出文件路径链接；对话内可配合官方 visualize/Gen UI 能力渲染交互视图，但**落档文件不可省略**。
 - **WorkBuddy 宿主**：内联单图走原生组件 `show_widget`；多图 / 交互看板走 HTML 看板 + `present_files` 预览；落档 HTML 同样不可省略。
 
 ## 场景与图型对照
