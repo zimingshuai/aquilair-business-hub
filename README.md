@@ -163,7 +163,7 @@ aquilair-business-hub/
 ├── avatars/                   # WorkBuddy 专家头像
 ├── vendors/                   # 宿主专属分发资产（doubao-visualization 豆包出图技能包，不随插件分发）
 ├── plugins/business-hub/      # 插件本体
-│   ├── .claude-plugin/ .zcode-plugin/ .codex-plugin/   # 三宿主插件清单
+│   ├── .zcode-plugin/                               # ZCode 插件清单（Claude Code / Codex 清单已于 2026-11-02 弃适配删除）
 │   ├── .mcp.json              # MCP 数据网关连接（全仓库唯一地址源）
 │   ├── hooks/                 # SessionStart 路由注入
 │   ├── agents/                # 宿主无关人设源 + 六宿主接入指南
