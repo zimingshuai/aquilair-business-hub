@@ -72,8 +72,15 @@
   | `400` business code `10000`「更新或删除动作必须提供目标实例」 | data 类动作未传 `instances` | 传 `instances:[{"entity_ref_code":"OBJ_...","instance_ids":[...]}]`（**注意此处的 entity 用 refCode**，与 objects_* 工具的 code 不同）；通道可达 |
   | 任务 `FAILED` + `response:"404 page not found"` | 函数包未部署（algoScheduler 找不到该函数路由，`executionTimeMs` 个位数即返回） | 函数包**逐个部署中**（2026-11-03 晚实测分化：生成物料需求已 SUCCEEDED 但其余多数仍 404）；如实报该函数不可用，**不要重试刷屏、不要把 FAILED 说成成功**；SUCCEEDED 也要核对实际效果（见下） |
 | 任务 `SUCCEEDED` 但数据未变 | 函数执行了但动作 `parameters:[]`（无参数定义）→ 空参空跑 | **SUCCEEDED ≠ 生效**——执行后必须在同分支复查实例数/字段，无变化则如实报「执行成功但无效果（动作未定义输入参数）」 |
-| 任务 `FAILED` + `response:{"type":"TypeError","error":"missing a required argument: 'xxx'"}` | **函数已真执行**（executionTimeMs 百毫秒级），但 `inputMappings` 的 constant 占位值未传递到函数入参 | **动作配置缺陷（工单 TK-inputmapping）**：实测「冻结BOM版本」inputMappings 配了 `dish_id="a"`/`bom_version="a"` 占位常量，但函数实际收到空参报 TypeError，且 `parameters:[]` 无处可传。此类动作**不可用**，如实报「函数已执行但入参未配置」；与 404（函数未部署）、409（未发布）区分 |
+| 任务 `FAILED` + `response:{"type":"TypeError","error":"missing a required argument: 'xxx'"}` | **函数已真执行**（executionTimeMs 百毫秒级）但入参没送到 | **首查 `caller_params` 的键名**（见下方铁律，最常见原因就是键名带 `$`）；若动作 `parameters:[]` 且 inputMappings 是常量占位，则属动作配置缺陷（工单 TK-inputmapping），如实报「函数已执行但入参未配置」 |
 - **动作执行路径建议**：先在**沙箱分支**试跑，核对无误再考虑 main；写完用 `objects_delete_branch`（参数是 **name 不是 branch_id**）清理。
+- **`caller_params` 键名铁律（实测踩坑）**：传参时键名**不带 `$` 前缀**——动作定义里写 `$dish_id`，
+  caller_params 要写 `{"dish_id": "926001"}`。带 `$` 会报 TypeError missing required argument（函数收到空参）。
+  三种形态实测：无前缀 SUCCEEDED / 带 `$` FAILED / 嵌 `params` 层 FAILED。
+- **`SUCCEEDED` 但零效果的第二类原因（假成功）**：函数体空实现或查询条件不匹配。实测「冻结BOM版本」：
+  参数正确、SUCCEEDED、28~74ms 快速返回空 `response:[]`，但把沙箱 BOM 从「草稿态」跑动作后**仍是草稿态**
+  → 动作不生效。**判定方法**：改动前后同一分支对比目标字段（本次用 objects_edit 造前置态再跑动作）；
+  无变化即报「动作执行成功但未产生预期变更」，不得声称冻结成功。
 - **data 类动作已实测全链路可用（2026-11-03 晚）**：`创建新品上市计划`（ACT_2DFA547172154786）带
   `caller_params`（29 个 `$` 前缀必填参数，从 workspace_model.actions[].parameters 取清单）沙箱执行
   SUCCEEDED 且真实落库（NP010 创建成功，字段全对）。data 类动作通用姿势：参数查动作定义 →

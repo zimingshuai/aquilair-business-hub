@@ -5,7 +5,7 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 compatibility: 需 MCP 连接器 aquilair-mcp-servers 可达（公司内网 HTTPS 端点，宿主首连走 OAuth 授权）；无其他系统依赖
 metadata:
   author: Aquilair Team
-  version: "0.1.12"
+  version: "0.1.13"
   workspace: "01a19ac6-4c5f-7000-8c2d-4cfe7158ca8f"
 ---
 
