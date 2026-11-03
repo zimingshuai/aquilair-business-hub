@@ -16,10 +16,14 @@ evals/
 │   └── cases.yaml                 # 制造技能用例集（13 条，mature；重点护栏+红队）
 ├── aquilair-data-delivery/
 │   └── cases.yaml                 # 数据交付规范用例集（8 条，mature）
+├── launch-readiness-diagnosis/
+│   └── cases.yaml                 # 旧上市保障技能用例集（mature；技能退役过渡期保留）
+├── launch-dynamic-assurance/
+│   └── cases.yaml                 # 新品上市POC动态保障用例集（13 条，2026-11-03 人工复核转正；空态期断言为主，数据灌入后补实例断言）
 └── runs/                          # 每轮评估结果记录（按日期归档；transcripts/ 为轨迹落盘）
 ```
 
-**套件状态（2026-09-22）**：3 个技能 37/37 全部 `mature: true`（fnb 16 + mfg 13 + ddl 8）。
+**套件状态（2026-11-03）**：5 个技能 66/66 全部 `mature: true`（fnb 16 + mfg 13 + ddl 8 + 旧 launch 16 + 新 launch-dynamic-assurance 13）。
 
 ## 跑回归（改技能后必做）
 

@@ -23,6 +23,7 @@ Aquilair 技能工厂的「使用端」入口：**先路由，再干活**。本�
 | 库存风险、周转、ABC 分类、缺货明细等诊断问答 | `fnb-inventory-analysis` | 业务技能（本插件） |
 | 可调出量、调拨方案、沙箱推演、确认执行 | `mfg-transfer-allocation` | 业务技能（本插件） |
 | 新品上市计划、上市事项与六类齐套、物料缺口、供需分配、采购到货、上市风险（数据交付恒叠加 aquilair-data-delivery，同 fnb/mfg） | `launch-dynamic-assurance` | 业务技能（本插件） |
+| 旧项目「新品上市保障」（workspace 01a15c77）的历史数据问答——⏳ 退役过渡：POC 验证后下线，新项目一律走上行 | `launch-readiness-diagnosis` | 业务技能（本插件，退役过渡） |
 | 任何含数据表格、图表、交付物的回复 | `aquilair-data-delivery` | 横切技能（本插件，恒叠加） |
 | 开发、改进、评估 Aquilair 技能本身（工厂任务） | `aquilair-skill-authoring` | 开发者元技能（aquilair-skill-forge 插件） |
 | 喂文档建知识库、域术语/实体/口径溯源问答、再摄取更新知识库 | `aquilair-knowledge-wiki` | 知识库技能（aquilair-skill-forge 插件） |
