@@ -70,8 +70,15 @@
   | --- | --- | --- |
   | `409` business code `20301`「本体项目尚未发布」 | `list_workspaces` 的 status=draft（发布后又有修订即回退） | 请平台方重新发布；**与 apiName/branch/参数无关**（实测假动作名也报同一错） |
   | `400` business code `10000`「更新或删除动作必须提供目标实例」 | data 类动作未传 `instances` | 传 `instances:[{"entity_ref_code":"OBJ_...","instance_ids":[...]}]`（**注意此处的 entity 用 refCode**，与 objects_* 工具的 code 不同）；通道可达 |
-  | 任务 `executionStatus=FAILED` + `response:"404 page not found"` | 函数执行服务（algoScheduler）未部署/路由缺失——`params:{}` 为空、`executionTimeMs` 个位数即返回 | **8 个 function 类动作全部不可用**（生成物料需求/计算齐套/生成采购计划/生成预测需求/冻结BOM/推荐参考品/参考品销量/季节系数）；notify 类同样无发送凭据。如实报「函数执行服务不可达」，**不要重试刷屏、不要把 FAILED 说成成功** |
-- **动作执行路径建议**：先在**沙箱分支**（`objects_create_branch` → `actions_run` 传 `branch`）试跑，核对无误再考虑 main；写完用 `objects_delete_branch`（参数是 **name 不是 branch_id**）清理。
+  | 任务 `FAILED` + `response:"404 page not found"` | 函数包未部署（algoScheduler 找不到该函数路由，`executionTimeMs` 个位数即返回） | 函数包**逐个部署中**（2026-11-03 晚实测分化：生成物料需求已 SUCCEEDED 但其余多数仍 404）；如实报该函数不可用，**不要重试刷屏、不要把 FAILED 说成成功**；SUCCEEDED 也要核对实际效果（见下） |
+| 任务 `SUCCEEDED` 但数据未变 | 函数执行了但动作 `parameters:[]`（无参数定义）→ 空参空跑 | **SUCCEEDED ≠ 生效**——执行后必须在同分支复查实例数/字段，无变化则如实报「执行成功但无效果（动作未定义输入参数）」 |
+- **动作执行路径建议**：先在**沙箱分支**试跑，核对无误再考虑 main；写完用 `objects_delete_branch`（参数是 **name 不是 branch_id**）清理。
+- **data 类动作已实测全链路可用（2026-11-03 晚）**：`创建新品上市计划`（ACT_2DFA547172154786）带
+  `caller_params`（29 个 `$` 前缀必填参数，从 workspace_model.actions[].parameters 取清单）沙箱执行
+  SUCCEEDED 且真实落库（NP010 创建成功，字段全对）。data 类动作通用姿势：参数查动作定义 →
+  caller_params 按 `$name` 传值 → 更新/删除类还须传 `instances`（entity 用 refCode）。
+- **branch 参数口径**：`actions_run` 的 branch 接受分支 id 或 name（实测均通）；`objects_query/get`
+  的 branch **只认 name**（传 id 报 40403 分支不存在）——统一用 name 最稳。
 - **动作执行 409「本体项目尚未发布」根因判据**：`list_workspaces` 的 `status=draft` 且有
   `publishedAt < updatedAt`（发布后又有修订）→ ruleaction-service 一律拒绝执行，**与 apiName、
   branch、参数无关**（实测：假动作名、真实动作+假分支均返回同一 409 20301）。处置：先由平台方
