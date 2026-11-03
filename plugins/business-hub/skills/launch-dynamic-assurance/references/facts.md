@@ -50,6 +50,14 @@
   15 动作 apiName 全为 null——**actions_run 当前无有效入参来源，不可承诺动作执行**（工单 TK-apiname）。
 - `actions_task_status`：task_id 必须 UUID；服务在线（非 UUID 报 400 即为连通证据）。
 - `metadata_object_neighborhood`：depth 参数上限 10（服务端约束）。
+- **`System` 实体 = 演示检查日（重要）**：objectType 传 `System`（code 已正式化，勿用 entity_ 名），
+  主键 `launch_plan_id`，字段 `system_date` / `system_time`——POC 演示的「当前检查日」以它为准
+  （2026-11-03 实测 system_date=2026-10-28，即演示时间轴与真实时间不同）。所有「超期/剩余天数」
+  必须基于检查日计算并注明来源：用户指定日 > System.system_date > 真实查询时间。
+- **物料需求单位口径（易错）**：`MaterialDemand.material_demand_qty` 的单位是物料
+  `Material.base_uom`（如「筐」），**不是** `bom_uom`（如「g」）；换算须乘 `bom_uom_factor`
+  （如 5000 g/筐）。展示时必须标对单位，禁止把「筐」标成「g」或反之——实测出现过 10200 筐
+  被标为 10200 g（错 5000 倍）。
 - `metadata_list_algorithms`：算法定位为外部优化 webhook 摘要；本项目清单为空（content:[] 形态，
   存档脚本按空清单写占位）。
 - `actions_run` 执行语义：实际为**异步**（2026-11-03 实测：直接返回 `{taskId, executionMode: "ASYNC",
