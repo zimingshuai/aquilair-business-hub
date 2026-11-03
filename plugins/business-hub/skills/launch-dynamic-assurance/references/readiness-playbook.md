@@ -1,14 +1,5 @@
 # 上市事项诊断
 
-> **实测校注（2026-11-03）**：本文件为业务方剧本原文收录（正文未改动），与 2026-11-03 实测元数据存在以下已知出入，冲突处以 references/facts.md 与实时元数据（metadata_* 实时返回）为准：
-> 1. **PurchasePlan / PurchaseSolution 当前为 entity_ 未命名实体**（工单 TK-code），objects_query 传 code/refCode 均 40401 不可查——正文涉及其字段（net_demand_qty / plan_purchase_qty / confirm_flag / send_flag / solution_code 等）时当前无查询承载，如实声明，不以推算冒充查询结果。
-> 2. **expected_supply_qty_ontime / expected_gap_qty 系统缺失**（工单 TK-sda字段）——正文「引用」两字段的口径按 facts.md 替代口径执行：以 SupplyDemandAllocation.supply_available_date 与需求日期（MaterialDemand.material_demand_date）现算对比展示，并注明判定字段缺失。
-> 3. **MaterialSupplier 实测主键为 material_supplier_code**（非正文「核对 strategy_code」的主键口径）；strategy_code 实测在 PurchaseSolution 属性中（该实体当前不可查，见第 1 条）。
-> 4. 正文「须核验 / 设计为 / 按当前已部署」类防御措辞与技能「实时查询为准」铁律一致——冲突时以实时元数据 + facts.md 为准。
-> 5. 正文文末引用的 delivery.md 未随本技能收录：可视化交付按 aquilair-data-delivery 技能规范执行（数据类交付强制配图）。
->
-> 原始剧本由业务方提供（2026-11-03），校注依据 evals/runs/2026-11-03-launch-poc-probe.md
-
 适用于计划准备进度、事项未完成原因、前置阻塞、处理顺序和按检查日复查。先锁定唯一项目及DishLaunchPlan，再按launch_plan_id读取事项。
 
 ## 诊断步骤
@@ -16,7 +7,7 @@
 1. **定范围**：按计划读取全部适用DishLaunchItem，区分有wh_code的事项与全计划事项，核对分页和预期事项集合。没有明确模板时不能宣称事项范围已完整。
 2. **按类型组织**：以item_type实际值分组，列事项、执行状态、负责人、时间和前置。类型为空或不明确时单列，不自定固定分类或事项编码。
 3. **取结果与证据**：读取item_description、execution_freq、execution_status、pre_item_codes、pre_item_execution_status、plan_completion_time、latest_actual_completion_time和max_plan_completion_time。结合当前注册规则与相关业务记录核对，不把事项描述直接变成自动判定程序。
-4. **核对业务关联**：基础数据查Dish/BOM，预测需求查ForecastSalesDemand，物料需求查MaterialDemand，采购查PurchaseSolution/PurchasePlan，供应参数查MaterialSupplier，门店销售查DishInStore。具体关联与条件须来自元数据、动作结果或明确业务键。
+4. **核对业务关联**：基础数据查Dish/BOM，预测需求查ForecastSalesDemand，物料需求查MaterialDemand，采购查 PurchaseSolution/PurchasePlan（当前不可查询，实测工单挂起，如实声明），供应参数查MaterialSupplier，门店销售查DishInStore。具体关联与条件须来自元数据、动作结果或明确业务键。
 5. **分类问题**：分开数据缺失、业务未完成、读取异常、规则/关联配置缺失；原系统状态与本次证据不足分列。
 6. **追溯与排序**：沿真实前置边核对根因，优先解决阻碍核查的问题，再处理已证实的前置根因；标注并行事项，不根据章节顺序编造串行流程。
 7. **交付与复查**：给计划与事项概况、问题证据、处理顺序、检查范围和查询时间。只读结果注明非本次重算；需要动作时核验实现与授权，完成后验证保存范围。
@@ -72,4 +63,6 @@
 | BOM或门店销售准备情况 | 事项结果加BOM有效版本/状态或DishInStore.sale_status证据；档案发布不等于门店可售 |
 | 采购计划确认或下发了吗 | 读PurchasePlan.confirm_flag/send_flag及已实现动作凭据，不把标记直接等同订单生成 |
 
-跨业务证据依[domain-model.md](domain-model.md)的有效关系追溯；物料与采购下钻见[material-purchase.md](material-purchase.md)，可视化见[delivery.md](delivery.md)。
+跨业务证据依[domain-model.md](domain-model.md)的有效关系追溯；物料与采购下钻见 material-purchase.md，可视化按 aquilair-data-delivery 技能规范执行。
+
+> 来源：业务方剧本（2026-11-03），正文已按当日实测元数据修订；后续以实时元数据为准。

@@ -24,7 +24,7 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 
 | 工具 | 用途 |
 | --- | --- |
-| `objects_query` | 全实体查询。DSL 方言见 facts.md：where 算子放 `type` 键、`not` 用单数 `child`、`property` 只认属性 code、排序服务端不可用→客户端做——与旧 launch-readiness-diagnosis 方言互斥，禁混用 |
+| `objects_query` | 全实体查询。DSL 方言见 facts.md：where 算子放 `type` 键、`not` 用单数 `child`、`property` 只认属性 code、排序服务端不可用→客户端做——方言细则见 facts.md |
 | `objects_get` / `objects_links` | 单实例全属性 / 关系出边。get 对不可查类型同样报 40402——「类型是否可查」必须用 objects_query 判断（40401 才是类型问题）；关系 code 均为 rel_ 生成名，实名查 `metadata_workspace_model` 的 relations |
 | `metadata_workspace_model` | 全量模型（本项目 21 实体/27 关系完整返回约 560KB 未截断；实体增多警惕截断，截断时退回轻量清单+neighborhood） |
 | `metadata_list_object_types` / `metadata_list_rules` / `metadata_list_actions` / `metadata_list_algorithms` | 元数据四清单：30 规则含 6 条【待处理】；15 动作 apiName 全 null；算法清单空 |
@@ -45,7 +45,7 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 - **依赖须有边**：上市事项依赖以 `pre_item_codes` 为准（客户端展开成 DAG 再按 `max_plan_completion_time` 排），不编造固定串行顺序；max_plan_completion_time 是「不影响上市的最晚允许完成」，不等于上市日。
 - **枚举以元数据+文档出处为权威**：enumValues 全空，枚举值出自业务文档（见 domain-model.md 决策枚举表）；`plan_status` 无定义枚举——展示原值，不自行补充「通过/不通过」。
 - **划线字段双核对**：文档删除线但系统仍在的属性（DishLaunchPlan 4 个、ReferenceDishBinding 系数 9 个、MaterialDemand 净需求 3 个等）——元数据为实、文档为背景，不因文档划线断言字段不存在。
-- **承载形态映射**：本项目无 ReadinessUnit/LaunchRisk 实体（旧项目与 storyline 素材口径）——六类齐套以 DishLaunchItem（上市事项）按 item_type 归纳；风险=可追溯的事项/缺口/订单异常清单，不是风险标签；旧编码（Q0001~Q0006/LR-NP009-xx/NP009）仅作问法映射，不作存在性承诺。
+- **承载形态以本体为准**：六类齐套以 DishLaunchItem（上市事项）按 item_type 归纳；风险=可追溯的事项/缺口/订单异常清单，无独立风险实体；故事线文档中出现的其他实体名/编码仅作问法理解参考，不作存在性承诺（以实时元数据为准）。
 - **名称与单据号**：计划/菜品/物料/仓库用「中文名（编码）」；单据号（NP/PO-/MD-/SQ-）回显前与工具返回原值逐字核对。
 
 ## 写操作确认（受控执行）

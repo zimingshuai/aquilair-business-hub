@@ -14,14 +14,14 @@
 
 ## objects_query 的 ObjectSet DSL（本项目方言，2026-11-03 实测定稿）
 
-- **裸 base 可查全量**：`object_set={"type":"base","objectType":"<实体 code>"}`——本项目接受（与旧项目相反）。
+- **裸 base 可查全量**：`object_set={"type":"base","objectType":"<实体 code>"}`——本项目接受。
 - **filter 必须带 where**（无 where 的 filter 报 42200）：
   `object_set={"type":"filter","objectSet":{"type":"base","objectType":"<实体 code>"},"where":{...}}`
 - **where 算子放 `type` 键**（不是 operator 键，传 operator 报 42200）：
   `{"type":"eq|neq|lt|lte|gt|gte|in|containsAnyTerm","property":"<属性 code>","value":<标量或数组>}`
 - 组合条件：`{"type":"and|or","children":[...]}`；**`{"type":"not","child":{...}}` 用单数 child**
   （传 children 报 42201「not 条件缺少 child」——本项目特有）。
-- `property` **只认属性 code**：传 PROP_ refCode 报 42201 未知属性（与旧项目相反，勿混用）。
+- `property` **只认属性 code**：传 PROP_ refCode 报 42201 未知属性。
 - `select` 传属性 code 数组；臆造字段名报 42201——报错时用 `metadata_object_neighborhood` 核对实名，不靠猜。
 - 分页只认 `page_token`（`page` 参数被 pydantic 拒绝）；`totalCount` 需显式 `include_total_count=true`，
   返回值是**字符串**（如 "0"），比较时先转型。

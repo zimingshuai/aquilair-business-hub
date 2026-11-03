@@ -1,14 +1,5 @@
 # 物料齐套与采购保障
 
-> **实测校注（2026-11-03）**：本文件为业务方剧本原文收录（正文未改动），与 2026-11-03 实测元数据存在以下已知出入，冲突处以 references/facts.md 与实时元数据（metadata_* 实时返回）为准：
-> 1. **PurchasePlan / PurchaseSolution 当前为 entity_ 未命名实体**（工单 TK-code），objects_query 传 code/refCode 均 40401 不可查——正文涉及其字段（net_demand_qty / plan_purchase_qty / confirm_flag / send_flag / solution_code 等）时当前无查询承载，如实声明，不以推算冒充查询结果。
-> 2. **expected_supply_qty_ontime / expected_gap_qty 系统缺失**（工单 TK-sda字段）——正文「引用」两字段的口径按 facts.md 替代口径执行：以 SupplyDemandAllocation.supply_available_date 与需求日期（MaterialDemand.material_demand_date）现算对比展示，并注明判定字段缺失。
-> 3. **MaterialSupplier 实测主键为 material_supplier_code**（非正文「核对 strategy_code」的主键口径）；strategy_code 实测在 PurchaseSolution 属性中（该实体当前不可查，见第 1 条）。
-> 4. 正文「须核验 / 设计为 / 按当前已部署」类防御措辞与技能「实时查询为准」铁律一致——冲突时以实时元数据 + facts.md 为准。
-> 5. 正文文末引用的 delivery.md 未随本技能收录：可视化交付按 aquilair-data-delivery 技能规范执行（数据类交付强制配图）。
->
-> 原始剧本由业务方提供（2026-11-03），校注依据 evals/runs/2026-11-03-launch-poc-probe.md
-
 适用于物料原始需求、齐套结果、供应参数、采购方案/计划、最晚采购日、订单跟踪与分配按时保障。业务数值和判定引用当前规则、算法、函数或已保存结果；文中公式用于解释设计，不授权问答层重算。
 
 ## 需求与供应追溯
@@ -24,7 +15,7 @@
 
 ## 物料供应参数与单位
 
-MaterialSupplier按物料、仓库、供应商读取，核对strategy_code、priority_level、replenishment_cycle、lead_time_days、transport_lead_time、min_order_qty、max_order_qty、order_multiple、valid_from、valid_to和is_active。参数存在不代表订单或分配已经按时保障。
+MaterialSupplier按物料、仓库、供应商读取，核对material_supplier_code（实测主键）、priority_level、replenishment_cycle、lead_time_days、transport_lead_time、min_order_qty、max_order_qty、order_multiple、valid_from、valid_to和is_active。参数存在不代表订单或分配已经按时保障。
 
 Material使用base_uom、purchase_uom、sales_uom、bom_uom及inv_uom_factor、purchase_uom_factor、bom_uom_factor、sales_uom_factor。由已部署程序按明确系数方向统一数量；缺少单位、系数或有效范围时报告待核查，不跨单位相减或凭经验换算。
 
@@ -37,6 +28,8 @@ Material使用base_uom、purchase_uom、sales_uom、bom_uom及inv_uom_factor、p
 - material_demand_date为需要的派生属性，但有效输入来源需核验。来源不明确时保留属性语义并报告待核查，不补造日期或恢复无效来源。
 
 ## 采购方案与采购计划
+
+PurchaseSolution / PurchasePlan 当前缺正式 code、不可查询（实测，工单挂起）——以下字段口径供数据补齐后使用，涉及时如实声明无承载。
 
 | 对象/字段 | 业务口径 |
 | --- | --- |
@@ -67,11 +60,10 @@ Material使用base_uom、purchase_uom、sales_uom、bom_uom及inv_uom_factor、p
 ## 采购分配按时保障
 
 1. 从目标计划的有效物料需求范围取已确认采购在途分配，用supply_nr关联PurchaseOrder.purchase_order_nr，核对物料、仓库和订单状态。
-2. 引用expected_supply_qty_ontime：设计为供应可用日晚于需求日则取0，否则取MIN(supply_available_qty,allocated_qty)。material_demand_date为有效派生属性，不能遗漏。
-3. 引用expected_gap_qty：属性说明与规则段的截零表达可能不一致，按当前已部署结果解释并记录配置差异，不在问答层改算。
-4. 订单未超过自己的交期也可能赶不上更早的物料需求日；订单交期与需求保障分开报告。
-5. 取消或关闭订单不再贡献有效在途，但其未履约分配仍是供应失效问题，不能通过过滤订单隐藏。
-6. 单笔分配有按时供应量不证明全局总量足够；多条分配共用同一供应时须核验算法总量约束或对账结果。
+2. expected_supply_qty_ontime / expected_gap_qty 当前无此字段（实测，工单挂起）——按时保障判定以 supply_available_date 与 material_demand_date 现算对比展示：可用日晚于需求日取 0 供给，否则取 MIN(supply_available_qty, allocated_qty)；缺口=MAX(0, allocated_qty−按时供给)；现算结果注明「展示口径，判定字段缺失」，不与规则回写值混淆。
+3. 订单未超过自己的交期也可能赶不上更早的物料需求日；订单交期与需求保障分开报告。
+4. 取消或关闭订单不再贡献有效在途，但其未履约分配仍是供应失效问题，不能通过过滤订单隐藏。
+5. 单笔分配有按时供应量不证明全局总量足够；多条分配共用同一供应时须核验算法总量约束或对账结果。
 
 输出分配编号、订单编号、需求编号、物料/仓库、需求日期、供应可用日、分配量、按时供应量和缺口。订单、分配与物料需求三个粒度分别汇总，避免缺口重复累计。
 
@@ -83,4 +75,6 @@ Material使用base_uom、purchase_uom、sales_uom、bom_uom及inv_uom_factor、p
 - 供应失效通知、供需重算和计划下发是动作；先核验实现及授权，保存失败或部分成功须明确说明。
 - 仓库保障与门店可售分开；有供应仓库或门店销售记录不证明物料已送达门店，没有配送执行证据不作到店承诺。
 
-交付按同单位分组展示需求、齐套、采购期限、订单风险和分配保障，详见[delivery.md](delivery.md)。字段来源缺口按[facts.md](facts.md)核验。
+交付按同单位分组展示需求、齐套、采购期限、订单风险和分配保障，可视化按 aquilair-data-delivery 技能规范执行；字段来源缺口按[facts.md](facts.md)核验。
+
+> 来源：业务方剧本（2026-11-03），正文已按当日实测元数据修订；后续以实时元数据为准。

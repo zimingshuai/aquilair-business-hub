@@ -25,19 +25,17 @@
 
 ### 上市事项执行状态（本项目「六类齐套」的承载形态）
 
-- 本项目**无 ReadinessUnit/SubReadinessUnit 实体**（那是旧项目模型）【实测模型】；六类齐套工作以
-  DishLaunchItem 上市事项承载：item_type 标事项类型（如 BOM 冻结/采购计划确认/库存更新/门店上架）、
-  pre_item_codes 前置依赖、execution_status 执行状态、max_plan_completion_time 最晚允许完成时间
-  （按上市就绪倒排）【E2 一.DishLaunchItem】。
+- 六类齐套工作以 DishLaunchItem 上市事项承载（以实时元数据为准）：item_type 标事项类型（如 BOM 冻结/
+  采购计划确认/库存更新/门店上架）、pre_item_codes 前置依赖、execution_status 执行状态、
+  max_plan_completion_time 最晚允许完成时间（按上市就绪倒排）【E2 一.DishLaunchItem】。
 - 执行状态判定（规则【待处理】，引用时注明）：latest_actual_completion_time 非空且 ≤ 计划完成时间=已完成；
   非空但 > 计划=延期完成；为空=未完成【E2 二.上市事项.执行状态，RULE_40E295A0E】。
-- 事项类型对应旧六类：商品（Q0001）/配方（Q0002）/物料（Q0003）/供应（Q0004）/仓配（Q0005）/门店与营销
-  （Q0006）【SL S03】——本编码体系属演示口径，与 DishLaunchItem.item_type 的对应关系以数据灌入后实查为准【实测：当前 0 实例】。
+- 六类归纳口径：商品/配方/物料/供应/仓配/门店与营销——按 item_type 实际取值归类（以实时查询为准）。
 
 ### 上市风险
 
-- 本项目**无 LaunchRisk 实体**（storyline 中 LR-NP009-xx 编码体系属旧/演示口径）【实测模型】；
-  文档规则区「上市事项延期/未完成风险/物料未齐套风险/采购订单延期到货风险」三条为空壳【E2 二.上市风险】。
+- 上市风险**无独立实体承载**【实测模型】；文档规则区「上市事项延期/未完成风险/物料未齐套风险/
+  采购订单延期到货风险」三条为空壳【E2 二.上市风险】。
 - 风险现状的表达路径：上市事项延期/未完成 ← DishLaunchItem 状态；物料缺口 ← MaterialDemand
   net_demand_qty（字段在、靠规则回写，规则 RULE_B86E790E6 在册）；到货延期 ← PurchaseOrder
   current_overdue_days/expected_delay_days（后者规则 RULE_901C611902 在册）。
@@ -70,13 +68,12 @@
 | DishLaunchItem.execution_status | NOT_STARTED / IN_PROGRESS / COMPLETED / BLOCKED | E2 同上 |
 | ReferenceDishBinding.bind_type | 参考品 / 类比品 | E2 一.ReferenceDishBinding |
 
-## 四、编码字典（演示口径，数据灌入前仅作问法映射，不作存在性承诺）
+## 四、编码字典（单据号编码规则与锚点口径；数值不作事实源）
 
-- 计划编码：NP009=青提冰茶上市计划（dish_id=926001，T=2026-11-15，首月目标 300000 杯，300 家门店）
-  【SL 一】。
-- 六类齐套演示码：Q0001 商品 / Q0002 配方 / Q0003 物料 / Q0004 供应 / Q0005 仓配 / Q0006 门店与营销【SL S03】。
-- 供应演示码：SQ0004_02 供应齐套子项【SL S06】；风险演示码：LR-NP009-01~04（旧口径，本项目无实体）【SL S07】。
-- 【实测】当前 main 分支 0 实例——上述编码均未在系统出现，回答时以实时查询为准。
+- 单据号前缀：NP=上市计划 / MD-=物料需求 / PO-=采购订单 / SQ-=采购方案——回显前与工具返回原值逐字核对。
+- 计划编码 NP009=青提冰茶上市计划（dish_id=926001）【SL 一】——演示设定值（T=2026-11-15、首月目标
+  300000 杯、300 家门店）不作事实源，数值以实时查询为准。
+- 【实测】当前 main 分支 0 实例——编码均未在系统出现，回答时以实时查询为准。
 
 ## 五、规则公式口径（引用时以 metadata_list_rules 实时清单核对 refCode 与【待处理】标记）
 

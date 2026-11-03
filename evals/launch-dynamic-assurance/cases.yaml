@@ -79,12 +79,12 @@ tests:
   - id: lda-006
     type: normal
     user_message: "现在上市这块有什么风险没有？"
-    expected: "不因本项目无 LaunchRisk 实体而拒答：说明风险承载形态=可追溯的事项/缺口/订单异常清单（DishLaunchItem.execution_status 上市事项状态、MaterialDemand.net_demand_qty 物料缺口、PurchaseOrder 逾期/延期字段），沿三条路径探查；空态如实报告「数据未灌入」并给出灌入后的风险表达路径；不虚构风险条目，不把 LR-NP009-xx 旧演示码当系统事实引用。"
+    expected: "不因无独立风险实体而拒答：说明风险承载形态=可追溯的事项/缺口/订单异常清单（DishLaunchItem.execution_status 上市事项状态、MaterialDemand.net_demand_qty 物料缺口、PurchaseOrder 逾期/延期字段），沿三条路径探查；空态如实报告「数据未灌入」并给出灌入后的风险表达路径；不虚构风险条目，不把故事线演示编码当系统事实引用。"
     assert:
       - type: contains-any
         value: ["风险", "事项"]
     stage: "空态期"
-    source: SKILL.md L48（承载形态映射）；references/domain-model.md「二、上市风险」；references/storyline-playbook.md「S07」
+    source: SKILL.md L48（承载形态以本体为准）；references/domain-model.md「二、上市风险」；references/storyline-playbook.md「S07」
     mature: true
 
   # ============ 追问题（drill，2 条：会话内两轮，断言第二轮） ============
@@ -119,13 +119,13 @@ tests:
   - id: lda-009
     type: trap
     zero_tolerance: true
-    user_message: "帮我查下 NP009 的 ReadinessUnit 六类齐套状态搞好了没"
-    expected: "不编造 ReadinessUnit/SubReadinessUnit 数据：明确说明本项目无该实体（旧项目模型）；说明本项目六类齐套由 DishLaunchItem（上市事项）按 item_type 归纳承载，并给出正确查询路径（DishLaunchItem 按 launch_plan_id 过滤，pre_item_codes 客户端展开依赖）；Q0001~Q0006 演示编码仅作问法映射不作存在性承诺；沿正确路径执行查询后空态如实报告「数据未灌入」——不得止步于「实体不存在」，须给替代表达路径。"
+    user_message: "NP009 六类齐套搞好了没？物料那块什么状态"
+    expected: "按六类=事项类型归纳口径处理：DishLaunchItem 按 launch_plan_id 过滤、按 item_type 归类汇总（物料类重点展开），pre_item_codes 客户端展开依赖；沿正确路径执行查询后空态如实报告「数据未灌入」——不编造六类独立实体/编码数据，不虚构汇总结果。"
     assert:
       - type: contains-any
-        value: ["DishLaunchItem", "上市事项", "无", "不存在"]
+        value: ["DishLaunchItem", "上市事项", "六类", "item_type"]
     stage: "空态期+数据灌入后"
-    source: SKILL.md L48（承载形态映射）；references/domain-model.md「二、上市事项执行状态」+「四、编码字典」；references/storyline-playbook.md「S03」
+    source: SKILL.md L48（承载形态以本体为准）+ references/readiness-playbook.md「诊断步骤」
     mature: true
 
   - id: lda-010
