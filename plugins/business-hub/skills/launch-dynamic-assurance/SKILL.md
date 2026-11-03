@@ -46,7 +46,7 @@ metadata:
 
 - **禁止重算**：齐套状态、销量系数（价格/季节/营销费用）、净需求 net_demand_qty（=毛−齐，规则回写）、方案数值一律引用回写值+规则名——自行计算会把「解释」变「造数」；展示层求和/差额注明计算口径。
 - **口径三分离**：首月经营目标（人工设定）/ 预测基准（参考品系数推导）/ 分周预测需求——三值不同源不得混用；【待处理】规则（价格系数/营销费用系数/事项执行状态等 6 条）引用时必须注明「待处理」。
-- **四类问题不混淆**：数据缺失 / 业务未完成 / 读取异常→待核查 / 规则配置缺失→待核查——不得把系统故障报成业务未完成，待核查≠已确认不满足；**空集合≠通过**；空态如实报「数据未灌入」。
+- **四类问题不混淆**：数据缺失 / 业务未完成 / 读取异常→待核查 / 规则配置缺失→待核查——不得把系统故障报成业务未完成，待核查≠已确认不满足；**空集合≠通过**；空态如实报「数据未灌入」；查无结果≠业务对象不存在（空态期两者分开表述，数据灌入后查无才可断言不存在）。
 - **依赖须有边**：上市事项依赖以 `pre_item_codes` 为准（客户端展开成 DAG 再按 `max_plan_completion_time` 排），不编造固定串行顺序；max_plan_completion_time 是「不影响上市的最晚允许完成」，不等于上市日。
 - **枚举以元数据+文档出处为权威**：enumValues 全空，枚举值出自业务文档（见 domain-model.md 决策枚举表）；`plan_status` 无定义枚举——展示原值，不自行补充「通过/不通过」。
 - **划线字段双核对**：文档删除线但系统仍在的属性（DishLaunchPlan 4 个、ReferenceDishBinding 系数 9 个、MaterialDemand 净需求 3 个等）——元数据为实、文档为背景，不因文档划线断言字段不存在。
@@ -81,7 +81,7 @@ metadata:
 
 ## 可用脚本
 
-- [`scripts/save_meta.py`](scripts/save_meta.py)（纯存档，零网络零凭证）：首次或缓存缺失/过期时——调 metadata 四清单工具 → 把四段返回 JSON 按 `{"object_types":...,"rules":...,"actions":...,"algorithms":...}`（各键值=返回 content[0].text 原样，算法空传 null）包装写给脚本存档至 `.meta-cache/` → 后续会话直接读缓存省往返；`_cache-info.json` 的 fetched_at 超 7 天重拉（`.meta-cache/` 运行时生成不入库）。
+- [`scripts/save_meta.py`](scripts/save_meta.py)（纯存档，零网络零凭证）：首次或缓存缺失/过期时——调 metadata 四清单工具 → 把四段返回 JSON 按 `{"object_types":...,"rules":...,"actions":...,"algorithms":...}`（各键值=返回 content[0].text 原样，算法空传 null）包装写给脚本存档至 `.meta-cache/`（命令带 `--workspace <id>` 记入归属） → 后续会话直接读缓存省往返；`_cache-info.json` 的 fetched_at 超 7 天重拉（`.meta-cache/` 运行时生成不入库）。
 
 ## 按需加载（何时读哪个参考文件）
 
