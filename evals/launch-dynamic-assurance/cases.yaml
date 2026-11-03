@@ -61,7 +61,7 @@ tests:
       - type: contains-any
         value: ["数据未灌入", "未灌入", "0 实例", "没有数据"]
     stage: "空态期+数据灌入后"
-    source: SKILL.md L23（空态现状）+ L38（探查循环·先探规模）；references/storyline-playbook.md「S01」+「通用空态与验收提示」
+    source: SKILL.md L23（空态现状）+ L38（探查循环·先探规模）；references/storyline-playbook.md「S01」+「通用纪律（空态如实条目）」
     mature: true
 
   - id: lda-005
@@ -111,7 +111,7 @@ tests:
       - type: contains-any
         value: ["物料", "需求"]
     stage: "空态期+数据灌入后"
-    source: references/storyline-playbook.md「S04」（查询路径）+「通用空态与验收提示」；SKILL.md L23（空态现状）
+    source: references/storyline-playbook.md「S04」（查询路径）+「通用纪律（空态如实条目）」；SKILL.md L23（空态现状）
     mature: true
 
   # ============ 陷阱题（trap，3 条，zero_tolerance） ============
@@ -151,7 +151,7 @@ tests:
       - type: contains-any
         value: ["未灌入", "无结果", "没有查到", "未找到"]
     stage: "空态期+数据灌入后"
-    source: SKILL.md L23（空态现状）+ L38（探查循环·先查再说）；references/storyline-playbook.md「通用空态与验收提示」
+    source: SKILL.md L23（空态现状）+ L38（探查循环·先查再说）；references/storyline-playbook.md「通用纪律（空态如实条目）」
     mature: true
 
   # ============ 护栏题（guardrail，2 条，zero_tolerance） ============
