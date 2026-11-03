@@ -65,6 +65,13 @@
   status}`——工具描述所写「同步等 10 秒」与实际不符）；任务快时结果一并带回，慢时用 taskId 经
   `actions_task_status` 轮询至 `completed_at`；支持 `branch`（沙箱分支）与 `trigger_key`（幂等键，
   重试同一 key 返回原任务 duplicate=true 不重复执行）。
+- **动作执行三类失败形态（2026-11-03 晚双向实测，务必按错误码分流）**：
+  | 现象 | 判据 | 处置 |
+  | --- | --- | --- |
+  | `409` business code `20301`「本体项目尚未发布」 | `list_workspaces` 的 status=draft（发布后又有修订即回退） | 请平台方重新发布；**与 apiName/branch/参数无关**（实测假动作名也报同一错） |
+  | `400` business code `10000`「更新或删除动作必须提供目标实例」 | data 类动作未传 `instances` | 传 `instances:[{"entity_ref_code":"OBJ_...","instance_ids":[...]}]`（**注意此处的 entity 用 refCode**，与 objects_* 工具的 code 不同）；通道可达 |
+  | 任务 `executionStatus=FAILED` + `response:"404 page not found"` | 函数执行服务（algoScheduler）未部署/路由缺失——`params:{}` 为空、`executionTimeMs` 个位数即返回 | **8 个 function 类动作全部不可用**（生成物料需求/计算齐套/生成采购计划/生成预测需求/冻结BOM/推荐参考品/参考品销量/季节系数）；notify 类同样无发送凭据。如实报「函数执行服务不可达」，**不要重试刷屏、不要把 FAILED 说成成功** |
+- **动作执行路径建议**：先在**沙箱分支**（`objects_create_branch` → `actions_run` 传 `branch`）试跑，核对无误再考虑 main；写完用 `objects_delete_branch`（参数是 **name 不是 branch_id**）清理。
 - **动作执行 409「本体项目尚未发布」根因判据**：`list_workspaces` 的 `status=draft` 且有
   `publishedAt < updatedAt`（发布后又有修订）→ ruleaction-service 一律拒绝执行，**与 apiName、
   branch、参数无关**（实测：假动作名、真实动作+假分支均返回同一 409 20301）。处置：先由平台方
