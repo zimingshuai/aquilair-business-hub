@@ -1,4 +1,4 @@
-# 元数据缓存（scripts/fetch_meta.py 运行时生成，不入库）
+# 元数据缓存（scripts/save_meta.py 存档生成，不入库）
 .meta-cache/
 # Python 编译缓存（py_compile/运行时生成，不入库）
 __pycache__/

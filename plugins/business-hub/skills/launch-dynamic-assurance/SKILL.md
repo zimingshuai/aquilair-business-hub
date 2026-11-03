@@ -5,7 +5,7 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 compatibility: 需 MCP 连接器 aquilair-mcp-servers 可达（公司内网 HTTPS 端点，宿主首连走 OAuth 授权）；无其他系统依赖
 metadata:
   author: Aquilair Team
-  version: "0.1.4"
+  version: "0.1.5"
   workspace: "01a19ac6-4c5f-7000-8c2d-4cfe7158ca8f"
 ---
 
@@ -40,7 +40,7 @@ metadata:
 
 ## 探查循环（接到问题的推进方式）
 
-**以 MCP 实时查询为唯一事实源——不信任何快照、文档值或记忆值**：① 元数据先行（`metadata_list_object_types` 轻量起步，属性级再 `metadata_object_neighborhood` 按需拉）→ ② 结合问题规划查询路径（可参照剧本）→ ③ `objects_query` 取实例 → ④ **观察是否足以回答**：不足则迭代（换属性实名/扩过滤/下钻关联冗余字段/补拉元数据），**终止判据 = 足以回答即停**，不追求穷尽数据。报错按码自纠：42200→查 DSL 结构；42201→核对属性实名；40401→确认类型可查性——entity_ 未命名实体 4 个（历史销量/采购计划/采购方案/系统）查询通道**不稳定**（服务端缺陷，工单挂起）：实时尝试，成功用结果；失败按错误码如实报告（40401/500/unreachable），不编造。
+**以 MCP 实时查询为唯一事实源——不信任何快照、文档值或记忆值**：① 元数据先行（已有 `.meta-cache/` 且未过期先读缓存再按需补拉；否则 `metadata_list_object_types` 轻量起步，属性级再 `metadata_object_neighborhood` 按需拉）→ ② 结合问题规划查询路径（可参照剧本）→ ③ `objects_query` 取实例 → ④ **观察是否足以回答**：不足则迭代（换属性实名/扩过滤/下钻关联冗余字段/补拉元数据），**终止判据 = 足以回答即停**，不追求穷尽数据。报错按码自纠：42200→查 DSL 结构；42201→核对属性实名；40401→确认类型可查性——entity_ 未命名实体 4 个（历史销量/采购计划/采购方案/系统）查询通道**不稳定**（服务端缺陷，工单挂起）：实时尝试，成功用结果；失败按错误码如实报告（40401/500/unreachable），不编造。
 
 ## 铁律（Gotchas）
 
@@ -81,11 +81,11 @@ metadata:
 
 ## 可用脚本
 
-- [`scripts/fetch_meta.py`](scripts/fetch_meta.py)：首用或元数据过期时预取四清单落 `.meta-cache/`（须传 token：环境变量 `AQUILAIR_MCP_TOKEN` 或 `--token`；`.meta-cache/` 运行时生成不入库）。
+- [`scripts/save_meta.py`](scripts/save_meta.py)（纯存档，零网络零凭证）：首次或缓存缺失/过期时——调 metadata 四清单工具 → 把四段返回 JSON 按 `{"object_types":...,"rules":...,"actions":...,"algorithms":...}`（各键值=返回 content[0].text 原样，算法空传 null）包装写给脚本存档至 `.meta-cache/` → 后续会话直接读缓存省往返；`_cache-info.json` 的 fetched_at 超 7 天重拉（`.meta-cache/` 运行时生成不入库）。
 
 ## 按需加载（何时读哪个参考文件）
 
-- **问法意图路由（自然语言问法→意图类→查询路径）+ 典型场景索引（S01~S07）**：[`references/storyline-playbook.md`](references/storyline-playbook.md)——任意上市问法先归意图类再取路径，复合问法拆类回答。
+- **问法意图路由（自然语言问法→意图类→查询路径）**：[`references/storyline-playbook.md`](references/storyline-playbook.md)——任意上市问法先归意图类再取路径，复合问法拆类回答。
 - **物料/采购下钻（供应参数、单位、效期、方案计划、四类订单检查、分配保障）**：[`references/material-purchase.md`](references/material-purchase.md)——业务方剧本原文收录（含实测校注）。
 - **上市事项诊断（进度、阻塞、处理顺序、复查）**：[`references/readiness-playbook.md`](references/readiness-playbook.md)——业务方剧本原文收录（含实测校注）。
 - **DSL 语法、工具行为、服务端状态、元数据缺陷**：[`references/facts.md`](references/facts.md)（方言最终版；不快照数据实态，数值现查）。
