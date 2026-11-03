@@ -10,14 +10,15 @@
 | --- | --- | --- | --- |
 | 🍜 `fnb-inventory-analysis` | 餐饮库存诊断：仓群风险总览（P0-P3）、判定依据溯源、SKU/ABC 分类、缺货明细 | `aquilair-mcp`（fnb 本体项目，只读工具） | 只读 |
 | 🏭 `mfg-transfer-allocation` | 生产制造调拨：多工厂缺货、方案/计划/评估、What-if 沙箱分支推演、确认后执行 | `aquilair-mcp`（mfg 本体项目，含写/分支工具） | 只读 + 写（确认卡流程） |
-| 🚀 `launch-readiness-diagnosis` | 新品上市保障：六类齐套诊断、上市风险与决策档位、物料缺口、首批采购与到货跟踪（计划·齐套·物料·采购全链） | `aquilair-mcp`（npi 本体项目，读为主 + 检查程序受控执行） | 只读 + 写（确认卡流程） |
+| 🚀 `launch-dynamic-assurance` | 新品上市动态保障（POC 项目）：上市计划与预测口径、上市事项与齐套、物料缺口、供需分配、采购订单跟踪、上市风险全链问答，数据交付强制可视化 | `aquilair-mcp-servers`（新品上市POC-最新版本体项目，读为主 + 写工具确认卡） | 只读 + 写（确认卡流程） |
+| 🚀 `launch-readiness-diagnosis` | 新品上市保障：六类齐套诊断、上市风险与决策档位、物料缺口、首批采购与到货跟踪（计划·齐套·物料·采购全链） | `aquilair-mcp`（npi 本体项目，读为主 + 检查程序受控执行） | 只读 + 写（确认卡流程）（⏳ 退役过渡：由 `launch-dynamic-assurance` 替代，POC 验证后下线） |
 | 📊 `aquilair-data-delivery` | 数据交付可视化规范：配图铁律、豆包式看板模板、图表选型 | —（交付规范，跨技能叠加） | 规范 |
 
 ### 元技能（裁决入口，随本插件分发）
 
 - 🧭 `aquilair-skill-router`：技能路由入口（使用端元技能）——复合/跨域业务问题先裁决技能叠加顺序再干活；新技能接入走其路由表扩充接口（工厂侧技能 `aquilair-skill-authoring` / `aquilair-knowledge-wiki` 在 aquilair-skill-forge 插件，未安装时路由如实指引，不手工代答）
 
-另有 **`plugins/business-hub/agents/`**：宿主无关的 agent 人设源文件（`aquilair-supply-chain-advisor`，供应链中枢顾问）+ 六宿主接入指南（ZCode / Claude Code / Codex / WorkBuddy / 豆包 / 企业自建的适配对照与自适配指令）。
+另有 **`plugins/business-hub/agents/`**：宿主无关的 agent 人设源文件（`aquilair-supply-chain-advisor` 供应链中枢顾问、`launch-poc-advisor` 新品上市POC动态保障顾问）+ 六宿主接入指南（ZCode / Claude Code / Codex / WorkBuddy / 豆包 / 企业自建的适配对照与自适配指令）。
 
 每个技能遵循渐进式披露：`SKILL.md` 只含核心指令，场景剧本 / Action 明细 / KPI 口径放 `references/` 按需加载；`scripts/fetch_meta.py` 负责首用元数据预取（落盘 `.meta-cache/`，运行时生成不入库）。
 
@@ -36,11 +37,14 @@
 
 ## 前置条件
 
-- **网络可达**：MCP 数据网关部署在公司内网（HTTPS 域名端点），需在内网 / VPN 环境使用。网关为多本体项目统一入口，OAuth Bearer 鉴权（宿主走 MCP OAuth 登录），两个业务技能各自使用固定 workspace：
+- **网络可达**：MCP 数据网关部署在公司内网（HTTPS 域名端点），需在内网 / VPN 环境使用。网关为多本体项目统一入口，OAuth Bearer 鉴权（宿主走 MCP OAuth 登录），各业务技能使用固定 workspace：
 
   | 服务 | 端点 | 支撑技能 |
   | --- | --- | --- |
   | `aquilair-mcp` | `https://aquilair.idcs.elitescloud.com/mcp-service/mcp` | fnb-inventory-analysis（fnb 本体项目）＋ mfg-transfer-allocation（mfg 本体项目） |
+  | `aquilair-mcp-servers` | `https://aquilair.idcs.elitescloud.com/mcp-service/mcp`（与 `aquilair-mcp` 同端点） | launch-dynamic-assurance（新品上市POC-最新版本体项目） |
+
+  > 双名过渡态：`aquilair-mcp` 与 `aquilair-mcp-servers` 指向同一网关端点，fnb/mfg 沿用前者、launch-dynamic-assurance 经后者寻址；地址唯一源仍在 `plugins/business-hub/.mcp.json`。
 
 - **（可选）Python 3**：首用元数据预取脚本 `fetch_meta.py` 需要；不跑脚本技能也能用（MCP 会话内拉元数据），只是首答稍慢。
 
@@ -85,7 +89,7 @@ codex plugin marketplace add <仓库地址>
 codex plugin add aquilair-business-hub@aquilair
 ```
 
-装齐后自动生效：4 技能 + MCP 数据网关（`codex mcp list` 应显示 `aquilair-mcp` 为 enabled）+ SessionStart 路由注入。`codex plugin remove aquilair-business-hub@aquilair` 随时卸载；仓库更新后 `codex plugin marketplace upgrade` 刷新。
+装齐后自动生效：6 技能 + MCP 数据网关（`codex mcp list` 应显示 `aquilair-mcp` 与 `aquilair-mcp-servers` 为 enabled）+ SessionStart 路由注入。`codex plugin remove aquilair-business-hub@aquilair` 随时卸载；仓库更新后 `codex plugin marketplace upgrade` 刷新。
 
 ### 方式三：通用技能目录（任何 Agent Skills 兼容客户端）
 
@@ -98,7 +102,8 @@ codex plugin add aquilair-business-hub@aquilair
 ```json
 {
   "mcpServers": {
-    "aquilair-mcp": { "type": "http", "url": "https://aquilair.idcs.elitescloud.com/mcp-service/mcp" }
+    "aquilair-mcp": { "type": "http", "url": "https://aquilair.idcs.elitescloud.com/mcp-service/mcp" },
+    "aquilair-mcp-servers": { "type": "http", "url": "https://aquilair.idcs.elitescloud.com/mcp-service/mcp" }
   }
 }
 ```
@@ -107,6 +112,9 @@ codex plugin add aquilair-business-hub@aquilair
 
 ```toml
 [mcp_servers.aquilair-mcp]
+url = "https://aquilair.idcs.elitescloud.com/mcp-service/mcp"
+
+[mcp_servers.aquilair-mcp-servers]
 url = "https://aquilair.idcs.elitescloud.com/mcp-service/mcp"
 ```
 
@@ -167,7 +175,7 @@ aquilair-business-hub/
 │   ├── .mcp.json              # MCP 数据网关连接（全仓库唯一地址源）
 │   ├── hooks/                 # SessionStart 路由注入
 │   ├── agents/                # 宿主无关人设源 + 六宿主接入指南
-│   └── skills/                # 4 技能（fnb / mfg / data-delivery / router）
+│   └── skills/                # 6 技能（fnb / mfg / launch 两代 / data-delivery / router）
 ├── evals/                     # 评估数据层：cases 用例集 + runs 回归记录（能力层在 forge 仓）
 ├── aquilair-knowledge/        # 知识库源文档区分发快照（主本在 forge 仓，见 SNAPSHOT.md）
 ├── tools/                     # pack_skill 打包 / lint_skills 巡检 / validate_cases 校验（vendored）

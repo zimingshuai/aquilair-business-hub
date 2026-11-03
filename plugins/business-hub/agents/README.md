@@ -1,6 +1,7 @@
 # agents/ —— Aquilair 顾问人设与跨宿主接入指南
 
-> 本目录存放**宿主无关的 agent 人设源文件**。`aquilair-supply-chain-advisor.md` 的正文
+> 本目录存放**宿主无关的 agent 人设源文件**。`aquilair-supply-chain-advisor.md`（供应链中枢顾问）、
+> `launch-poc-advisor.md`（新品上市POC动态保障顾问，配套技能 `launch-dynamic-assurance`）的正文
 > 是各宿主通用的系统提示词；frontmatter 遵循 Claude Code / ZCode subagent 规范。
 > 把整个仓库交给任何智能体（或其使用者）后，按本文件第三节宿主对照表与第四节字段映射即可自行适配接入。
 
@@ -23,7 +24,7 @@
 
 | 宿主 | 接入方法 | 已验证 |
 | --- | --- | --- |
-| **ZCode** | **推荐插件**（2026-09-24 实测，拆分后双插件）：「插件市场 → 添加 → 添加插件市场」粘贴本仓库根目录 → 「个人 → aquilair」按需安装 `aquilair-business-hub`（业务 4 技能 + MCP + SessionStart hook 一次装齐）与 `aquilair-skill-forge`（技能工厂元技能，开发者装）；更新走「市场源刷新 → 插件详情更新」。**出图建议同市场加装官方 `visualize` 插件**（Gen UI 内联渲染，见第六节）。人设拷至 `~/.zcode/agents/`（插件清单不含 agents，subagent 人设需单独拷）。备选：技能拷 `~/.zcode/skills/` + `plugins/business-hub/.mcp.json` 抄 `~/.agents/mcp.json`（新会话生效） | ✅ 2026-09-24 插件闭环（双插件结构待实测） |
+| **ZCode** | **推荐插件**（2026-09-24 实测，拆分后双插件）：「插件市场 → 添加 → 添加插件市场」粘贴本仓库根目录 → 「个人 → aquilair」按需安装 `aquilair-business-hub`（业务 5 技能 + MCP + SessionStart hook 一次装齐）与 `aquilair-skill-forge`（技能工厂元技能，开发者装）；更新走「市场源刷新 → 插件详情更新」。**出图建议同市场加装官方 `visualize` 插件**（Gen UI 内联渲染，见第六节）。人设拷至 `~/.zcode/agents/`（插件清单不含 agents，subagent 人设需单独拷）。备选：技能拷 `~/.zcode/skills/` + `plugins/business-hub/.mcp.json` 抄 `~/.agents/mcp.json`（新会话生效） | ✅ 2026-09-24 插件闭环（双插件结构待实测） |
 | **Claude Code** | 人设拷至 `~/.claude/agents/`（或项目 `.claude/agents/`）；插件方式 `/plugin marketplace add <本仓库>`；技能目录拷 `~/.claude/skills/`；MCP 加进 `claude mcp add` 或项目 `.mcp.json` | ✅ 插件格式即为此设计 |
 | **Codex** | 插件市场两条命令（Codex CLI 0.154.0 实测，拆分后双插件）：`codex plugin marketplace add <仓库地址>` → `codex plugin add aquilair-business-hub@aquilair`（业务技能 + MCP + SessionStart hook 全自动装齐；开发者再加装 `aquilair-skill-forge@aquilair`）——0.15x 兼容 Claude Code 市场清单。备选：技能目录拷 `~/.codex/skills/` + MCP 手写 `~/.codex/config.toml`（片段见主 README「MCP 手动配置」节） | ✅ 2026-09-24 验证（双插件结构待实测） |
 | **WorkBuddy / CodeBuddy** | 已有适配版（`my-experts` 市场里的 `aquilair-supply-chain-advisor` 专家包）：`.codebuddy-plugin/plugin.json` + `plugins/business-hub/agents/*.md`（frontmatter 加 displayName/profession/maxTurns/skills）+ 业务技能 + avatars。**适配资产已入库本仓库**（`.codebuddy-plugin/` 清单与包内 README、`avatars/` 头像，v1.x 独立版本线；只随 business-hub 业务技能，不含 forge 元技能），WorkBuddy 侧目录是分发副本 | ✅ 运行中（v1.3.0 对齐 hub 0.3.0） |
@@ -49,8 +50,8 @@
 > 你收到了 aquilair-skills 仓库。请为本环境接入 Aquilair 供应链顾问：
 > 1. 读 `plugins/business-hub/agents/aquilair-supply-chain-advisor.md`，正文即系统提示词；
 > 2. 按本环境的 agent 定义机制创建智能体，frontmatter/配置字段按 `agents/README.md` 第四节映射；
-> 3. 把 `plugins/business-hub/skills/` 下 4 个业务技能安装到本环境的技能位置（终端用户必装；`plugins/skill-forge/skills/` 3 个元技能供开发者按需；无技能机制则作为系统提示词附件/知识库挂载）；
-> 4. 在本环境的 MCP 配置中注册 `plugins/business-hub/.mcp.json` 里的统一数据网关 `aquilair-mcp`（需内网可达）；
+> 3. 把 `plugins/business-hub/skills/` 下 5 个业务技能安装到本环境的技能位置（终端用户必装；`plugins/skill-forge/skills/` 3 个元技能供开发者按需；无技能机制则作为系统提示词附件/知识库挂载）；
+> 4. 在本环境的 MCP 配置中注册 `plugins/business-hub/.mcp.json` 里的统一数据网关（`aquilair-mcp` 与 `aquilair-mcp-servers` 同端点双名过渡，需内网可达）；
 > 5. 验证：问「各仓库有没有库存风险？」应触发 fnb 技能；问「工厂缺货情况」应触发 mfg 技能；验证清单见仓库 `evals/`（37 条评估用例全部 mature，其中护栏/红队用例零容忍）。
 
 ## 六、可视化出图通道（宿主工具路由）

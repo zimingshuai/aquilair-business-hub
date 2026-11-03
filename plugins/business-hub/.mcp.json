@@ -3,6 +3,10 @@
     "aquilair-mcp": {
       "type": "http",
       "url": "https://aquilair.idcs.elitescloud.com/mcp-service/mcp"
+    },
+    "aquilair-mcp-servers": {
+      "type": "http",
+      "url": "https://aquilair.idcs.elitescloud.com/mcp-service/mcp"
     }
   }
 }
