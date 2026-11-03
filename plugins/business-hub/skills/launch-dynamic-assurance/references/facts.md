@@ -45,6 +45,11 @@
 - `metadata_list_actions`：仅返回 refCode+name+description，**不返回 apiName**；workspace_model 中
   15 动作 apiName 全为 null——**actions_run 当前无有效入参来源，不可承诺动作执行**（工单 TK-apiname）。
 - `actions_task_status`：task_id 必须 UUID；服务在线（非 UUID 报 400 即为连通证据）。
+- `metadata_object_neighborhood`：depth 参数上限 10（服务端约束）。
+- `metadata_list_algorithms`：算法定位为外部优化 webhook 摘要；本项目清单为空（content:[] 形态，
+  存档脚本按空清单写占位）。
+- `actions_run` 超时语义：提交后同步等待约 10 秒，未完成返回 `{task_id, status: RUNNING}`——
+  需用 `actions_task_status` 轮询直至 `completed_at` 有值；本项目 apiName 全 null，当前无有效入参。
 - `objects_list_branches`：仅 main（branchId=0）；沙箱推演前须先 objects_create_branch（写操作，走确认卡）。
 
 ## 服务端状态与能力边界

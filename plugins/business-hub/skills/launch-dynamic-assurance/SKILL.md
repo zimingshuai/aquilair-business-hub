@@ -27,16 +27,20 @@ metadata:
 
 **空态现状【2026-11-03 实测】：main 分支（唯一分支）21 实体全部 0 实例**——回答实例问题先探规模（`include_total_count=true`；返回 totalCount 是**字符串**），空态如实报「数据未灌入」，禁止用 NP009 文档演示值（300000 杯/300 家/T=2026-11-15）冒充查询结果。
 
-| 工具 | 用途 |
+网关共 **19 个工具**（工作区管理 1｜元数据查询 6｜对象数据 10｜动作执行 2），下表按类归组关键行为；完整清单与描述以 `tools/list` 实时返回为准。
+
+| 工具（按类） | 用途与关键行为 |
 | --- | --- |
-| `objects_query` | 全实体查询。DSL 方言见 facts.md：where 算子放 `type` 键、`not` 用单数 `child`、`property` 只认属性 code、排序服务端不可用→客户端做——方言细则见 facts.md |
-| `objects_get` / `objects_links` | 单实例全属性 / 关系出边。get 对 entity_ 未命名实体同样报 40402 而非类型错误——「类型是否可查」必须用 objects_query 判断（40401 才是类型问题）；关系 code 均为 rel_ 生成名，实名查 `metadata_workspace_model` 的 relations |
-| `metadata_workspace_model` | 全量模型（本项目 21 实体/27 关系完整返回约 560KB 未截断；实体增多警惕截断，截断时退回轻量清单+neighborhood） |
-| `metadata_list_object_types` / `metadata_list_rules` / `metadata_list_actions` / `metadata_list_algorithms` | 元数据四清单：30 规则含 6 条【待处理】；15 动作 apiName 全 null；算法清单空 |
-| `metadata_object_neighborhood` | 属性级详情；42201 报错时核对属性实名，不靠猜 |
-| `list_workspaces` / `objects_list_branches` | 工作区状态 / 分支清单（当前仅 main） |
-| `objects_save` / `objects_edit` / `objects_delete` / `objects_create_branch` / `objects_delete_branch` / `actions_run` | **写操作，必走确认卡**（见下节）；actions_run 当前无 apiName 入参来源，不可承诺执行 |
-| `objects_relation_counts` | 全参数形态 42200 待核查——以 objects_links 或关联冗余字段（dish_id/wh_code/demand_nr）query 替代 |
+| 工作区：`list_workspaces` | 列凭证可访问的本体项目，id 即其余工具的 workspace_id；本项目状态以实时返回为准 |
+| 元数据：`metadata_list_object_types` | 探索起点：对象/关系类型概览图（轻量，首选取代全量模型） |
+| 元数据：`metadata_workspace_model` | 一次拉全模型（对象+关系+规则+动作+算法；本项目完整返回约 560KB 未截断，实体增多警惕截断→退回轻量清单+neighborhood） |
+| 元数据：`metadata_list_rules` / `metadata_list_actions` / `metadata_list_algorithms` | 规则（含【待处理】标注）/ 动作（apiName 全 null）/ 算法（外部优化 webhook 摘要，本项目空）三清单 |
+| 元数据：`metadata_object_neighborhood` | 对象类型周边 N 跳完整定义（depth 上限 10）；42201 报错时核对属性实名，不靠猜 |
+| 对象读：`objects_query` / `objects_get` / `objects_links` | 通用查询（筛选/分页 page_token/选列 select；**排序当前不可用→客户端做**，方言见 facts.md）/ 主键取单件（对 entity_ 未命名实体报 40402 而非类型错误，类型可查性用 query 判 40401）/ 关系出边（关系 code 均为 rel_ 生成名，实名查模型 relations） |
+| 对象读：`objects_relation_counts` | 全参数形态 42200 待核查——以 objects_links 或关联冗余字段（dish_id/wh_code/demand_nr）query 替代 |
+| 对象写：`objects_save` / `objects_edit` / `objects_delete` | upsert / 批量编辑 / 删除——**main 分支即生产数据，必走确认卡**（见下节） |
+| 沙箱：`objects_create_branch` / `objects_delete_branch` / `objects_list_branches` | What-if 分支：克隆数据视图做推演写入不碰生产（建/删分支同样走确认卡）；当前仅 main |
+| 动作：`actions_run` / `actions_task_status` | 提交本体动作，同步等约 10 秒，超时返回 `{task_id, RUNNING}`→用 `actions_task_status` 轮询至 `completed_at`；当前 apiName 全 null 无有效入参来源，不可承诺执行 |
 
 ## 探查循环（接到问题的推进方式）
 
