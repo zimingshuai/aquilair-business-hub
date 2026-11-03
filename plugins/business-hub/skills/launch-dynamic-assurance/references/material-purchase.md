@@ -29,7 +29,7 @@ Material使用base_uom、purchase_uom、sales_uom、bom_uom及inv_uom_factor、p
 
 ## 采购方案与采购计划
 
-PurchaseSolution / PurchasePlan 当前缺正式 code、不可查询（实测，工单挂起）——以下字段口径供数据补齐后使用，涉及时如实声明无承载。
+PurchaseSolution / PurchasePlan 当前缺正式 code、实例查询通道不稳定（服务端缺陷，工单挂起；2026-11-03 复验 40401/500/不可达交错、期间曾查通返回空态）——每次实时尝试，失败按错误码如实报告；以下字段口径供查询可用时使用。
 
 | 对象/字段 | 业务口径 |
 | --- | --- |

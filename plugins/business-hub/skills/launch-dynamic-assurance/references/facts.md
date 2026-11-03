@@ -34,7 +34,7 @@
 ## 工具行为
 
 - `objects_get`：object_type 传实体 code + 主键值；实例不存在报 40402「对象在本体模型不存在」。
-  **注意**：对不可查类型（entity_ 未命名实体）同样报 40402 而非类型错误——判断「类型是否可查」必须用
+  **注意**：对 entity_ 未命名实体同样报 40402 而非类型错误——判断「类型是否可查」必须用
   objects_query（报 40401 才是类型问题）。
 - `objects_links`：实例不存在报 40402；link_codes 省略展开全部出边。关系 code 均为 rel_ 生成名——
   拿关系实名用 `metadata_workspace_model` 的 relations（name/refCode/两端属性）。
@@ -62,10 +62,10 @@
 
 | 缺陷 | 现象与复现 | 处置 | 工单 |
 | --- | --- | --- | --- |
-| 4 实体无正式 code | HistorySalesByDay/PurchasePlan/PurchaseSolution/「系统」为 entity_ 生成名，objects_query 传 code 或 refCode 均 40401 | 开工单补 code；补齐前涉及这 4 实体的查询如实声明无承载（参考品历史销量链路受影响最大） | TK-code |
+| 4 实体无正式 code | HistorySalesByDay/采购计划/采购方案/「系统」为 entity_ 生成名——元数据层存在（enabled=true，属性 15/16/5/3），实例查询通道**不稳定**：2026-11-03 复验 40401/500/data-service unreachable 交错，期间采购计划 code 曾查通返回空态（服务端修复进行中） | 每次实时尝试：成功用返回结果；失败按错误码如实报告（40401=类型未注册/500=服务端错误/unreachable=服务不可达），不编造不重试刷屏；开工单补正式 code 并稳定通道（参考品历史销量链路受影响最大） | TK-code |
 | MaterialSupplier 主键口径 | 文档主键 strategy_code，系统主键 material_supplier_code（另有 material_in_wh_code，无 strategy_code） | 一律以实时元数据 isKey 为准，get 用 material_supplier_code | TK-主键 |
 | 供应按时判定字段缺失 | SupplyDemandAllocation 无 expected_supply_qty_ontime / expected_gap_qty（文档有公式） | 到货可行性判定改由 supply_available_date vs demand 日期现算展示口径，并注明字段缺失 | TK-sda字段 |
 | 库存指标字段缺失 | MaterialInWarehouse 缺 available_inventory_qty/dii/idd/inventory_holding_cost/remain_forecast_sales_qty | 相关指标不承诺，字段清单以实时元数据为准 | TK-miw字段 |
 | 划线属性未同步清除 | DishLaunchPlan（plan_start_date 等 4 个）、ReferenceDishBinding（系数 9 个）、ForecastSalesDemand（3 个）、MaterialDemand（net_demand_qty 等 3 个）、SupplyDemandAllocation（material_demand_date）——文档删除线但系统仍在 | 引用前双核对（元数据为实、文档为背景）；不因文档划线断言字段不存在 | TK-划线 |
-| 关系缺口 | Dish.history_sales_by_day、DishLaunchPlan.ref_launch_plan 自关联、MaterialInWarehouse→purchase_orders/purchase_plan/forecast_sales_demand 3 条缺失 | 参考品历史销量经 Dish→HistorySalesByDay 无关系可走（且实体不可查）；参考计划链经 ReferenceDishBinding.ref_launch_plan_id 属性中转；在途采购经 SupplyDemandAllocation.supply_nr 中转 | TK-关系 |
+| 关系缺口 | Dish.history_sales_by_day、DishLaunchPlan.ref_launch_plan 自关联、MaterialInWarehouse→purchase_orders/purchase_plan/forecast_sales_demand 3 条缺失 | 参考品历史销量经 Dish→HistorySalesByDay 无关系可走（且该实体查询通道不稳定）；参考计划链经 ReferenceDishBinding.ref_launch_plan_id 属性中转；在途采购经 SupplyDemandAllocation.supply_nr 中转 | TK-关系 |
 | MCP 工具 description 为空 | objects_query 等 description 空串，DSL 用法无内嵌文档 | 技能侧自备方言表（本手册）；平台侧补文档属增强项 | 低优先 |

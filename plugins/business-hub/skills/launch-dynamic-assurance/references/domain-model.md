@@ -8,9 +8,9 @@
 ## 一、业务链（一个新品从立项到上市的全链）
 
 计划立项（DishLaunchPlan）→ 参考品绑定（ReferenceDishBinding）→ 参考品历史销量聚合（HistorySalesByDay，
-**实体当前不可查**【实测 40401】）→ 首月经营目标 vs 预测基准 → 周粒度预测需求（ForecastSalesDemand，
+实例查询通道当前不稳定【实测 2026-11-03：40401/500/不可达交错】）→ 首月经营目标 vs 预测基准 → 周粒度预测需求（ForecastSalesDemand，
 4 条周需求）→ BOM 展开物料需求（MaterialDemand）→ 库存/在途供需分配（SupplyDemandAllocation）→
-物料齐套（MaterialKitting）→ 采购计划（entity_01e7964c 采购计划，**不可查**【实测】）→ 采购订单跟踪
+物料齐套（MaterialKitting）→ 采购计划（entity_01e7964c，查询通道不稳定【实测】）→ 采购订单跟踪
 （PurchaseOrder）。上市准备工作以**上市事项**（DishLaunchItem）跟踪执行与依赖。【BG 2.2/3.x，实测模型】
 
 关键口径：

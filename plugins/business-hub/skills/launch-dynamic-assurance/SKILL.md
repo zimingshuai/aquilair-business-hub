@@ -25,7 +25,7 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 | 工具 | 用途 |
 | --- | --- |
 | `objects_query` | 全实体查询。DSL 方言见 facts.md：where 算子放 `type` 键、`not` 用单数 `child`、`property` 只认属性 code、排序服务端不可用→客户端做——方言细则见 facts.md |
-| `objects_get` / `objects_links` | 单实例全属性 / 关系出边。get 对不可查类型同样报 40402——「类型是否可查」必须用 objects_query 判断（40401 才是类型问题）；关系 code 均为 rel_ 生成名，实名查 `metadata_workspace_model` 的 relations |
+| `objects_get` / `objects_links` | 单实例全属性 / 关系出边。get 对 entity_ 未命名实体同样报 40402 而非类型错误——「类型是否可查」必须用 objects_query 判断（40401 才是类型问题）；关系 code 均为 rel_ 生成名，实名查 `metadata_workspace_model` 的 relations |
 | `metadata_workspace_model` | 全量模型（本项目 21 实体/27 关系完整返回约 560KB 未截断；实体增多警惕截断，截断时退回轻量清单+neighborhood） |
 | `metadata_list_object_types` / `metadata_list_rules` / `metadata_list_actions` / `metadata_list_algorithms` | 元数据四清单：30 规则含 6 条【待处理】；15 动作 apiName 全 null；算法清单空 |
 | `metadata_object_neighborhood` | 属性级详情；42201 报错时核对属性实名，不靠猜 |
@@ -35,7 +35,7 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 
 ## 探查循环（接到问题的推进方式）
 
-**以 MCP 实时查询为唯一事实源——不信任何快照、文档值或记忆值**：① 元数据先行（`metadata_list_object_types` 轻量起步，属性级再 `metadata_object_neighborhood` 按需拉）→ ② 结合问题规划查询路径（可参照剧本）→ ③ `objects_query` 取实例 → ④ **观察是否足以回答**：不足则迭代（换属性实名/扩过滤/下钻关联冗余字段/补拉元数据），**终止判据 = 足以回答即停**，不追求穷尽数据。报错按码自纠：42200→查 DSL 结构；42201→核对属性实名；40401→确认类型可查性（HistorySalesByDay/PurchasePlan/PurchaseSolution 等 entity_ 未命名实体 4 个不可查，涉及查询如实声明无承载）。
+**以 MCP 实时查询为唯一事实源——不信任何快照、文档值或记忆值**：① 元数据先行（`metadata_list_object_types` 轻量起步，属性级再 `metadata_object_neighborhood` 按需拉）→ ② 结合问题规划查询路径（可参照剧本）→ ③ `objects_query` 取实例 → ④ **观察是否足以回答**：不足则迭代（换属性实名/扩过滤/下钻关联冗余字段/补拉元数据），**终止判据 = 足以回答即停**，不追求穷尽数据。报错按码自纠：42200→查 DSL 结构；42201→核对属性实名；40401→确认类型可查性——entity_ 未命名实体 4 个（历史销量/采购计划/采购方案/系统）查询通道**不稳定**（服务端缺陷，工单挂起）：实时尝试，成功用结果；失败按错误码如实报告（40401/500/unreachable），不编造。
 
 ## 铁律（Gotchas）
 

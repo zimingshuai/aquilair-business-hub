@@ -24,7 +24,7 @@
 | 时间与倒排 | 「啥时候必须搞定」「最晚啥时候完成」「还剩几天」「倒排时间给我看看」「死线是哪天」 | DishLaunchItem 的 plan_completion_time/max_plan_completion_time/latest_actual_completion_time；物料侧 MaterialDemand.max_purchase_date/max_lead_time_days | max_plan_completion_time=不影响上市的最晚允许完成≠上市日；需求层 max_purchase_date=material_demand_date−max_lead_time_days（max_lead_time_days=MAX(关联供应商 lead_time_days)，不跨仓全库求最大）；重排倒排计算动作无承载，只读已存排期【domain-model「五、物料齐套与净需求」；readiness-playbook「周期与时间」】 |
 | 齐套与缺口排查 | 「料齐了没」「还差啥料」「有没有缺口」「缺多少、哪个仓缺」「啥时候能齐」 | ForecastSalesDemand（dish_id 锁本计划预测版本）→ MaterialDemand（dish_demand_nr 关联；material_demand_qty/total_kit_qty/net_demand_qty/material_demand_date）→ MaterialKitting（demand_nr；kit_qty/kit_time） | 毛需求/齐套量/净需求按【物料×仓库×需求】粒度；net_demand_qty 是规则回写值（规则在册），引用注「计算回写」不自行计算；数量齐但到得晚单独表达时间不满足，不混入数量缺口【material-purchase「需求与供应追溯」】 |
 | 供需分配 | 「库存和在途怎么分的」「分配了没、确认了没」「每笔需求能拿到多少」「库存够不够扣」「在途算进来了吗」 | SupplyDemandAllocation 按 demand_nr select：allocation_nr/supply_type/supply_nr/supply_available_date/supply_available_qty/allocated_qty/allocation_status | supply_type 两枚举不同时套用（INVENTORY→supply_nr 指库存批次/PURCHASE_IN_TRANSIT→指采购订单）；枚举出自业务文档（enumValues 全空）；expected_supply_qty_ontime/expected_gap_qty 系统缺失→supply_available_date 与需求日期现算对比并注明字段缺失【domain-model「三、决策枚举」；facts「元数据缺陷」】 |
-| 采购方案与计划 | 「采购跟得上来吗」「打算买多少」「采购计划下了没」「最晚啥时候得下单」「MOQ 是多少」「确认/下发了没有」 | 净需求>0 的 MaterialDemand → 采购计划/方案实体（entity_ 未命名，objects_query 40401 不可查【实测】，涉及时如实声明无承载）→ MaterialSupplier 策略参数（material_code+wh_code 过滤） | 需求层与计划层 max_purchase_date 是两种口径不混用；confirm_flag/send_flag≠采购订单已生成；方案生成/成本测算无算法承载，只做缺口×策略参数的可行性说明，不虚构方案【material-purchase「采购方案与采购计划」；facts「服务端状态与能力边界」】 |
+| 采购方案与计划 | 「采购跟得上来吗」「打算买多少」「采购计划下了没」「最晚啥时候得下单」「MOQ 是多少」「确认/下发了没有」 | 净需求>0 的 MaterialDemand → 采购计划/方案实体（entity_ 未命名，查询通道不稳定【实测】：实时尝试，失败按错误码如实报告）→ MaterialSupplier 策略参数（material_code+wh_code 过滤） | 需求层与计划层 max_purchase_date 是两种口径不混用；confirm_flag/send_flag≠采购订单已生成；方案生成/成本测算无算法承载，只做缺口×策略参数的可行性说明，不虚构方案【material-purchase「采购方案与采购计划」；facts「服务端状态与能力边界」】 |
 | 订单到货跟踪 | 「料到了没」「订单到货了吗」「还有多少没交」「会不会延期」「预计哪天能到」「供应商靠谱吗」 | PurchaseOrder 按 material_code 过滤 select：purchase_order_nr/supplier_code/required_delivery_date/estimated_arrival_date/total_order_qty/undelivery_qty/status/current_overdue_days/expected_delay_days | 当前逾期与预计延期两种口径不混用（一个看当前日期、一个看预计到达日期）；estimated_arrival_date 为空或已过仍未交完=「到货时间待确认」，不归为正常保障；催交/提醒动作无执行凭据不虚称已催【material-purchase「四类订单与分配检查」「提醒、重算与执行边界」】 |
 | 风险与放行判断 | 「能不能按时上」「有啥风险没」「会不会赶不上上市」「现在能放行上市吗」「还差什么才能上」 | 三路径汇总：DishLaunchItem 按 execution_status 汇总（未完成/延期=当前阻断项）+ MaterialDemand 净缺口现状 + PurchaseOrder 异常字段；plan_status 读原值 | 风险=可追溯的事项/缺口/订单异常清单，无独立风险实体、不是风险标签；放行结论须六类事项全部完成+无未解缺口才可给出，否则列剩余条件；不为演示效果把计划说成可上市【domain-model「二、上市风险」】 |
 | 目标调整影响 | 「目标定 300000 杯合理吗」「目标要不要调」「调目标会影响啥」「预测跟目标差多少」 | DishLaunchPlan select target_first_month_sales_qty 与 forecast_first_month_sales_qty 两字段分别取值对比；参考链 ReferenceDishBinding（new_launch_plan_id 过滤）→参考计划实例（ref_launch_plan_id 中转）读 actual_sales_qty/actual_sales_qty_by_w1~w4 | 口径三分离：首月经营目标（人工设定）/预测基准（参考品系数推导）/分周预测需求三者不同源不混用；差额与偏差率注明计算口径，不代用户调目标；无级联重算规则时不宣称周需求/采购已同步【domain-model「一、业务链」「五、预测基准链」】 |
@@ -40,7 +40,7 @@
 - 「目标 300000 杯会不会定高了？现在料齐了没？」→ 目标调整影响 + 齐套与缺口排查。
 - 「六类齐套分别啥状态，物料那块卡在谁那了？」→ 进度与事项状态 + 齐套与缺口排查。
 - 「哪些店上、门店那边准备咋样？」→ 上市门店与渠道准备 + 进度与事项状态。
-- 「都有哪些实体？参考品历史销量能查吗？」→ 元数据与能力边界（HistorySalesByDay 不可查如实声明）。
+- 「都有哪些实体？参考品历史销量能查吗？」→ 元数据与能力边界（HistorySalesByDay 查询通道不稳定：实时尝试，失败如实报告）。
 
 ## 二、典型场景索引（S01~S07，细查路径见对应意图类与所引剧本）
 
@@ -67,12 +67,12 @@
 - **查无结果≠不存在**：空态期查无实例时把「查无结果」与「数据未灌入」分开表述，不断言业务对象
   不存在；待核查≠已确认不满足，不把系统故障报成业务未完成。
 - **迭代与终止**：报错按码自纠（42200→查 DSL 结构；42201→核对属性实名；40401→确认类型可查性，
-  entity_ 未命名实体 4 个不可查如实声明）；终止判据=足以回答即停，不穷尽数据。
+  entity_ 未命名实体 4 个查询通道不稳定——实时尝试，失败按错误码如实报告）；终止判据=足以回答即停，不穷尽数据。
 - **引用不重算**：状态与数值引用回写字段+规则名（【待处理】规则注明）；展示层求和/差额注明
   计算口径；把「解释」变「造数」是违规。
 - **输出与可视化**：先结论后证据，逐条标来源（实体.属性/规则 refCode/文档口径）；数据类交付
   强制配可视化（aquilair-data-delivery 两档），只回纯文本表格=违规。
 - **故事线素材不作事实源**：NP009 演示设定值（300000 杯/300 家/T=2026-11-15）不作事实源，数值一律
-  以实时查询为准；HistorySalesByDay/PurchasePlan/PurchaseSolution 等未命名实体当前不可查（工单挂起），
+  以实时查询为准；HistorySalesByDay/采购计划/采购方案等未命名实体查询通道不稳定（服务端缺陷，工单挂起）——实时尝试，失败如实报告，
   涉及时如实声明、聚合值走参考计划实例字段；检查上市齐套/重排倒排/方案生成等动作与算法无注册承载，
   被要求执行时如实说明。

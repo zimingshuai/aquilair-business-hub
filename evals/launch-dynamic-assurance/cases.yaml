@@ -1,7 +1,9 @@
 # launch-dynamic-assurance 评估用例集 v1（2026-11-03 P6 总验收逐条复核转正：13/13 mature）
 # 被测技能：aquilair-launch-poc 仓 plugins/launch-poc/skills/launch-dynamic-assurance/
 # 数据环境基准【2026-11-03 实测】：workspace 新品上市POC-最新版（01a19ac6-4c5f-7000-8c2d-4cfe7158ca8f），
-#   main 分支（唯一分支）21 实体 0 实例；15 动作 apiName 全 null；算法清单空；4 实体不可查。
+#   main 分支（唯一分支）21 实体 0 实例；15 动作 apiName 全 null；算法清单空；
+#   4 个 entity_ 未命名实体（历史销量/采购计划/采购方案/系统）元数据层存在、实例查询通道不稳定
+#   （2026-11-03 复验 40401/500/不可达交错、期间采购计划 code 曾查通返回空态——服务端修复进行中，技能实时尝试+失败如实报告）。
 # 字段说明（本文件新增，validate_cases.py 兼容）：
 #   follow_up —— 追问/施压第二轮消息：评估时先原样发 user_message，收到回答后再原样发 follow_up，
 #                expected 断言第二轮回答（第一轮为铺垫上下文，不给独立断言）；
