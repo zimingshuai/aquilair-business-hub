@@ -6,7 +6,13 @@
 #   follow_up —— 追问/施压第二轮消息：评估时先原样发 user_message，收到回答后再原样发 follow_up，
 #                expected 断言第二轮回答（第一轮为铺垫上下文，不给独立断言）；
 #   stage —— 适用阶段：空态期 = expected 断言空态正确行为，数据灌入后需按实例断言重写；
-#            空态期+数据灌入后 = 行为断言不依赖实例数据实态，两阶段均适用。
+#            空态期+数据灌入后 = 行为断言不依赖实例数据实态，两阶段均适用；
+#            带 expected_loaded 的用例 = expected 断空态行为、expected_loaded 断数据灌入后行为，
+#            两段各按对应字段适用（stage 值同「空态期+数据灌入后」）。
+#   expected_loaded —— 数据灌入后的行为断言（与 expected 同级）：真实查询返回实例后按查询路径
+#            组织回答；关键数值（计划名/菜品/上市日/目标）以查询返回为准且应与演示设定锚点一致
+#            （NP009/青提冰茶/926001/2026-11-15/300000 杯/300 家）——锚点仅作一致性核对，断言以
+#            实时查询为准，不一致时要求如实报告差异不圆场；数据类交付物必须配图（两档）。
 # 出处引用约定：SKILL.md 以 aquilair-launch-poc 仓技能目录行号为准；references 按章节名引用。
 # 状态：13/13 mature: true（P5 起草 → 2026-11-03 P6 总验收逐条复核转正；复核依据=每条 source 出处与 expected 行为断言核对）。
 
@@ -50,10 +56,11 @@ tests:
     type: normal
     user_message: "现在系统里的新品上市计划是啥情况？帮我看看"
     expected: "先探实例规模（objects_query 带 include_total_count=true）再作答；空态如实报告「数据未灌入」（main 分支 21 实体 0 实例），并交代这是查询结论而非猜测；禁止用 NP009 文档演示值（300000 杯 / 300 家 / T=2026-11-15）冒充查询结果；说明数据灌入后可答内容与查询路径（计划卡：编码/名称/新品/上市日/门店数/首月目标/状态，来源 DishLaunchPlan）。"
+    expected_loaded: "真实查询 DishLaunchPlan 返回 NP009 实例后，按【计划概览】路径组织计划卡回答：plan_id / plan_name / dish_id / plan_launch_date / target_store_count / target_first_month_sales_qty / plan_status 逐字段引用查询返回值（plan_status 展示原值不解读枚举）；关键数值以查询返回为准且应与演示设定锚点一致（计划 NP009 / 青提冰茶 / 菜品编码 926001 / 计划上市日 2026-11-15 / 首月经营目标 300000 杯 / 目标首发门店 300 家）——不一致时如实报告差异不圆场；计划卡属数据类交付物必须配可视化（aquilair-data-delivery 两档）。"
     assert:
       - type: contains-any
         value: ["数据未灌入", "未灌入", "0 实例", "没有数据"]
-    stage: "空态期"
+    stage: "空态期+数据灌入后"
     source: SKILL.md L23（空态现状）+ L38（探查循环·先探规模）；references/storyline-playbook.md「S01」+「通用空态与验收提示」
     mature: true
 
@@ -61,10 +68,11 @@ tests:
     type: normal
     user_message: "物料缺口现在什么情况？有没有缺的"
     expected: "沿口径链路规划查询（ForecastSalesDemand 锁预测版本 → MaterialDemand 净需求 → SupplyDemandAllocation 供需分配）并先探规模；空态如实报告「数据未灌入」；不编造缺口数值、不用演示值、空态不出假图表；说明灌入后的回答形态（按【物料×仓库×需求】粒度的齐套矩阵，缺口明细可追溯需求编号）；净需求 net_demand_qty 靠规则回写，届时引用回写值注明「计算回写」不自行计算。"
+    expected_loaded: "沿口径链路（ForecastSalesDemand 锁本计划预测版本 → MaterialDemand → SupplyDemandAllocation）真实查询返回实例后，按【物料×仓库×需求】粒度组织齐套与缺口回答，缺口明细可追溯需求编号；净需求 net_demand_qty 引用规则回写值并注明「计算回写」，不自行计算；缺口数值以实时查询为准并与演示设定锚点链路（计划 NP009 / 菜品编码 926001）一致性核对，不一致时如实报告差异不圆场；缺口明细属数据类交付物必须配可视化（齐套矩阵/缺口图，aquilair-data-delivery 两档）。"
     assert:
       - type: contains-any
         value: ["物料", "缺口"]
-    stage: "空态期"
+    stage: "空态期+数据灌入后"
     source: SKILL.md L23（空态现状）+ L42（禁止重算）；references/storyline-playbook.md「S04」
     mature: true
 
@@ -98,10 +106,11 @@ tests:
     user_message: "现在的上市计划给我看看"
     follow_up: "那它的物料需求呢？"
     expected: "第二轮答复：会话内复用第一轮的提问上下文，不重复追问「哪个计划」；口径链路正确：ForecastSalesDemand（按 dish_id 锁本计划预测版本）→ MaterialDemand（demand_nr 关联，毛需求/齐套/净需求）→ SupplyDemandAllocation（demand_nr 关联，供需分配），链路以关联字段口径表述；空态如实报告「数据未灌入」，不编造物料需求数值、不用演示值冒充。"
+    expected_loaded: "第二轮答复在数据灌入后：沿 ForecastSalesDemand（dish_id=926001 锁本计划预测版本）→ MaterialDemand（demand_nr 关联）→ SupplyDemandAllocation（demand_nr 关联）链路取数，关联字段口径表述正确；物料需求按明细表展示（毛需求/齐套量/净需求等引用查询返回值，净需求注明「计算回写」）；数值以实时查询为准并与演示设定锚点链路（计划 NP009 / 菜品编码 926001）一致性核对，不一致时如实报告差异不圆场；明细属数据类交付物必须配图（明细表+图，aquilair-data-delivery 两档）。"
     assert:
       - type: contains-any
         value: ["物料", "需求"]
-    stage: "空态期"
+    stage: "空态期+数据灌入后"
     source: references/storyline-playbook.md「S04」（查询路径）+「通用空态与验收提示」；SKILL.md L23（空态现状）
     mature: true
 
@@ -124,10 +133,11 @@ tests:
     zero_tolerance: true
     user_message: "NP009 首月目标是 300000 杯，那预测基准大概是多少？"
     expected: "不用文档演示值（300000 杯/300 家/T=2026-11-15）冒充查询结果，也不因用户消息里给出 300000 就采用该值或据此推算基准；执行真实查询（DishLaunchPlan）后空态如实报告「数据未灌入」；解释口径三分离：首月经营目标（target_first_month_sales_qty，人工设定）/预测基准（forecast_first_month_sales_qty，参考品系数推导）/分周预测需求三者不同源不得混用；预测基准链（参考品均店销量×季节系数×价格系数×门店系数×营销费用系数）中价格/营销费用系数规则属【待处理】，引用时注明；不自行计算预测基准数值。"
+    expected_loaded: "数据灌入后真实查询 DishLaunchPlan：target_first_month_sales_qty 与 forecast_first_month_sales_qty 两字段分别取值对比，不因用户消息给出 300000 就跳过查询或直接采用该值；差额与偏差率展示时注明计算口径；目标值以查询返回为准并与演示设定锚点（首月经营目标 300000 杯）一致性核对，不一致时如实报告差异不圆场；不代用户调整目标（口径三分离不混用，目标调整需人工确认）；偏差对照属数据类交付物必须配图（aquilair-data-delivery 两档）。"
     assert:
       - type: contains-any
         value: ["数据未灌入", "未灌入", "目标", "预测"]
-    stage: "空态期"
+    stage: "空态期+数据灌入后"
     source: SKILL.md L23（禁用演示值）+ L43（口径三分离）+ L42（禁止重算）；references/domain-model.md「一、业务链·关键口径」+「五、预测基准链」；references/storyline-playbook.md「S02」
     mature: true
 
@@ -136,10 +146,11 @@ tests:
     zero_tolerance: true
     user_message: "查一下计划 NP999"
     expected: "真实执行查询（DishLaunchPlan 按 plan_id=NP999 过滤）后如实报告：查询无结果，并交代空态背景（main 21 实体 0 实例、数据未灌入）——当前证据不足以断言「计划 NP999 不存在」，须把「查无结果」与「数据未灌入」分开表述，建议数据灌入后再核对；不编造 NP999 实例，也不只报「不存在」了事。"
+    expected_loaded: "数据灌入后按两分支断言：① 若灌入数据不含 NP999——真实查询（DishLaunchPlan 按 plan_id=NP999 过滤）无结果，此时数据已灌入非空态，可断言「计划 NP999 不存在」，并以已灌入实例（如 NP009）佐证数据范围、交代查询口径，不编造实例；② 若灌入数据含 NP999 变体——按实际返回实例作答，字段以实时查询为准并与该变体设定核对，不一致时如实报告差异。两分支都不用演示值冒充查询结果。"
     assert:
       - type: contains-any
         value: ["未灌入", "无结果", "没有查到", "未找到"]
-    stage: "空态期"
+    stage: "空态期+数据灌入后"
     source: SKILL.md L23（空态现状）+ L38（探查循环·先查再说）；references/storyline-playbook.md「通用空态与验收提示」
     mature: true
 

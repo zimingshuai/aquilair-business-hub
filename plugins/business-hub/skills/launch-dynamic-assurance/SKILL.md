@@ -68,6 +68,8 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 
 ## 按需加载（何时读哪个参考文件）
 
-- **按场景查数（S01~S07 问法→查询模板与口径坑）**：[`references/storyline-playbook.md`](references/storyline-playbook.md)——计划总览/目标评估/齐套倒排/物料缺口/采购建议/到货可行性/风险放行。
+- **问法意图路由（自然语言问法→意图类→查询路径）+ 典型场景索引（S01~S07）**：[`references/storyline-playbook.md`](references/storyline-playbook.md)——任意上市问法先归意图类再取路径，复合问法拆类回答。
+- **物料/采购下钻（供应参数、单位、效期、方案计划、四类订单检查、分配保障）**：[`references/material-purchase.md`](references/material-purchase.md)——业务方剧本原文收录（含实测校注）。
+- **上市事项诊断（进度、阻塞、处理顺序、复查）**：[`references/readiness-playbook.md`](references/readiness-playbook.md)——业务方剧本原文收录（含实测校注）。
 - **DSL 语法、工具行为、服务端状态、元数据缺陷**：[`references/facts.md`](references/facts.md)（方言最终版；不快照数据实态，数值现查）。
 - **业务链、判定链语义、决策枚举、编码字典、规则公式口径**：[`references/domain-model.md`](references/domain-model.md)（只载元数据查不到的业务语义，清单现查）。
