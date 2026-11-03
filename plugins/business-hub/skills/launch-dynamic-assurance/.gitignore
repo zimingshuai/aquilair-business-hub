@@ -2,3 +2,5 @@
 .meta-cache/
 # Python 编译缓存（py_compile/运行时生成，不入库）
 __pycache__/
+# 交付产物（落当前工作区 deliverables/，误落技能目录时兜底不入库）
+deliverables/
