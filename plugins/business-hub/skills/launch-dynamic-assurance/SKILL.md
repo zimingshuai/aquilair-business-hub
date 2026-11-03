@@ -1,7 +1,12 @@
 ---
 name: launch-dynamic-assurance
-description: 新品上市动态保障全链问答（计划·预测·物料·齐套·采购·跟踪·风险）。Use when the user asks about 新品上市计划、上市事项与六类齐套（商品/配方/仓配/物料/供应/门店与营销）、首月经营目标与预测基准、参考品绑定与系数、物料需求与缺口、供需分配、首批采购建议、采购订单到货跟踪、上市风险与能否按期上市、POC 项目里的上市数据——any question about new dish launch plans, launch items, forecast baseline, material gaps, supply-demand allocation, or purchase arrival tracking. 数据来自 MCP 连接器 aquilair-mcp-servers（workspace：新品上市POC-最新版，含写工具须走确认卡）。仅限业务问答：本技能只读取与解释，不是判定引擎/预测引擎/供需引擎；开发/脚本/报表类请求不属于本技能——not for development tasks like writing scripts or building reports, even if the topic involves launch data.
+description: 新品上市动态保障全链问答（计划·预测·物料·齐套·采购·跟踪·风险）。Use when the user asks about 新品上市计划、上市事项与六类齐套（商品/配方/仓配/物料/供应/门店与营销）、首月经营目标与预测基准、参考品绑定与系数、物料需求与缺口、供需分配、首批采购建议、采购订单到货跟踪、上市风险与能否按期上市、POC 项目里的上市数据。用户未直接说『上市』二字也应触发：新品/新饮品/菜单上新进展、首月目标、备料与采购到货问题——any question about new dish launch plans, launch items, forecast baseline, material gaps, supply-demand allocation, or purchase arrival tracking. 数据来自 MCP 连接器 aquilair-mcp-servers（workspace：新品上市POC-最新版，含写工具须走确认卡）。仅限业务问答：本技能只读取与解释，不是判定引擎/预测引擎/供需引擎；开发/脚本/报表类请求不属于本技能——not for development tasks like writing scripts or building reports, even if the topic involves launch data.
 license: Proprietary — Aquilair 内部分发，仅限公司内网使用
+compatibility: 需 MCP 连接器 aquilair-mcp-servers 可达（公司内网 HTTPS 端点，宿主首连走 OAuth 授权）；无其他系统依赖
+metadata:
+  author: Aquilair Team
+  version: "0.1.4"
+  workspace: "01a19ac6-4c5f-7000-8c2d-4cfe7158ca8f"
 ---
 
 # 新品上市动态保障问答（解释型 + 受控执行）
@@ -65,6 +70,18 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 
 - 中文先结论后证据；每项关键结论注来源（实体.属性 / 规则 refCode / 文档口径）；明细超 20 行展示最相关前 10 并说明可展开。
 - Emoji：📋 计划｜🟢 已完成 🔴 缺口 🟡 待核查 ⚠️ 延期 📦 物料 🚚 到货 📎 溯源。
+- 数据类回答按固定骨架组织（模板比自由 prose 可靠）：
+
+```markdown
+# 结论（一段：当前状态+关键数字）
+## 证据（表：对象｜字段｜观测值｜来源规则/记录）
+## 溯源（实体.属性 / 规则 refCode 列表）
+## 可视化（图/看板落点+落档路径）
+```
+
+## 可用脚本
+
+- [`scripts/fetch_meta.py`](scripts/fetch_meta.py)：首用或元数据过期时预取四清单落 `.meta-cache/`（须传 token：环境变量 `AQUILAIR_MCP_TOKEN` 或 `--token`；`.meta-cache/` 运行时生成不入库）。
 
 ## 按需加载（何时读哪个参考文件）
 
