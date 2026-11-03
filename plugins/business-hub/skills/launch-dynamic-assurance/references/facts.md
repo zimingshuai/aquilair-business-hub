@@ -46,8 +46,9 @@
 - `metadata_workspace_model`：全量模型完整返回（2026-11-03 观测约 560KB 未截断；实体/关系/规则数当日持续
   变化——规模以实时返回为准，不快照）；载荷大需警惕截断，截断时退回 metadata_list_object_types（轻量）+
   metadata_object_neighborhood(ref_code, depth=0)。
-- `metadata_list_actions`：仅返回 refCode+name+description，**不返回 apiName**；workspace_model 中
-  15 动作 apiName 全为 null——**actions_run 当前无有效入参来源，不可承诺动作执行**（工单 TK-apiname）。
+- `metadata_list_actions`：返回 refCode+name+description，**不含 apiName**；apiName（ACT_ 前缀）须从
+  `metadata_workspace_model.actions[].apiName` 取——**2026-11-03 晚已全部填充（15/15）**，动作定义完整
+  （含 steps/function/OSS 包路径）。取 apiName 走 workspace_model，勿从 list_actions 找。
 - `actions_task_status`：task_id 必须 UUID；服务在线（非 UUID 报 400 即为连通证据）。
 - `metadata_object_neighborhood`：depth 参数上限 10（服务端约束）。
 - **`System` 实体 = 演示检查日（重要）**：objectType 传 `System`（code 已正式化，勿用 entity_ 名），
@@ -62,7 +63,12 @@
   存档脚本按空清单写占位）。
 - `actions_run` 执行语义：实际为**异步**（2026-11-03 实测：直接返回 `{taskId, executionMode: "ASYNC",
   status}`——工具描述所写「同步等 10 秒」与实际不符）；任务快时结果一并带回，慢时用 taskId 经
-  `actions_task_status` 轮询至 `completed_at`；本项目 apiName 全 null，当前无有效入参。
+  `actions_task_status` 轮询至 `completed_at`；支持 `branch`（沙箱分支）与 `trigger_key`（幂等键，
+  重试同一 key 返回原任务 duplicate=true 不重复执行）。
+- **动作执行 409「本体项目尚未发布」根因判据**：`list_workspaces` 的 `status=draft` 且有
+  `publishedAt < updatedAt`（发布后又有修订）→ ruleaction-service 一律拒绝执行，**与 apiName、
+  branch、参数无关**（实测：假动作名、真实动作+假分支均返回同一 409 20301）。处置：先由平台方
+  重新发布；**不要重试刷屏**，也不要用「执行成功」措辞掩盖。
 - `objects_list_branches`：仅 main（branchId=0）；沙箱推演前须先 objects_create_branch（写操作，走确认卡）。
 
 ## 服务端状态与能力边界

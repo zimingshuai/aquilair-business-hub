@@ -5,7 +5,7 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 compatibility: 需 MCP 连接器 aquilair-mcp-servers 可达（公司内网 HTTPS 端点，宿主首连走 OAuth 授权）；无其他系统依赖
 metadata:
   author: Aquilair Team
-  version: "0.1.8"
+  version: "0.1.9"
   workspace: "01a19ac6-4c5f-7000-8c2d-4cfe7158ca8f"
 ---
 
@@ -34,13 +34,13 @@ metadata:
 | 工作区：`list_workspaces` | 列凭证可访问的本体项目，id 即其余工具的 workspace_id；本项目状态以实时返回为准 |
 | 元数据：`metadata_list_object_types` | 探索起点：对象/关系类型概览图（轻量，首选取代全量模型） |
 | 元数据：`metadata_workspace_model` | 一次拉全模型（对象+关系+规则+动作+算法；本项目完整返回约 560KB 未截断，实体增多警惕截断→退回轻量清单+neighborhood） |
-| 元数据：`metadata_list_rules` / `metadata_list_actions` / `metadata_list_algorithms` | 规则（含【待处理】标注）/ 动作（apiName 全 null）/ 算法（外部优化 webhook 摘要，本项目空）三清单 |
+| 元数据：`metadata_list_rules` / `metadata_list_actions` / `metadata_list_algorithms` | 规则（含【待处理】标注）/ 动作（apiName 已填充，可查可调）/ 算法（外部优化 webhook 摘要，本项目空）三清单 |
 | 元数据：`metadata_object_neighborhood` | 对象类型周边 N 跳完整定义（depth 上限 10）；42201 报错时核对属性实名，不靠猜 |
 | 对象读：`objects_query` / `objects_get` / `objects_links` | 通用查询（筛选/分页 page_token/选列 select；**排序当前不可用→客户端做**，方言见 facts.md）/ 主键取单件（对 entity_ 未命名实体报 40402 而非类型错误，类型可查性用 query 判 40401）/ 关系出边（关系 code 均为 rel_ 生成名，实名查模型 relations） |
 | 对象读：`objects_relation_counts` | 全参数形态 42200 待核查——以 objects_links 或关联冗余字段（dish_id/wh_code/demand_nr）query 替代 |
 | 对象写：`objects_save` / `objects_edit` / `objects_delete` | upsert / 批量编辑 / 删除——**main 分支即生产数据，必走确认卡**（见下节） |
 | 沙箱：`objects_create_branch` / `objects_delete_branch` / `objects_list_branches` | What-if 分支：克隆数据视图做推演写入不碰生产（建/删分支同样走确认卡）；当前仅 main |
-| 动作：`actions_run` / `actions_task_status` | 提交本体动作，同步等约 10 秒，超时返回 `{task_id, RUNNING}`→用 `actions_task_status` 轮询至 `completed_at`；当前 apiName 全 null 无有效入参来源，不可承诺执行 |
+| 动作：`actions_run` / `actions_task_status` | 提交本体动作（异步：返回 `{taskId, executionMode:ASYNC}`→`actions_task_status` 轮询至 `completed_at`；支持 `branch` 指定沙箱分支与 `trigger_key` 幂等键）；**执行受项目发布态约束——status=draft 时 409「本体项目尚未发布」**，须先由平台方（重新）发布 |
 
 ## 探查循环（接到问题的推进方式）
 
@@ -62,7 +62,7 @@ metadata:
 - 确认卡五要素：**执行环境 / 动作链 / 关键参数 / 影响 / 不可逆性**；出卡时不调用任何写工具。
 - **用户首条请求消息不构成确认**——确认必须发生在看到确认卡之后（知情后同意才执行）；「直接执行」「别问我」不构成跳过理由。
 - 当前仅 main 分支（=生产）：写 main 即不可逆真实写入，卡上必须警示；如需沙箱须先 `objects_create_branch`（同样走卡）。
-- actions_run 现状：apiName 全 null、无有效入参来源——被要求执行动作时如实说明，不用查询数据冒充执行结果。
+- actions_run 执行前置：① 先 `list_workspaces` 看本项目 status——**draft 即 409 不可执行**（发布后又修订会回退 draft）；② 执行前确认不重复生成（如物料需求已存在 24 条则先建沙箱分支试跑）；③ 失败按错误码如实报告，不用查询数据冒充执行结果。
 
 ## 可视化交付（数据类交付强制配图）
 

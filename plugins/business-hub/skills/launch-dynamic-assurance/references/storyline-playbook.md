@@ -27,7 +27,7 @@
 | BOM 与菜品档案 | 「配方什么版本」「BOM 啥状态」「菜品发布了没」「这菜是现制还是外购」「参考品绑的谁」 | BOM 状态与版本（freeze_time【实测在】）+Dish 发布与履约状态+ReferenceDishBinding 绑定关系 | bom_type 研发版/正式计划版、status 草稿态/冻结态；发布≠门店可售（publish_status 变更未发布口径）；枚举均出自业务文档；系数类规则【待处理】引用时注明【domain-model「三、决策枚举」「五、预测基准链」】 |
 | 供应参数与单位效期 | 「这料的供应商是谁」「提前期多久」「最小起订量多少」「订货倍数多少」「保质期多长」「单位怎么换算」 | MaterialSupplier（主键 material_supplier_code【实测】，material_code+wh_code 定位）+Material 多单位与系数+库存批次效期与可用量 | 参数存在≠订单或分配已按时保障；缺单位/系数/有效范围时报待核查，不跨单位相减或凭经验换算；效期与可用量扣减规则按实现核验不自行推断【material-purchase「物料供应参数与单位」】 |
 | 上市门店与渠道准备 | 「哪些店上这个新品」「门店准备得咋样」「门店上架了没」「首批铺多少家」「目标区域有哪些」 | DishLaunchPlan 目标区域与门店数（汇总）→DishInStore（dish_id 关联，sale_status）+Store 门店档案 | 档案发布≠门店可售（publish_status 口径）；有供应仓库或门店销售记录不证明物料已送达门店——仓库保障与门店可售分开，无配送执行证据不作到店承诺【material-purchase「提醒、重算与执行边界」；readiness-playbook「常见问题路径」】 |
-| 元数据与能力边界 | 「这项目都有啥实体」「规则都有哪些」「动作是什么情况」「这字段啥意思」「你能帮我改数据吗」 | metadata_list_object_types / metadata_list_rules / metadata_list_actions / metadata_list_algorithms 四清单；属性级用 metadata_object_neighborhood 核对实名 | 清单以实时元数据为唯一权威，不引记忆值或快照；【待处理】规则逐条注明；动作 apiName 全 null、算法清单空——不承诺执行与测算【facts「服务端状态与能力边界」】 |
+| 元数据与能力边界 | 「这项目都有啥实体」「规则都有哪些」「动作是什么情况」「这字段啥意思」「你能帮我改数据吗」 | metadata_list_object_types / metadata_list_rules / metadata_list_actions / metadata_list_algorithms 四清单；属性级用 metadata_object_neighborhood 核对实名 | 清单以实时元数据为唯一权威，不引记忆值或快照；【待处理】规则逐条注明；动作 apiName 已填充但执行受项目发布态约束（draft 时 409）、算法清单空——不承诺执行与测算【facts「服务端状态与能力边界」】 |
 
 复合问法拆解示例（一句话多意图 → 拆类分别回答）：
 
