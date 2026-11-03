@@ -327,7 +327,11 @@ def call_tool(endpoint: str, headers: dict[str, str], tool_name: str, arguments:
     if result.get("isError"):
         raise RuntimeError(f"工具 {tool_name} 返回 isError=True：{result_text[:500]}")
     content = result.get("content", [])
-    if not content or content[0].get("type") != "text":
+    if not content:
+        # 空清单形态（2026-11-03 实测：metadata_list_algorithms 对空清单返回 content:[] 且
+        # isError=false）——返回 None 由调用侧按工具语义处理，不在此处误判为失败。
+        return None
+    if content[0].get("type") != "text":
         raise RuntimeError(f"工具 {tool_name} 返回无文本内容：{result_text[:200]}")
     #   4. 解析内层 JSON（工具返回为双层 JSON：text 字段里还是 JSON 字符串）
     try:
@@ -352,10 +356,13 @@ def _is_algorithms_empty(payload: Any) -> bool:
     """判断算法清单拉取结果是否为空（本项目实测返回空数组，写占位说明而非空文件）。
 
     Args:
-        payload: metadata_list_algorithms 解析后的内层数据（list 或 dict 包装形态）。
+        payload: metadata_list_algorithms 解析后的内层数据（list 或 dict 包装形态）；
+                 None 表示服务端空清单形态（content:[] 且 isError=false，2026-11-03 实测）。
     Returns:
         True 表示写占位文件；False 表示照常落盘。
     """
+    if payload is None:
+        return True
     if isinstance(payload, list):
         return len(payload) == 0
     if isinstance(payload, dict):  # 防御 dict 包装形态：值全为空列表视为空
