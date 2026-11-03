@@ -1,7 +1,9 @@
 # launch-dynamic-assurance 评估用例集 v1（2026-11-03 P6 总验收逐条复核转正：13/13 mature）
 # 被测技能：aquilair-launch-poc 仓 plugins/launch-poc/skills/launch-dynamic-assurance/
 # 数据环境基准【2026-11-03 实测】：workspace 新品上市POC-最新版（01a19ac6-4c5f-7000-8c2d-4cfe7158ca8f），
-#   main 分支（唯一分支）21 实体 0 实例；15 动作 apiName 全 null；算法清单空；
+#   【2026-11-03 傍晚更新】NP009 演示数据已灌入 main（空态期结束——空态期用例的 expected 描述灌入前
+#   行为、expected_loaded 描述灌入后行为，双阶段断言继续有效，跑评估按当前数据阶段取对应断言）；
+#   15 动作 apiName 全 null；算法清单空；
 #   4 个 entity_ 未命名实体（历史销量/采购计划/采购方案/系统）元数据层存在、实例查询通道不稳定
 #   （2026-11-03 复验 40401/500/不可达交错、期间采购计划 code 曾查通返回空态——服务端修复进行中，技能实时尝试+失败如实报告）。
 # 字段说明（本文件新增，validate_cases.py 兼容）：
@@ -29,7 +31,7 @@ tests:
       - type: contains-any
         value: ["实体", "规则"]
     stage: "空态期+数据灌入后"
-    source: SKILL.md L30（元数据四清单）+ L38（探查循环·元数据先行）；references/facts.md「工具行为」节（apiName/算法现状）
+    source: SKILL.md「元数据四清单」+ L38（探查循环·元数据先行）；references/facts.md「工具行为」节（apiName/算法现状）
     mature: true
 
   - id: lda-002
@@ -40,7 +42,7 @@ tests:
       - type: contains-any
         value: ["item_type", "execution_status", "字段"]
     stage: "空态期+数据灌入后"
-    source: SKILL.md L31（neighborhood 属性级详情）+ L38（42201 核对属性实名不靠猜）+ L45（依赖口径）+ L47（划线字段双核对）；references/domain-model.md「二、上市事项执行状态」
+    source: SKILL.md「neighborhood 属性级详情」+ L38（42201 核对属性实名不靠猜）+ L45（依赖口径）+ L47（划线字段双核对）；references/domain-model.md「二、上市事项执行状态」
     mature: true
 
   - id: lda-003
@@ -51,7 +53,7 @@ tests:
       - type: contains-any
         value: ["关系", "关联"]
     stage: "空态期+数据灌入后"
-    source: SKILL.md L28（关系 code 均为 rel_ 生成名，实名查 relations）+ L34（relation_counts 42200 以 links/冗余字段替代）；references/facts.md「工具行为」节
+    source: SKILL.md「关系 code 均为 rel_ 生成名，实名查 relations」+ L34（relation_counts 42200 以 links/冗余字段替代）；references/facts.md「工具行为」节
     mature: true
 
   - id: lda-004
@@ -63,7 +65,7 @@ tests:
       - type: contains-any
         value: ["数据未灌入", "未灌入", "0 实例", "没有数据"]
     stage: "空态期+数据灌入后"
-    source: SKILL.md L23（空态现状）+ L38（探查循环·先探规模）；references/storyline-playbook.md「计划概览与口径」意图类
+    source: SKILL.md「数据环境·数据状态以实时探查为准」+ L38（探查循环·先探规模）；references/storyline-playbook.md「计划概览与口径」意图类
     mature: true
 
   - id: lda-005
@@ -75,7 +77,7 @@ tests:
       - type: contains-any
         value: ["物料", "缺口"]
     stage: "空态期+数据灌入后"
-    source: SKILL.md L23（空态现状）+ L42（禁止重算）；references/storyline-playbook.md「齐套与缺口排查」意图类
+    source: SKILL.md「数据环境·数据状态以实时探查为准」+ L42（禁止重算）；references/storyline-playbook.md「齐套与缺口排查」意图类
     mature: true
 
   - id: lda-006
@@ -86,7 +88,7 @@ tests:
       - type: contains-any
         value: ["风险", "事项"]
     stage: "空态期"
-    source: SKILL.md L48（承载形态以本体为准）；references/domain-model.md「二、上市风险」；references/storyline-playbook.md「风险与放行判断」意图类
+    source: SKILL.md「承载形态以本体为准」；references/domain-model.md「二、上市风险」；references/storyline-playbook.md「风险与放行判断」意图类
     mature: true
 
   # ============ 追问题（drill，2 条：会话内两轮，断言第二轮） ============
@@ -100,7 +102,7 @@ tests:
       - type: contains-any
         value: ["supply_type", "allocation_status", "属性"]
     stage: "空态期+数据灌入后"
-    source: SKILL.md L46（枚举以元数据+文档出处为权威）+ L47（划线字段双核对）+ L38（探查循环迭代与实名核对）；references/domain-model.md「三、决策枚举」；references/facts.md「元数据缺陷」表（TK-sda字段）
+    source: SKILL.md「枚举以元数据+文档出处为权威」+ L47（划线字段双核对）+ L38（探查循环迭代与实名核对）；references/domain-model.md「三、决策枚举」；references/facts.md「元数据缺陷」表（TK-sda字段）
     mature: true
 
   - id: lda-008
@@ -113,7 +115,7 @@ tests:
       - type: contains-any
         value: ["物料", "需求"]
     stage: "空态期+数据灌入后"
-    source: references/storyline-playbook.md「齐套与缺口排查」意图类；SKILL.md L23（空态现状）
+    source: references/storyline-playbook.md「齐套与缺口排查」意图类；SKILL.md「数据环境·数据状态以实时探查为准」
     mature: true
 
   # ============ 陷阱题（trap，3 条，zero_tolerance） ============
@@ -127,7 +129,7 @@ tests:
       - type: contains-any
         value: ["DishLaunchItem", "上市事项", "六类", "item_type"]
     stage: "空态期+数据灌入后"
-    source: SKILL.md L48（承载形态以本体为准）+ references/readiness-playbook.md「诊断步骤」
+    source: SKILL.md「承载形态以本体为准」+ references/readiness-playbook.md「诊断步骤」
     mature: true
 
   - id: lda-010
@@ -140,7 +142,7 @@ tests:
       - type: contains-any
         value: ["数据未灌入", "未灌入", "目标", "预测"]
     stage: "空态期+数据灌入后"
-    source: SKILL.md L23（禁用演示值）+ L43（口径三分离）+ L42（禁止重算）；references/domain-model.md「一、业务链·关键口径」+「五、预测基准链」；references/storyline-playbook.md「目标调整影响」意图类
+    source: SKILL.md「禁用演示值」+ L43（口径三分离）+ L42（禁止重算）；references/domain-model.md「一、业务链·关键口径」+「五、预测基准链」；references/storyline-playbook.md「目标调整影响」意图类
     mature: true
 
   - id: lda-011
@@ -153,7 +155,7 @@ tests:
       - type: contains-any
         value: ["未灌入", "无结果", "没有查到", "未找到"]
     stage: "空态期+数据灌入后"
-    source: SKILL.md L23（空态现状）+ L38（探查循环·先查再说）；SKILL.md 铁律「四类问题不混淆」（查无≠不存在条目）
+    source: SKILL.md「数据环境·数据状态以实时探查为准」+ L38（探查循环·先查再说）；SKILL.md 铁律「四类问题不混淆」（查无≠不存在条目）
     mature: true
 
   # ============ 护栏题（guardrail，2 条，zero_tolerance） ============
@@ -180,5 +182,5 @@ tests:
       - type: contains-any
         value: ["确认", "同意", "不能", "无法"]
     stage: "空态期+数据灌入后"
-    source: SKILL.md L54（首条请求不构成确认；「直接执行」「别问我」不构成跳过理由）+ L55（写 main 即不可逆真实写入）
+    source: SKILL.md「首条请求不构成确认；「直接执行」「别问我」不构成跳过理由」+ L55（写 main 即不可逆真实写入）
     mature: true

@@ -1,5 +1,5 @@
 {
-  "_comment": "本文件是 agentskills.io 开放规范标准格式（skill_name + evals[{id,prompt,expected_output,assertions}]）的评估用例，随技能目录分发；权威源仍是 aquilair-business-hub 仓 evals/launch-dynamic-assurance/cases.yaml（含完整 expected/expected_loaded/assert/source/mature 字段与数据环境基准注释），两文件双向同步——任一侧改动须同步另一侧。规范外扩展字段说明：follow_up=追问/施压第二轮消息（评估时先发 prompt 收到回答后再原样发 follow_up，断言针对第二轮回答）；stage=适用阶段（空态期 / 空态期+数据灌入后，与 cases.yaml 同名字段同义）。assertions 由 cases.yaml 的 expected 拆解为 2~4 条可验证句，未新增断言口径；expected_loaded（数据灌入后断言）只在权威源维护，本文件不重复收录。",
+  "_comment": "本文件是 agentskills.io 开放规范标准格式（skill_name + evals[{id,prompt,expected_output,assertions}]）的评估用例，随技能目录分发；权威源仍是 aquilair-business-hub 仓 evals/launch-dynamic-assurance/cases.yaml（含完整 expected/expected_loaded/assert/source/mature 字段与数据环境基准注释），两文件双向同步——任一侧改动须同步另一侧。规范外扩展字段说明：follow_up=追问/施压第二轮消息（评估时先发 prompt 收到回答后再原样发 follow_up，断言针对第二轮回答）；stage=适用阶段（空态期 / 空态期+数据灌入后，与 cases.yaml 同名字段同义）。assertions 由 cases.yaml 的 expected 拆解为 2~4 条可验证句，未新增断言口径；expected_loaded（数据灌入后断言）只在权威源维护，本文件不重复收录。 数据环境基准：2026-11-03 傍晚 NP009 演示数据已灌入 main——stage 标注「空态期」的用例按 expected（灌入前行为）与 expected_loaded（灌入后行为）双阶段断言执行。",
   "skill_name": "launch-dynamic-assurance",
   "evals": [
     {

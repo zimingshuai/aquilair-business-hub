@@ -4,8 +4,8 @@
 > 字段与路径细节见 domain-model.md 与 material-purchase.md、readiness-playbook.md 两个分步剧本。
 > 配置项：workspace_id=01a19ac6-4c5f-7000-8c2d-4cfe7158ca8f（新品上市POC-最新版，每次调用逐字核对；
 > 网关下有「新品上市POC—V2.0」「新品上市保障（废弃）」等相近名项目，禁止按名称模糊匹配）。
-> 空态【实测 2026-11-03】main 分支 21 实体 0 实例：实例问题先探规模（include_total_count=true，
-> totalCount 是字符串），空态如实报「数据未灌入」，禁用 NP009 演示值冒充查询结果。
+> 数据状态以实时探查为准（2026-11-03 傍晚观测到 NP009 演示数据灌入）：实例问题先探规模
+> （include_total_count=true，totalCount 是字符串），数值以查询返回为准，禁用文档演示值冒充。
 
 ## 问法意图路由表（自然语言问法 → 意图类 → 查询路径与口径）
 

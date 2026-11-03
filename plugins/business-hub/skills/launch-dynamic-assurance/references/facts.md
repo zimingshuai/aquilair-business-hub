@@ -38,24 +38,30 @@
   objects_query（报 40401 才是类型问题）。
 - `objects_links`：实例不存在报 40402；link_codes 省略展开全部出边。关系 code 均为 rel_ 生成名——
   拿关系实名用 `metadata_workspace_model` 的 relations（name/refCode/两端属性）。
-- `objects_relation_counts`：**全部参数形态 42200（含 inputSchema 自述形态），待核查**（工单 TK-relcnt）——
-  当前以 objects_links 或关联冗余字段（dish_id/wh_code/demand_nr 等）query 替代。
-- `metadata_workspace_model`：本项目规模（21 实体/27 关系）完整返回约 560KB 未被截断；实体增多需警惕
-  截断风险，截断时退回 metadata_list_object_types（轻量）+ metadata_object_neighborhood(ref_code, depth=0)。
+- `objects_relation_counts`：**2026-11-03 傍晚已打通**（服务端更新后参数校验放行）。正确语法（三必填参数）：
+  `{"workspace_id":..., "source_object_type":"<code>", "source_object_set":{<ObjectSet>},
+    "relations":[{"relationCode":"rel_<生成名>"}]}`——工具描述所写 relationRefCode/REF_ 形态不认（42200）；
+  relations 须传对象数组（字符串数组被拒）；关系须与源对象类型匹配（不匹配 42201）；relatedCount 是**字符串**。
+  工具描述待服务端同步（工单 TK-relcnt 保留至描述修正）。
+- `metadata_workspace_model`：全量模型完整返回（2026-11-03 观测约 560KB 未截断；实体/关系/规则数当日持续
+  变化——规模以实时返回为准，不快照）；载荷大需警惕截断，截断时退回 metadata_list_object_types（轻量）+
+  metadata_object_neighborhood(ref_code, depth=0)。
 - `metadata_list_actions`：仅返回 refCode+name+description，**不返回 apiName**；workspace_model 中
   15 动作 apiName 全为 null——**actions_run 当前无有效入参来源，不可承诺动作执行**（工单 TK-apiname）。
 - `actions_task_status`：task_id 必须 UUID；服务在线（非 UUID 报 400 即为连通证据）。
 - `metadata_object_neighborhood`：depth 参数上限 10（服务端约束）。
 - `metadata_list_algorithms`：算法定位为外部优化 webhook 摘要；本项目清单为空（content:[] 形态，
   存档脚本按空清单写占位）。
-- `actions_run` 超时语义：提交后同步等待约 10 秒，未完成返回 `{task_id, status: RUNNING}`——
-  需用 `actions_task_status` 轮询直至 `completed_at` 有值；本项目 apiName 全 null，当前无有效入参。
+- `actions_run` 执行语义：实际为**异步**（2026-11-03 实测：直接返回 `{taskId, executionMode: "ASYNC",
+  status}`——工具描述所写「同步等 10 秒」与实际不符）；任务快时结果一并带回，慢时用 taskId 经
+  `actions_task_status` 轮询至 `completed_at`；本项目 apiName 全 null，当前无有效入参。
 - `objects_list_branches`：仅 main（branchId=0）；沙箱推演前须先 objects_create_branch（写操作，走确认卡）。
 
 ## 服务端状态与能力边界
 
-- **数据层当前空**：main 分支 21 实体实测全为 0 实例（2026-11-03）——回答业务实例问题前先探实例规模，
-  空态如实报告「数据未灌入」，禁止用文档演示值（NP009/300000 杯等）冒充查询结果。
+- **数据状态以实时为准**：2026-11-03 傍晚观测到 NP009 演示数据灌入 main（上市计划/菜品/门店/物料需求/
+  采购订单等已有实例，数值随时变化不快照）——回答前先探实例规模；仅大范围 0 实例才报「数据未灌入」，
+  禁止用文档演示值（NP009/300000 杯等）冒充查询结果。
 - **无「检查上市齐套」类动作**：15 动作/8 函数中不存在检查上市齐套/重排齐套时间/采购成本测算承载；
   六类齐套进展以 DishLaunchItem（上市事项）数据 + 已注册规则（metadata_list_rules 实时清单）说明。
 - **算法清单空**（metadata_list_algorithms=[]）：首批采购方案生成/成本测算无算法承载，被要求执行时
