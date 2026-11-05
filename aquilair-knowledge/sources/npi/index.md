@@ -10,7 +10,7 @@
 | NP009 POC 演示故事线（带查询） | [`raw/NP009_POC_Demo_Storyline_With_Queries.md`](raw/NP009_POC_Demo_Storyline_With_Queries.md) | 飞书 wiki ZoO3wngdLi5gEpkTzCmcqU2dnwe，2026-11-03 拉取（S01~S07 场景） |
 | 动作与关联函数 | [`raw/动作与关联函数.md`](raw/动作与关联函数.md) | 飞书 wiki IqljwBAUciXszBkoxKqcc8IIn3d，2026-11-03 拉取（fn_* 函数定义） |
 | 新品上市POC业务背景与功能说明 | [`raw/新品上市POC业务背景与功能说明.md`](raw/新品上市POC业务背景与功能说明.md) | 飞书 wiki MSYxwzdkAiDhDLkaHyNc3G78nFc，2026-11-03 拉取 |
-| 旧技能 playbook（launch-readiness-diagnosis） | [`raw/launch-readiness-diagnosis_skills旧版playbook.md`](raw/launch-readiness-diagnosis_skills旧版playbook.md) | 飞书 wiki RB79wBXxaio1sGkSLt9ceiNKntc，2026-11-03 拉取（旧项目六类齐套诊断程序，退役过渡期备查） |
+| 旧技能 playbook（launch-readiness-diagnosis） | [`raw/launch-readiness-diagnosis_skills旧版playbook.md`](raw/launch-readiness-diagnosis_skills旧版playbook.md) | 飞书 wiki RB79wBXxaio1sGkSLt9ceiNKntc，2026-11-03 拉取（旧项目六类齐套诊断程序；技能已移出插件分发，素材备查） |
 
 ## 编译层
 

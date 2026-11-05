@@ -24,8 +24,7 @@
     "./plugins/business-hub/skills/aquilair-skill-router",
     "./plugins/business-hub/skills/fnb-inventory-analysis",
     "./plugins/business-hub/skills/mfg-transfer-allocation",
-    "./plugins/business-hub/skills/launch-dynamic-assurance",
-    "./plugins/business-hub/skills/launch-readiness-diagnosis"
+    "./plugins/business-hub/skills/launch-dynamic-assurance"
   ],
   "expertType": "agent",
   "agentName": "aquilair-supply-chain-advisor",

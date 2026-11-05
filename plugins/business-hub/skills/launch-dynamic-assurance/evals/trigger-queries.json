@@ -95,7 +95,7 @@
     {
       "query": "老项目新品上市保障的数据",
       "should_trigger": false,
-      "note": "退役过渡域——旧技能 launch-readiness-diagnosis 领地，指向旧项目数据非本 POC 项目"
+      "note": "旧技能 launch-readiness-diagnosis 已移出插件分发（retired-skills/ 备查），旧项目数据问答非本 POC 项目"
     },
     {
       "query": "下单买咖啡豆",

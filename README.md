@@ -11,8 +11,9 @@
 | 🍜 `fnb-inventory-analysis` | 餐饮库存诊断：仓群风险总览（P0-P3）、判定依据溯源、SKU/ABC 分类、缺货明细 | `aquilair-mcp-servers`（fnb 本体项目，只读工具） | 只读 |
 | 🏭 `mfg-transfer-allocation` | 生产制造调拨：多工厂缺货、方案/计划/评估、What-if 沙箱分支推演、确认后执行 | `aquilair-mcp-servers`（mfg 本体项目，含写/分支工具） | 只读 + 写（确认卡流程） |
 | 🚀 `launch-dynamic-assurance` | 新品上市动态保障（POC 项目）：上市计划与预测口径、上市事项与齐套、物料缺口、供需分配、采购订单跟踪、上市风险全链问答，数据交付强制可视化 | `aquilair-mcp-servers`（新品上市POC-最新版本体项目，读为主 + 写工具确认卡） | 只读 + 写（确认卡流程） |
-| 🚀 `launch-readiness-diagnosis` | 新品上市保障：六类齐套诊断、上市风险与决策档位、物料缺口、首批采购与到货跟踪（计划·齐套·物料·采购全链） | `aquilair-mcp-servers`（npi 本体项目，读为主 + 检查程序受控执行） | 只读 + 写（确认卡流程）（⏳ 退役过渡：由 `launch-dynamic-assurance` 替代，POC 验证后下线） |
 | 📊 `aquilair-data-delivery` | 数据交付可视化规范：配图铁律、豆包式看板模板、图表选型 | —（交付规范，跨技能叠加） | 规范 |
+
+> 已退役：`launch-readiness-diagnosis`（旧项目六类齐套诊断）与配套顾问 `new-arrival-advisor` 已移出插件分发（2026-11-05），素材在仓库 `retired-skills/` 备查，不再随安装加载。
 
 ### 元技能（裁决入口，随本插件分发）
 
@@ -88,7 +89,7 @@ codex plugin marketplace add <仓库地址>
 codex plugin add aquilair-business-hub@aquilair
 ```
 
-装齐后自动生效：6 技能 + MCP 数据网关（`codex mcp list` 应显示 `aquilair-mcp-servers` 为 enabled）+ SessionStart 路由注入。`codex plugin remove aquilair-business-hub@aquilair` 随时卸载；仓库更新后 `codex plugin marketplace upgrade` 刷新。
+装齐后自动生效：5 技能 + MCP 数据网关（`codex mcp list` 应显示 `aquilair-mcp-servers` 为 enabled）+ SessionStart 路由注入。`codex plugin remove aquilair-business-hub@aquilair` 随时卸载；仓库更新后 `codex plugin marketplace upgrade` 刷新。
 
 ### 方式三：通用技能目录（任何 Agent Skills 兼容客户端）
 
@@ -170,7 +171,7 @@ aquilair-business-hub/
 │   ├── .mcp.json              # MCP 数据网关连接（全仓库唯一地址源）
 │   ├── hooks/                 # SessionStart 路由注入
 │   ├── agents/                # 宿主无关人设源 + 六宿主接入指南
-│   └── skills/                # 6 技能（fnb / mfg / launch 两代 / data-delivery / router）
+│   └── skills/                # 5 技能（fnb / mfg / launch / data-delivery / router；旧 launch 技能已退役至仓库 retired-skills/）
 ├── evals/                     # 评估数据层：cases 用例集 + runs 回归记录（能力层在 forge 仓）
 ├── aquilair-knowledge/        # 知识库源文档区分发快照（主本在 forge 仓，见 SNAPSHOT.md）
 ├── tools/                     # pack_skill 打包 / lint_skills 巡检 / validate_cases 校验（vendored）
