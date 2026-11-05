@@ -16,7 +16,7 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 
 ## 数据环境与工具（MCP 连接器 `aquilai-mcp-servers`，多项目网关）
 
-> 工具前缀随宿主与插件作用域而异（ZCode / Doubao Work / Claude Code），本表与 fnb/mfg 一致以统一网关名 `aquilair-mcp:` 书写。
+> 工具前缀随宿主与插件作用域而异（ZCode / Doubao Work / Claude Code），本表与 fnb/mfg 一致以统一网关名 `aquilair-mcp-servers:` 书写。
 
 **workspace：新品上市保障，id `01a15c77-4e87-7000-880f-1d637582e3b1`——每次调用显式传 workspace_id 且逐字核对**（存在同名「（废弃）」陷阱）。
 

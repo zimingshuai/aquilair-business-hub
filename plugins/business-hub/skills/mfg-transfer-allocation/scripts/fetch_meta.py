@@ -1,6 +1,6 @@
 """预取 MCP 统一网关的业务元数据并落盘为技能级缓存。
 
-主要 Input：--service 服务名（默认 aquilair-mcp，须存在于 .mcp.json）、
+主要 Input：--service 服务名（默认 aquilair-mcp-servers，须存在于 .mcp.json）、
 --workspace 本体项目 UUID（默认 mfg 制造业工厂调拨项目）、--token Bearer 凭证
 （缺省按 环境变量 AQUILAIR_MCP_TOKEN / .mcp.json 条目 headers.Authorization 顺序兜底）、
 --refresh 强制忽略缓存重拉、--url 直接指定 MCP 端点（通用拷贝安装时的兜底通道）。
@@ -21,7 +21,7 @@ from typing import Any
 
 # ===========一、常量与配置==========
 # DEFAULT_SERVICE：统一网关在 .mcp.json 中的服务名（所有 mfg/fnb 域工具都挂在该服务下）。
-DEFAULT_SERVICE = "aquilair-mcp"
+DEFAULT_SERVICE = "aquilair-mcp-servers"
 # DEFAULT_WORKSPACE：mfg 本体项目「demo（勿动！！）」制造业工厂调拨的 workspace UUID，所有工具调用必填。
 DEFAULT_WORKSPACE = "01a03bb7-2da4-7000-8dcf-1fb48f6f7fc9"
 # META_TOOLS：要预取的三个元数据工具名 -> 缓存文件名的映射（共同必填参数 workspace_id）。

@@ -8,10 +8,10 @@
 
 | 技能 | 能力 | 数据服务 | 操作类型 |
 | --- | --- | --- | --- |
-| 🍜 `fnb-inventory-analysis` | 餐饮库存诊断：仓群风险总览（P0-P3）、判定依据溯源、SKU/ABC 分类、缺货明细 | `aquilair-mcp`（fnb 本体项目，只读工具） | 只读 |
-| 🏭 `mfg-transfer-allocation` | 生产制造调拨：多工厂缺货、方案/计划/评估、What-if 沙箱分支推演、确认后执行 | `aquilair-mcp`（mfg 本体项目，含写/分支工具） | 只读 + 写（确认卡流程） |
+| 🍜 `fnb-inventory-analysis` | 餐饮库存诊断：仓群风险总览（P0-P3）、判定依据溯源、SKU/ABC 分类、缺货明细 | `aquilair-mcp-servers`（fnb 本体项目，只读工具） | 只读 |
+| 🏭 `mfg-transfer-allocation` | 生产制造调拨：多工厂缺货、方案/计划/评估、What-if 沙箱分支推演、确认后执行 | `aquilair-mcp-servers`（mfg 本体项目，含写/分支工具） | 只读 + 写（确认卡流程） |
 | 🚀 `launch-dynamic-assurance` | 新品上市动态保障（POC 项目）：上市计划与预测口径、上市事项与齐套、物料缺口、供需分配、采购订单跟踪、上市风险全链问答，数据交付强制可视化 | `aquilair-mcp-servers`（新品上市POC-最新版本体项目，读为主 + 写工具确认卡） | 只读 + 写（确认卡流程） |
-| 🚀 `launch-readiness-diagnosis` | 新品上市保障：六类齐套诊断、上市风险与决策档位、物料缺口、首批采购与到货跟踪（计划·齐套·物料·采购全链） | `aquilair-mcp`（npi 本体项目，读为主 + 检查程序受控执行） | 只读 + 写（确认卡流程）（⏳ 退役过渡：由 `launch-dynamic-assurance` 替代，POC 验证后下线） |
+| 🚀 `launch-readiness-diagnosis` | 新品上市保障：六类齐套诊断、上市风险与决策档位、物料缺口、首批采购与到货跟踪（计划·齐套·物料·采购全链） | `aquilair-mcp-servers`（npi 本体项目，读为主 + 检查程序受控执行） | 只读 + 写（确认卡流程）（⏳ 退役过渡：由 `launch-dynamic-assurance` 替代，POC 验证后下线） |
 | 📊 `aquilair-data-delivery` | 数据交付可视化规范：配图铁律、豆包式看板模板、图表选型 | —（交付规范，跨技能叠加） | 规范 |
 
 ### 元技能（裁决入口，随本插件分发）
@@ -41,10 +41,9 @@
 
   | 服务 | 端点 | 支撑技能 |
   | --- | --- | --- |
-  | `aquilair-mcp` | `https://aquilair.idcs.elitescloud.com/mcp-service/mcp` | fnb-inventory-analysis（fnb 本体项目）＋ mfg-transfer-allocation（mfg 本体项目） |
-  | `aquilair-mcp-servers` | `https://aquilair.idcs.elitescloud.com/mcp-service/mcp`（与 `aquilair-mcp` 同端点） | launch-dynamic-assurance（新品上市POC-最新版本体项目） |
+  | `aquilair-mcp-servers` | `https://aquilair.idcs.elitescloud.com/mcp-service/mcp` | fnb-inventory-analysis（fnb 本体项目）＋ mfg-transfer-allocation（mfg 本体项目）＋ launch-dynamic-assurance（新品上市POC-最新版本体项目） |
 
-  > 双名过渡态：`aquilair-mcp` 与 `aquilair-mcp-servers` 指向同一网关端点，fnb/mfg 沿用前者、launch-dynamic-assurance 经后者寻址；地址唯一源仍在 `plugins/business-hub/.mcp.json`。
+  > 地址唯一源在 `plugins/business-hub/.mcp.json`（2026-11-05 起双名收敛为单名 `aquilair-mcp-servers`，旧名 `aquilair-mcp` 停用）。
 
 - **（可选）Python 3**：首用元数据预取脚本 `fetch_meta.py` 需要；不跑脚本技能也能用（MCP 会话内拉元数据），只是首答稍慢。
 
@@ -89,7 +88,7 @@ codex plugin marketplace add <仓库地址>
 codex plugin add aquilair-business-hub@aquilair
 ```
 
-装齐后自动生效：6 技能 + MCP 数据网关（`codex mcp list` 应显示 `aquilair-mcp` 与 `aquilair-mcp-servers` 为 enabled）+ SessionStart 路由注入。`codex plugin remove aquilair-business-hub@aquilair` 随时卸载；仓库更新后 `codex plugin marketplace upgrade` 刷新。
+装齐后自动生效：6 技能 + MCP 数据网关（`codex mcp list` 应显示 `aquilair-mcp-servers` 为 enabled）+ SessionStart 路由注入。`codex plugin remove aquilair-business-hub@aquilair` 随时卸载；仓库更新后 `codex plugin marketplace upgrade` 刷新。
 
 ### 方式三：通用技能目录（任何 Agent Skills 兼容客户端）
 
@@ -102,7 +101,6 @@ codex plugin add aquilair-business-hub@aquilair
 ```json
 {
   "mcpServers": {
-    "aquilair-mcp": { "type": "http", "url": "https://aquilair.idcs.elitescloud.com/mcp-service/mcp" },
     "aquilair-mcp-servers": { "type": "http", "url": "https://aquilair.idcs.elitescloud.com/mcp-service/mcp" }
   }
 }
@@ -111,9 +109,6 @@ codex plugin add aquilair-business-hub@aquilair
 **TOML 格式**（Codex `~/.codex/config.toml`）：
 
 ```toml
-[mcp_servers.aquilair-mcp]
-url = "https://aquilair.idcs.elitescloud.com/mcp-service/mcp"
-
 [mcp_servers.aquilair-mcp-servers]
 url = "https://aquilair.idcs.elitescloud.com/mcp-service/mcp"
 ```

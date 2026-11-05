@@ -1,6 +1,6 @@
 ---
 name: mfg-transfer-allocation
-description: 生产制造多工厂物料调拨助手。Use when the user asks about 工厂缺货情况、物料库存与可调出量、调拨方案与评估（总调拨成本/运输天数）、调拨计划明细、按策略生成方案、What-if 沙箱推演对比、确认后执行调拨——any question about multi-plant material shortage, transfer solutions or sandbox what-if analysis. 数据来自 MCP 服务 aquilair-mcp（统一网关），含写操作，必须走确认卡流程。仅限业务问答：开发/脚本/算法实现类请求不属于本技能——not for development tasks like writing transfer scripts, even if the topic involves transfer.
+description: 生产制造多工厂物料调拨助手。Use when the user asks about 工厂缺货情况、物料库存与可调出量、调拨方案与评估（总调拨成本/运输天数）、调拨计划明细、按策略生成方案、What-if 沙箱推演对比、确认后执行调拨——any question about multi-plant material shortage, transfer solutions or sandbox what-if analysis. 数据来自 MCP 服务 aquilair-mcp-servers（统一网关），含写操作，必须走确认卡流程。仅限业务问答：开发/脚本/算法实现类请求不属于本技能——not for development tasks like writing transfer scripts, even if the topic involves transfer.
 license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 ---
 
@@ -14,22 +14,22 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 - **沙箱分支**：`objects_create_branch`（`parent="main"`）从生产克隆的数据视图；分支上读写不影响生产；`objects_compare_branch` 查看与父分支的对象增删改；`objects_delete_branch` 整体丢弃。
 - ⚠️ `branch` 是 `objects_*` 工具的**显式参数**：查询沙箱分支时必须显式传 `branch`（沙箱分支名）；比较生产与沙箱分支时**分别查询，不得混用结果**。向用户说明或纠正 `branch` 传参时，须一并提醒前述两条规则。
 
-## 工具（MCP `aquilair-mcp` 统一网关）
+## 工具（MCP `aquilair-mcp-servers` 统一网关）
 
 所有工具**必填** `workspace_id=01a03bb7-2da4-7000-8dcf-1fb48f6f7fc9`（mfg 本体项目「demo（勿动！！）」制造业工厂调拨 v1.21.0：Plant 工厂 / Material 物料 / MaterialInPlant 工厂物料 / PlantTransferRouting 调拨路径 / TransferPlan 调拨计划 / TransferOptimizationStrategy 策略 / TransferOptimizationSolution 方案 / TransferOptSolutionEvaluation 方案评估等，10 对象 12 关系）。
 
 | 工具（全限定名） | 用途 |
 | --- | --- |
-| `aquilair-mcp:metadata_workspace_model` | 全量业务模型（对象/属性/关系/规则/动作）；轻量概览 `metadata_list_object_types`、单对象详情 `metadata_object_neighborhood`、规则摘要 `metadata_list_rules`、动作摘要 `metadata_list_actions` |
-| `aquilair-mcp:objects_query`（`object_set, select, branch`） | ObjectSet 条件查询实例（语法见下） |
-| `aquilair-mcp:objects_get`（`object_type=OBJ_xxx, object_id, select, branch`） | 指定对象完整属性值及释义 |
-| `aquilair-mcp:objects_links`（`object_code, object_id, branch, link_codes`） | 关系拓扑（出向/入向）；**例外：此工具用实体 code（如 `Plant`）与关系 code，不用 refCode** |
-| `aquilair-mcp:objects_create_branch`（`name, parent="main"`） | 从生产克隆沙箱分支（资源写入，无需确认） |
-| `aquilair-mcp:objects_list_branches`（） | 分支清单（main + 各沙箱分支） |
-| `aquilair-mcp:objects_compare_branch`（`name, object_type?, select?, limit`） | 对比沙箱分支与父分支的对象增/删/改 |
-| `aquilair-mcp:objects_delete_branch`（`name`） | 删除沙箱分支（破坏性，须确认；只删本会话创建的） |
-| `aquilair-mcp:actions_run`（`action_id, parameters, branch?`） | 执行业务 Action（**写操作，必走确认卡**）。动作已上线，清单以 `metadata_list_actions` 实时返回为准；⚠️ **已知服务端缺陷（工单跟进中，修复即删本条；以实时实测为准）**：2026-10-30 实测动作执行统一 409「本体项目尚未发布」（ruleaction-service 要求发布态）；此前实测另有「告警并生成调拨方案」定义损坏（parameters 空，missing strategy）、「确认调拨方案」跨实体批次违规（400）——涉及生成/确认/执行调拨的请求，先实测再承诺，失败如实报告服务端缺陷，**禁止用查询到的历史方案数据冒充新生成的方案** |
-| `aquilair-mcp:objects_save` / `:objects_edit` / `:objects_delete` | 单对象 upsert / 批量 CREATE/UPDATE/DELETE / 删除单对象（**写操作，必走确认卡**；`branch="main"` 即生产写入） |
+| `aquilair-mcp-servers:metadata_workspace_model` | 全量业务模型（对象/属性/关系/规则/动作）；轻量概览 `metadata_list_object_types`、单对象详情 `metadata_object_neighborhood`、规则摘要 `metadata_list_rules`、动作摘要 `metadata_list_actions` |
+| `aquilair-mcp-servers:objects_query`（`object_set, select, branch`） | ObjectSet 条件查询实例（语法见下） |
+| `aquilair-mcp-servers:objects_get`（`object_type=OBJ_xxx, object_id, select, branch`） | 指定对象完整属性值及释义 |
+| `aquilair-mcp-servers:objects_links`（`object_code, object_id, branch, link_codes`） | 关系拓扑（出向/入向）；**例外：此工具用实体 code（如 `Plant`）与关系 code，不用 refCode** |
+| `aquilair-mcp-servers:objects_create_branch`（`name, parent="main"`） | 从生产克隆沙箱分支（资源写入，无需确认） |
+| `aquilair-mcp-servers:objects_list_branches`（） | 分支清单（main + 各沙箱分支） |
+| `aquilair-mcp-servers:objects_compare_branch`（`name, object_type?, select?, limit`） | 对比沙箱分支与父分支的对象增/删/改 |
+| `aquilair-mcp-servers:objects_delete_branch`（`name`） | 删除沙箱分支（破坏性，须确认；只删本会话创建的） |
+| `aquilair-mcp-servers:actions_run`（`action_id, parameters, branch?`） | 执行业务 Action（**写操作，必走确认卡**）。动作已上线，清单以 `metadata_list_actions` 实时返回为准；⚠️ **已知服务端缺陷（工单跟进中，修复即删本条；以实时实测为准）**：2026-10-30 实测动作执行统一 409「本体项目尚未发布」（ruleaction-service 要求发布态）；此前实测另有「告警并生成调拨方案」定义损坏（parameters 空，missing strategy）、「确认调拨方案」跨实体批次违规（400）——涉及生成/确认/执行调拨的请求，先实测再承诺，失败如实报告服务端缺陷，**禁止用查询到的历史方案数据冒充新生成的方案** |
+| `aquilair-mcp-servers:objects_save` / `:objects_edit` / `:objects_delete` | 单对象 upsert / 批量 CREATE/UPDATE/DELETE / 删除单对象（**写操作，必走确认卡**；`branch="main"` 即生产写入） |
 
 **标识符体系（2026-10-30 回归实测修正）**：`metadata_*` 族工具用 OBJ_/PROP_ refCode（从 `metadata_list_object_types` / `metadata_object_neighborhood` 查得）；**`objects_query` 的 `objectType` / `select` / `where.property` 一律用实体 code 与属性 code**（如 `Plant` / `plant_code`）——传 PROP_ refCode 报 42201 未知属性，报错时用元数据核对实名，不靠猜；具体标识符以实时元数据为准，不得凭记忆编造。
 

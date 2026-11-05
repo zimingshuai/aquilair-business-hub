@@ -1,6 +1,6 @@
 """预取统一 MCP 网关的业务元数据并落盘为技能级缓存。
 
-主要 Input：--service 服务名（默认 aquilair-mcp，须存在于 .mcp.json）、
+主要 Input：--service 服务名（默认 aquilair-mcp-servers，须存在于 .mcp.json）、
 --workspace fnb 本体项目 UUID（网关工具的必填 workspace_id）、
 --token OAuth Bearer 凭证（缺省按序取环境变量 AQUILAIR_MCP_TOKEN、
 .mcp.json 服务条目 headers.Authorization；凭证值不写入日志与缓存）、
@@ -22,7 +22,7 @@ from typing import Any
 
 # ===========一、常量与配置==========
 # DEFAULT_SERVICE：统一 MCP 网关在 .mcp.json 中的服务名。
-DEFAULT_SERVICE = "aquilair-mcp"
+DEFAULT_SERVICE = "aquilair-mcp-servers"
 # DEFAULT_WORKSPACE：fnb 本体项目 UUID（「demo（勿动！）」餐饮业库存分析），网关工具必填参数。
 DEFAULT_WORKSPACE = "019fd9ed-8715-7000-8f28-0a14f59c5563"
 # TOKEN_ENV_VAR：OAuth Bearer 凭证的环境变量名（凭证只从外部传入，不硬编码进代码）。

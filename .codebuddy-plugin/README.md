@@ -8,7 +8,7 @@
 > ZCode visualize 见上游文档），viz-templates 模板降为兜底。（补登：v1.3.0 = 同步上游双仓拆分版 hub 0.3.0。）
 
 > v1.2.0 变更（2026-10-23）：同步上游仓库 `aquilair-skills` v0.2.0——MCP 接口代际迁移：
-> 旧单体服务 mcp0/mcp1 下线，收敛为统一网关 `aquilair-mcp`
+> 旧单体服务 mcp0/mcp1 下线，收敛为统一网关 `aquilair-mcp-servers`
 > （https://aquilair.idcs.elitescloud.com/mcp-service/mcp，OAuth Bearer 鉴权，多本体项目单端点）。
 > fnb/mfg 技能工具面全换（metadata_*/objects_*/actions_*，refCode 引用体系 + ObjectSet 查询），
 > 各自固化 workspace；mfg 沙箱语义改为数据分支制；`fetch_meta.py` 重构（凭证三通道：
@@ -34,10 +34,10 @@ Agent 型（单个 AI 专家）｜行业分类：12-IndustryConsultant 行业顾
 
 | 职责 | 说明 | 数据环境 |
 | --- | --- | --- |
-| 库存健康诊断 | 仓群风险总览（P0-P3）、SKU 周转、ABC 分类、缺货明细、判定依据溯源 | `aquilair-mcp`（fnb 本体项目，只读） |
-| 缺货响应处理 | 接收工厂缺货反馈，联动各工厂物料库存匹配可调出物料，给出初步响应方案 | `aquilair-mcp`（mfg 本体项目） |
-| 调拨方案生成 | 多工厂物料调拨方案：调拨路径、数量、时效预期 + 方案评估 | `aquilair-mcp`（mfg 本体项目） |
-| 沙箱推演验证 | What-if 分支模拟推演，评估执行风险与预期效果，确认后才在生产执行 | `aquilair-mcp`（mfg 本体项目） |
+| 库存健康诊断 | 仓群风险总览（P0-P3）、SKU 周转、ABC 分类、缺货明细、判定依据溯源 | `aquilair-mcp-servers`（fnb 本体项目，只读） |
+| 缺货响应处理 | 接收工厂缺货反馈，联动各工厂物料库存匹配可调出物料，给出初步响应方案 | `aquilair-mcp-servers`（mfg 本体项目） |
+| 调拨方案生成 | 多工厂物料调拨方案：调拨路径、数量、时效预期 + 方案评估 | `aquilair-mcp-servers`（mfg 本体项目） |
+| 沙箱推演验证 | What-if 分支模拟推演，评估执行风险与预期效果，确认后才在生产执行 | `aquilair-mcp-servers`（mfg 本体项目） |
 
 **核心原则**：数据真实（禁止重算/重判/估算）、不编造、不确定先确认、隐私不泄露、交付完整、不发半成品、多步骤同步进展。
 数据类交付默认强制配可视化看板（详见技能 `aquilair-data-delivery`）。
@@ -80,7 +80,7 @@ Agent 型（单个 AI 专家）｜行业分类：12-IndustryConsultant 行业顾
 MCP 数据网关部署在公司内网，需在能访问下列端点的环境（内网 / VPN）下使用（OAuth Bearer 鉴权；两个业务技能各自使用固定 workspace）：
 
 ```
-aquilair-mcp               https://aquilair.idcs.elitescloud.com/mcp-service/mcp
+aquilair-mcp-servers      https://aquilair.idcs.elitescloud.com/mcp-service/mcp
 ```
 
 宿主环境需注册该 MCP 网关（本包的 `.mcp.json` 为标准格式，供 `fetch_meta.py` 解析服务地址）。

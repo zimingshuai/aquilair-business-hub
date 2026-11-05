@@ -51,7 +51,7 @@
 > 1. 读 `plugins/business-hub/agents/aquilair-supply-chain-advisor.md`，正文即系统提示词；
 > 2. 按本环境的 agent 定义机制创建智能体，frontmatter/配置字段按 `agents/README.md` 第四节映射；
 > 3. 把 `plugins/business-hub/skills/` 下 5 个业务技能安装到本环境的技能位置（终端用户必装；`plugins/skill-forge/skills/` 3 个元技能供开发者按需；无技能机制则作为系统提示词附件/知识库挂载）；
-> 4. 在本环境的 MCP 配置中注册 `plugins/business-hub/.mcp.json` 里的统一数据网关（`aquilair-mcp` 与 `aquilair-mcp-servers` 同端点双名过渡，需内网可达）；
+> 4. 在本环境的 MCP 配置中注册 `plugins/business-hub/.mcp.json` 里的统一数据网关（`aquilair-mcp-servers`，需内网可达；旧名 `aquilair-mcp` 已于 2026-11-05 停用）；
 > 5. 验证：问「各仓库有没有库存风险？」应触发 fnb 技能；问「工厂缺货情况」应触发 mfg 技能；验证清单见仓库 `evals/`（37 条评估用例全部 mature，其中护栏/红队用例零容忍）。
 
 ## 六、可视化出图通道（宿主工具路由）

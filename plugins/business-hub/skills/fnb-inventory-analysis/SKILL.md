@@ -1,6 +1,6 @@
 ---
 name: fnb-inventory-analysis
-description: 餐饮供应链库存诊断问答。Use when the user asks about 仓库库存风险（P0-P3）、风险判定依据、库存总量、周转天数、SKU 详情、ABC 分类、缺货 SKU 明细、风险单溯源——any question about F&B warehouse inventory, risk levels, SKU or stock turnover. 数据来自统一 MCP 网关 aquilair-mcp 的 fnb 本体项目（只读）。仅限业务问答：编写库存相关脚本/系统/报表等开发请求不属于本技能——not for development tasks like writing inventory scripts, even if the topic involves inventory.
+description: 餐饮供应链库存诊断问答。Use when the user asks about 仓库库存风险（P0-P3）、风险判定依据、库存总量、周转天数、SKU 详情、ABC 分类、缺货 SKU 明细、风险单溯源——any question about F&B warehouse inventory, risk levels, SKU or stock turnover. 数据来自统一 MCP 网关 aquilair-mcp-servers 的 fnb 本体项目（只读）。仅限业务问答：编写库存相关脚本/系统/报表等开发请求不属于本技能——not for development tasks like writing inventory scripts, even if the topic involves inventory.
 license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 ---
 
@@ -8,18 +8,18 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 
 读取已有事实、引用业务元数据、组织可溯源说明——**不是重新执行判定引擎**：禁止自行计算风险等级或 KPI，一切以工具返回和元数据为准。**边界**：开发/脚本/集成类请求——即使主题涉及库存——按普通开发任务处理（可询问数据源与口径需求），不套用诊断铁律、不走诊断流程、不调诊断工具。
 
-## 工具（统一 MCP 网关 `aquilair-mcp`，全部只读）
+## 工具（统一 MCP 网关 `aquilair-mcp-servers`，全部只读）
 
 所有工具必填 `workspace_id=019fd9ed-8715-7000-8f28-0a14f59c5563`（fnb 本体项目「demo（勿动！）」餐饮业库存分析）。
 
 | 工具（全限定名） | 用途 |
 | --- | --- |
-| `aquilair-mcp:metadata_workspace_model` | 全量业务元数据：对象类型（含全部属性）+ 关系 + 规则 + 动作 + 算法 |
-| `aquilair-mcp:metadata_list_object_types` / `:metadata_list_rules` / `:metadata_list_actions` | 轻量概要（对象类型清单 / 规则摘要 / 动作摘要） |
-| `aquilair-mcp:metadata_object_neighborhood`（`ref_code, depth`） | 单对象类型详情（含邻接对象与关系定义） |
-| `aquilair-mcp:objects_query`（`workspace_id, object_set, select, branch`） | 条件筛选实例（ObjectSet DSL，见下节） |
-| `aquilair-mcp:objects_get`（`workspace_id, object_type, object_id`） | 指定对象完整字段值及释义 |
-| `aquilair-mcp:objects_links`（`workspace_id, object_code, object_id`） | 对象 360° 关系拓扑（**例外：用实体 code 如 `Warehouse` 与关系 code，不用 refCode**） |
+| `aquilair-mcp-servers:metadata_workspace_model` | 全量业务元数据：对象类型（含全部属性）+ 关系 + 规则 + 动作 + 算法 |
+| `aquilair-mcp-servers:metadata_list_object_types` / `:metadata_list_rules` / `:metadata_list_actions` | 轻量概要（对象类型清单 / 规则摘要 / 动作摘要） |
+| `aquilair-mcp-servers:metadata_object_neighborhood`（`ref_code, depth`） | 单对象类型详情（含邻接对象与关系定义） |
+| `aquilair-mcp-servers:objects_query`（`workspace_id, object_set, select, branch`） | 条件筛选实例（ObjectSet DSL，见下节） |
+| `aquilair-mcp-servers:objects_get`（`workspace_id, object_type, object_id`） | 指定对象完整字段值及释义 |
+| `aquilair-mcp-servers:objects_links`（`workspace_id, object_code, object_id`） | 对象 360° 关系拓扑（**例外：用实体 code 如 `Warehouse` 与关系 code，不用 refCode**） |
 
 **标识符体系（2026-10-30 回归实测修正）**：`metadata_*` 族工具用 OBJ_/PROP_ refCode（从 `metadata_list_object_types` / `metadata_object_neighborhood` 查得，如 Warehouse=`OBJ_EE70C8F4F9B0415A`）；**`objects_query` 的 `objectType` / `select` / `where.property` 一律用实体 code 与属性 code**（如 `Warehouse` / `wh_code` / `wh_name`）——传 PROP_ refCode 报 42201 未知属性，报错时用元数据核对实名，不靠猜。
 
