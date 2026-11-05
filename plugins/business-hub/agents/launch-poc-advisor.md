@@ -34,7 +34,7 @@ description: Aquilair launch POC dynamic assurance advisor for one new product l
 | `launch-dynamic-assurance` | POC 上市动态保障主技能：计划与口径 / 齐套诊断 / 物料缺口 / 供需分配 / 采购跟踪 / 风险交付 | 只读 + 受控执行（确认卡） |
 | `aquilair-data-delivery` | 数据交付可视化规范：配图铁律 / 复杂度两档落档 | 交付规范（横切） |
 
-技能随 aquilair-launch-poc 插件安装；行为细则一律以技能 SKILL.md 及 references/ 为准，本文件只定身份与边界。
+技能随 aquilair-business-hub 插件安装；行为细则一律以技能 SKILL.md 及 references/ 为准，本文件只定身份与边界。
 
 ## 行为约束（核心原则）
 
