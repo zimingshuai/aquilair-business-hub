@@ -19,8 +19,8 @@
 #            实时查询为准，不一致时要求如实报告差异不圆场；分析类交付（跨对象子图诊断/多维对比/趋势分布）
 #            必须配图（两档），单对象/单边查看类交付纯 Markdown 表格合法（SKILL 0.1.14 子图锚定伸缩口径）。
 # 出处引用约定：SKILL.md 以 aquilair-launch-poc 仓技能目录行号为准；references 按章节名引用。
-# 状态：17 条 = 13 mature（2026-11-03 P6 总验收逐条复核转正）+ 4 新增草稿 mature: false（lda-014~017，
-#   2026-11-09 子图锚定伸缩改版配套：查看类×2 断言纯文本交付，诊断类×2 断言看板交付保持强度；待人工复核转正）。
+# 状态：17 条 = 17 mature（13 条 2026-11-03 P6 总验收转正；lda-014~017 为 2026-11-09 子图锚定伸缩改版配套：
+#   查看类×2 断言纯文本交付，诊断类×2 断言看板交付保持强度；2026-11-09 用户授权转正）。
 
 tests:
   # ============ 正常题（normal，6 条：元数据类 3 + 行为类 3） ============
@@ -199,7 +199,7 @@ tests:
         value: ["上市计划", "NP009"]
     stage: "空态期+数据灌入后"
     source: SKILL.md 0.1.14 L47（探查循环·子图锚定：单对象直查该类型）+ L68-L69（可视化交付·分析类触发条件/单对象查看纯文本合法）；agents/launch-poc-advisor.md「交付随子图伸缩」
-    mature: false
+    mature: true
 
   - id: lda-015
     type: normal
@@ -211,7 +211,7 @@ tests:
         value: ["上市", "计划"]
     stage: "空态期+数据灌入后"
     source: SKILL.md 0.1.14 L47（探查循环·子图锚定：判定依据是元数据关系与基数，非问句动词）+ L69（单对象/单边查看类交付纯 Markdown 合法）；agents/launch-poc-advisor.md「交付随子图伸缩」
-    mature: false
+    mature: true
 
   - id: lda-016
     type: normal
@@ -223,7 +223,7 @@ tests:
         value: ["风险", "事项"]
     stage: "空态期+数据灌入后"
     source: SKILL.md 0.1.14 L47（探查循环·子图锚定：跨对象子图展开多实体链路配完整诊断）+ L68（分析类交付强制配图）+ L57（承载形态以本体为准）；references/storyline-playbook.md「风险与放行判断」意图类
-    mature: false
+    mature: true
 
   - id: lda-017
     type: normal
@@ -235,4 +235,4 @@ tests:
         value: ["物料", "缺口"]
     stage: "空态期+数据灌入后"
     source: SKILL.md 0.1.14 L47（探查循环·子图锚定：跨对象子图展开多实体链路配完整诊断）+ L68（分析类交付强制配图）；references/storyline-playbook.md「齐套与缺口排查」意图类
-    mature: false
+    mature: true

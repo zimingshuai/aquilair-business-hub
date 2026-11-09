@@ -55,8 +55,8 @@
 
 | 字段 | 枚举 | 出处 |
 | --- | --- | --- |
-| SupplyDemandAllocation.supply_type | INVENTORY（仓库库存）/ PURCHASE_IN_TRANSIT（采购在途） | E2 一.SupplyDemandAllocation |
-| SupplyDemandAllocation.allocation_status | PLANNED / CONFIRMED / CANCELLED | E2 同上 |
+| SupplyDemandAllocation.supply_type | INVENTORY（仓库库存）/ PURCHASE_IN_TRANSIT（采购在途）；数据侧实际写值为小写连写 apiCode：purchaseorder↔PURCHASE_IN_TRANSIT、batchinventory↔INVENTORY（2026-11-09 实测——过滤传实测值，语义解释用业务口径，按大写值 filter 会查空） | E2 一.SupplyDemandAllocation + 2026-11-09 实测 |
+| SupplyDemandAllocation.allocation_status | PLANNED / CONFIRMED / CANCELLED（业务口径）；2026-11-09 实测另见 ALLOCATED（不在文档三值内——如实报告差异，不臆造映射） | E2 同上 + 2026-11-09 实测 |
 | Dish.fulfillment_type | MADE_TO_ORDER（现制）/ DIRECT_SALE（外购直售） | E2 一.Dish |
 | Dish.dish_status | 草稿 / 正常 / 停用 | E2 同上 |
 | Dish.publish_status | 未发布 / 已发布 / 变更未发布（发布≠门店可售） | E2 同上 |

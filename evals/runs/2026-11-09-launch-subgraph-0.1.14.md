@@ -49,3 +49,17 @@ SKILL.md「可视化交付」节无条件强制 + 探查循环缺子图锚定规
   SKILL.md L40 工具表仍写「42200 待核查」——存量不同步；② workspace 已转 published，SKILL.md 数据环境节
   「可能 status=draft」表述可留（实时为准条款覆盖）但 actions_run 409 前提已变化；
   ③ supply_type 实测值与业务文档枚举口径不一致（服务端数据问题，建议挂工单核对）。
+
+## 2026-11-09 晚补充：口径同步实测与处置（总监工亲测）
+
+用户授权后三项口径事实全部实时实测定谳并同步入文档（同日第二笔提交）：
+
+| 事项 | 实测结果（2026-11-09 晚，workspace v1.100.0） | 处置 |
+| --- | --- | --- |
+| objects_relation_counts | **打通确认**：relations=[{"relationCode":"rel_5d6bf6d5"}]→relatedCount="13"、rel_3712b263→"1"，与 DishLaunchItem 13 条/风险 1 条一致 | SKILL.md 工具表 L40 由「42200 待核查」改为「已打通」（facts.md 原记载正确） |
+| workspace 状态 | list_workspaces 实测 status=**published**，version v1.100.0（2026-11-09 17:50:02 发布） | SKILL.md 数据环境节与 facts.md 的「可能 status=draft」表述更新为实测事实+回退 draft 判据保留 |
+| supply_type / allocation_status | 实测写值为小写连写 apiCode：**purchaseorder**（↔PURCHASE_IN_TRANSIT）、**batchinventory**（↔INVENTORY）；allocation_status 实测 **ALLOCATED**（文档三值之外） | domain-model「三、决策枚举」补映射（过滤传实测值、语义解释用业务口径）；material-purchase 过滤注意；facts.md 新增「枚举字段数据侧写值风格」条目（本文件为证据） |
+
+- lda-014~017 同日经用户授权转正（mature: false→true ×4），cases.yaml/README 状态行同步（17/17 mature）。
+- 供应侧枚举数据与业务文档的系统性不一致（purchaseorder/batchinventory/ALLOCATED）属服务端/数据侧问题，
+  技能侧按「如实报告差异+映射口径」处理；是否修正数据侧写值归平台方，建议另挂工单。

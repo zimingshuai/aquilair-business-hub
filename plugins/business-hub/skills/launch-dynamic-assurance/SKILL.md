@@ -23,7 +23,7 @@ metadata:
 
 > 工具前缀随宿主而异，本表以统一网关名书写裸工具名。
 
-**workspace：新品上市POC-最新版，id `01a19ac6-4c5f-7000-8c2d-4cfe7158ca8f`——每次调用显式传 workspace_id 且逐字核对**（网关下存在「新品上市POC—V2.0」「新品上市保障（废弃）」等相近名项目，禁止按名称模糊匹配）；本项目可能 status=draft，状态以 `list_workspaces` 实时返回为准。
+**workspace：新品上市POC-最新版，id `01a19ac6-4c5f-7000-8c2d-4cfe7158ca8f`——每次调用显式传 workspace_id 且逐字核对**（网关下存在「新品上市POC—V2.0」「新品上市保障（废弃）」等相近名项目，禁止按名称模糊匹配）；本项目状态以 `list_workspaces` 实时返回为准（2026-11-09 观测=published v1.100.0；发布后修订会回退 draft，届时 actions_run 按下文 409 处置）。
 
 **数据状态以实时探查为准**【2026-11-03 傍晚观测到 NP009 演示数据已灌入 main】——实例问题先探规模（`include_total_count=true`；totalCount 是**字符串**），规模/状态/数值一律以查询返回为准（不快照：当日实体数/关系数/规则数均在变）；仅当大范围 0 实例时才报「数据未灌入」，禁止用 NP009 文档演示值（300000 杯/300 家/T=2026-11-15）冒充查询结果。
 
@@ -37,7 +37,7 @@ metadata:
 | 元数据：`metadata_list_rules` / `metadata_list_actions` / `metadata_list_algorithms` | 规则（含【待处理】标注）/ 动作（apiName 已填充，可查可调）/ 算法（外部优化 webhook 摘要，本项目空）三清单 |
 | 元数据：`metadata_object_neighborhood` | 对象类型周边 N 跳完整定义（depth 上限 10）；42201 报错时核对属性实名，不靠猜 |
 | 对象读：`objects_query` / `objects_get` / `objects_links` | 通用查询（筛选/分页 page_token/选列 select；**排序当前不可用→客户端做**，方言见 facts.md）/ 主键取单件（对 entity_ 未命名实体报 40402 而非类型错误，类型可查性用 query 判 40401）/ 关系出边（关系 code 均为 rel_ 生成名，实名查模型 relations） |
-| 对象读：`objects_relation_counts` | 全参数形态 42200 待核查——以 objects_links 或关联冗余字段（dish_id/wh_code/demand_nr）query 替代 |
+| 对象读：`objects_relation_counts` | **已打通**（2026-11-03/11-09 两轮实测）：轻量看各关系挂载量（relatedCount 为字符串）；语法用 `relationCode` 键（工具描述所写 relationRefCode 不认），详见 facts.md |
 | 对象写：`objects_save` / `objects_edit` / `objects_delete` | upsert / 批量编辑 / 删除——**main 分支即生产数据，必走确认卡**（见下节） |
 | 沙箱：`objects_create_branch` / `objects_delete_branch` / `objects_list_branches` | What-if 分支：克隆数据视图做推演写入不碰生产（建/删分支同样走确认卡）；当前仅 main |
 | 动作：`actions_run` / `actions_task_status` | 提交本体动作（异步：返回 `{taskId, executionMode:ASYNC}`→`actions_task_status` 轮询至 `completed_at`；支持 `branch` 指定沙箱分支与 `trigger_key` 幂等键）；**执行受项目发布态约束——status=draft 时 409「本体项目尚未发布」**，须先由平台方（重新）发布 |
