@@ -10,7 +10,7 @@
 - MaterialDemand以dish_demand_nr关联根需求、material_in_wh_code关联物料在仓、bom_key关联BOM行，并保留bom_id/bom_version。
 - material_demand_qty为原始物料需求；total_kit_qty及min_kit_time/max_kit_time是齐套结果，不能把原始需求或分配量直接当采购缺口。
 - MaterialKitting通过demand_nr回到物料需求，按kit_time和kit_qty解释结果；要取根需求、配方和分配证据时沿需求的有效关系追溯，不假设齐套记录有额外直接Link。
-- SupplyDemandAllocation以demand_nr关联物料需求。supply_type=INVENTORY时supply_nr指向库存批次；PURCHASE_IN_TRANSIT时指向采购订单，两者不同时套用。
+- SupplyDemandAllocation以demand_nr关联物料需求。supply_type=INVENTORY时supply_nr指向库存批次；PURCHASE_IN_TRANSIT时指向采购订单，两者不同时套用。**过滤注意**：数据侧 supply_type 实际写值为小写连写 apiCode（purchaseorder/batchinventory，2026-11-09 实测）——filter 传实测值、语义解释沿用业务口径，按文档大写值过滤会查空。
 - MaterialInWarehouse汇总物料×仓库信息，关联采购订单、采购计划、预测需求及物料供应商；汇总值与来源明细不重复计入有效供应。
 
 ## 物料供应参数与单位
@@ -52,7 +52,7 @@ PurchaseSolution / PurchasePlan 当前缺正式 code、实例查询通道不稳�
 | --- | --- | --- |
 | 当前交货逾期 | 未取消、未关闭、undelivery_qty>0及已计算current_overdue_days | 已超过要求交期的剩余未交量 |
 | 预计交期不满足 | 有效未交订单及expected_delay_days | 预计到货不满足订单要求交期的风险 |
-| 采购分配按时保障 | PURCHASE_IN_TRANSIT、CONFIRMED、allocated_qty>0及关联订单 | 哪笔需求能按期获得多少供应、缺口和原因 |
+| 采购分配按时保障 | PURCHASE_IN_TRANSIT、CONFIRMED、allocated_qty>0及关联订单（枚举数据侧写值以实时查询为准，supply_type 实测见上文过滤注意） | 哪笔需求能按期获得多少供应、缺口和原因 |
 | 发货提醒 | 有效未交、ship_date为空、配置的提醒日和最晚发货日 | 当前已部署提醒阶段及发送凭据 |
 
 当前逾期设计依据当前日期与required_delivery_date，预计延期依据estimated_arrival_date与required_delivery_date；两者不能混用。预计到货为空，或已过期但仍未交完，报告到货时间待确认，不能归为正常保障。

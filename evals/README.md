@@ -19,11 +19,11 @@ evals/
 ├── launch-readiness-diagnosis/
 │   └── cases.yaml                 # 旧上市保障技能用例集（mature；技能已移出插件分发，用例备查）
 ├── launch-dynamic-assurance/
-│   └── cases.yaml                 # 新品上市POC动态保障用例集（13 条，2026-11-03 人工复核转正；空态期断言为主，数据灌入后补实例断言）
+│   └── cases.yaml                 # 新品上市POC动态保障用例集（17 条 = 17 mature；lda-014~017 为 0.1.14 子图锚定伸缩配套，2026-11-09 用户授权转正）
 └── runs/                          # 每轮评估结果记录（按日期归档；transcripts/ 为轨迹落盘）
 ```
 
-**套件状态（2026-11-09）**：5 个技能 65 条用例（fnb 16 + mfg 13 + ddl 10 + 旧 launch 13 + 新 launch-dynamic-assurance 13；旧 launch 实数 13，此前误记 16）；ddl-009/010 为脚本渲染优先改版配套用例，2026-11-09 回归通过（pass^3）已转正。
+**套件状态（2026-11-09）**：5 个技能 69 条用例（fnb 16 + mfg 13 + ddl 10 + 旧 launch 13 + 新 launch-dynamic-assurance 17；旧 launch 实数 13，此前误记 16）；ddl-009/010 为脚本渲染优先改版配套用例，2026-11-09 回归通过（pass^3）已转正；lda-014~017 为 launch 0.1.14 子图锚定伸缩改版配套，2026-11-09 用户授权转正（17/17 mature）。
 
 ## 跑回归（改技能后必做）
 

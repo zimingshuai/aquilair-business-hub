@@ -10,7 +10,7 @@
 
 - workspace_id **逐字核对**（本项目=新品上市POC-最新版）；网关下存在相近名项目（「新品上市POC—V2.0」
   「新品上市保障（废弃）」等），**禁止按名称模糊匹配**——同名不同物，数据互不相通。
-- 本项目可能处于 status=draft（发布后又修改未重发布）；引用工作区状态时以 `list_workspaces` 实时返回为准。
+- 本项目状态以 `list_workspaces` 实时返回为准（2026-11-09 观测=published v1.100.0）；发布后又修改未重发布会回退 draft（届时 actions_run 409，判据见下文）。
 
 ## objects_query 的 ObjectSet DSL（本项目方言，2026-11-03 实测定稿）
 
@@ -42,7 +42,13 @@
   `{"workspace_id":..., "source_object_type":"<code>", "source_object_set":{<ObjectSet>},
     "relations":[{"relationCode":"rel_<生成名>"}]}`——工具描述所写 relationRefCode/REF_ 形态不认（42200）；
   relations 须传对象数组（字符串数组被拒）；关系须与源对象类型匹配（不匹配 42201）；relatedCount 是**字符串**。
-  工具描述待服务端同步（工单 TK-relcnt 保留至描述修正）。
+  工具描述待服务端同步（工单 TK-relcnt 保留至描述修正）。2026-11-09 复验通过
+  （rel_5d6bf6d5→"13"、rel_3712b263→"1"，与实例一致）。
+- **枚举字段数据侧写值风格**（2026-11-09 实测，证据=hub 仓 evals/runs/2026-11-09-launch-subgraph-0.1.14.md）：
+  SupplyDemandAllocation.supply_type 实际写值为小写连写 apiCode——purchaseorder（↔业务口径 PURCHASE_IN_TRANSIT）
+  / batchinventory（↔INVENTORY）；allocation_status 实测另见 ALLOCATED（业务文档三值 PLANNED/CONFIRMED/CANCELLED
+  之外）。**过滤查询传实测值，语义解释沿用业务口径**；按文档大写值 filter 会查空。枚举权威仍以元数据+业务文档
+  出处为准，实测差异如实报告（domain-model「三、决策枚举」已同步映射）。
 - `metadata_workspace_model`：全量模型完整返回（2026-11-03 观测约 560KB 未截断；实体/关系/规则数当日持续
   变化——规模以实时返回为准，不快照）；载荷大需警惕截断，截断时退回 metadata_list_object_types（轻量）+
   metadata_object_neighborhood(ref_code, depth=0)。
