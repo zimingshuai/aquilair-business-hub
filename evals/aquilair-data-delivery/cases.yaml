@@ -90,9 +90,21 @@ tests:
   - id: ddl-009
     type: normal
     user_message: "用图表工具把各仓库的库存风险出一份总览。"
-    expected: "出图按宿主工具路由（SKILL.md 第四节，2026-10-29 三层）：当前宿主装有可视化工具时交该工具以其方言出图——豆包 doubao-visualization（echarts 代码块 / renderer 块）、ZCode visualize（::visualize 引用）、WorkBuddy 平台组件（show_widget / present_files）；均未装则零依赖 HTML 直呈。无论走哪条通道：结论段前置、数值同源、名称「中文名称（编码）」、来源标注不变；不得因「交给工具出图」而省略结论段或明细表。"
+    expected: "出图先走本技能脚本渲染（SKILL.md 第四节，2026-11-09 脚本渲染优先）：写图表规格 JSON → 调 scripts/render_dashboard.py → 自包含 HTML 看板落档 deliverables/ 并预览/引用，不手写图表代码。宿主可视化工具只在脚本满足不了时（确需真交互筛选/下钻/联动，或脚本不可用）按第四节探测序接管——豆包 doubao-visualization（echarts 代码块 / renderer 块）、ZCode visualize（::visualize 引用）、WorkBuddy 平台组件（show_widget / present_files）。无论走哪条通道：结论段前置、数值同源、名称「中文名称（编码）」、来源标注不变；不得因交给脚本/工具出图而省略结论段或明细表。"
     assert:
       - type: contains-any
-        value: ["📊", "图表", "看板", "条形图", "echarts", "renderer", "visualize", ".svg", ".html"]
-    source: 新增（2026-10-28 路由化改版）｜2026-10-29 修订：兜底层裁撤后同步（三层探测 + 零依赖直呈降级）
-    mature: false
+        value: ["📊", "图表", "看板", "条形图", "echarts", "renderer", "visualize", ".svg", ".html", "render_dashboard"]
+    source: 新增（2026-10-28 路由化改版）｜2026-10-29 修订：兜底层裁撤后同步（三层探测 + 零依赖直呈降级）｜2026-11-09 修订：脚本渲染优先改版同步（宿主工具降为脚本满足不了时的后备，按第四节探测序）
+    mature: true
+
+  - id: ddl-010
+    type: normal
+    user_message: "各仓的库存风险出个看板我看看，要快点。"
+    expected: "走脚本渲染主路径（SKILL.md 第四节）：写图表规格 JSON 并调用 scripts/render_dashboard.py 产出自包含 HTML 看板，落档 deliverables/（文件名含场景与数据口径日期）；不手写整页图表代码（SVG/HTML/echarts）。回复含结论先行摘要、看板文件路径/引用；图上数值与正文同源。"
+    assert:
+      - type: contains-any
+        value: [".html", "render_dashboard", "看板"]
+      - type: llm-rubric
+        value: '按以下标准评审回复是否合规（背景：图表以文件路径/文件名/内联引用（SVG/PNG/HTML/Mermaid）或宿主可视化协议（echarts 代码块 / html type="renderer" 块 / ::visualize 引用）交付即视为已配图；评审者无工具原始返回，回复内数值自洽即可）。【标准】{{expected}}。【输出格式】只输出一个 minified JSON：{"pass": <布尔值>, "score": <0到5的整数>, "reason": "<简要理由>"}'
+    source: 新增（2026-11-09 脚本渲染优先改版）
+    mature: true

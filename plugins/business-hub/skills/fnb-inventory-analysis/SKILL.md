@@ -23,7 +23,7 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 
 **标识符体系（2026-10-30 回归实测修正）**：`metadata_*` 族工具用 OBJ_/PROP_ refCode（从 `metadata_list_object_types` / `metadata_object_neighborhood` 查得，如 Warehouse=`OBJ_EE70C8F4F9B0415A`）；**`objects_query` 的 `objectType` / `select` / `where.property` 一律用实体 code 与属性 code**（如 `Warehouse` / `wh_code` / `wh_name`）——传 PROP_ refCode 报 42201 未知属性，报错时用元数据核对实名，不靠猜。
 
-**探查循环（接到问题的推进方式）**：**以 MCP 实时查询为唯一事实源——不信任何快照、文档记录值或记忆值**：①先读元数据弄清实体/属性/关系/规则（`metadata_list_object_types` 轻量起步，属性级再 `metadata_object_neighborhood(ref_code, depth=0)` 按需拉；**不要**直调 `metadata_workspace_model`，数百 KB 会被工具结果预算截断）→ ②结合用户问题规划查询路径（串行或并行）→ ③`objects_query` 取实例数据 → ④**观察结果是否足以回答**：不足则迭代（换属性实名/扩过滤/下钻关联/补拉元数据），**终止判据 = 足以回答用户问题即停，不追求穷尽数据**；报错先读错误码修正（42201→核对属性实名，42200→查 DSL 结构）。规则、字段定义以实时元数据为唯一权威。`python scripts/fetch_meta.py` 是缓存刷新器（**非必需**，凭证按序取 `--token` / 环境变量 `AQUILAIR_MCP_TOKEN` / `.mcp.json`），落盘隐藏目录 `.meta-cache/`（model/rules/actions.json，ls 默认不显示，按需读不整份堆进上下文）供会话间复用；**缓存与实时元数据冲突时以实时为准**。**已知元数据问题**（引用时以实体为准、不必在回答中报告）：`InventoryRisk` 的 description 语义偏向预测追踪；`risk_level` 无枚举释义（P0-P3 含义从触发规则拼出）。
+**探查循环（接到问题的推进方式）**：**以 MCP 实时查询为唯一事实源——不信任何快照、文档记录值或记忆值**：①先读元数据弄清实体/属性/关系/规则（`metadata_list_object_types` 轻量起步，属性级再 `metadata_object_neighborhood(ref_code, depth=0)` 按需拉；**不要**直调 `metadata_workspace_model`，数百 KB 会被工具结果预算截断）→ ②结合用户问题规划查询路径——**互不依赖的多个查询放进同一条消息并发发出**（不逐个等待返回）；仅翻页续传、或过滤条件依赖前一查询结果时才串行→ ③`objects_query` 取实例数据 → ④**观察结果是否足以回答**：不足则迭代（换属性实名/扩过滤/下钻关联/补拉元数据），**终止判据 = 足以回答用户问题即停，不追求穷尽数据**；报错先读错误码修正（42201→核对属性实名，42200→查 DSL 结构）。规则、字段定义以实时元数据为唯一权威。`python scripts/fetch_meta.py` 是缓存刷新器（**非必需**，凭证按序取 `--token` / 环境变量 `AQUILAIR_MCP_TOKEN` / `.mcp.json`），落盘隐藏目录 `.meta-cache/`（model/rules/actions.json，ls 默认不显示，按需读不整份堆进上下文）供会话间复用；**缓存与实时元数据冲突时以实时为准**。**已知元数据问题**（引用时以实体为准、不必在回答中报告）：`InventoryRisk` 的 description 语义偏向预测追踪；`risk_level` 无枚举释义（P0-P3 含义从触发规则拼出）。
 
 ## ObjectSet 查询语法（写错必查询失败）
 
@@ -57,6 +57,7 @@ license: Proprietary — Aquilair 内部分发，仅限公司内网使用
 ## 输出规范
 
 - 中文，先结论后证据；多条数据用 Markdown 表格；每项关键结论注明数据来源（如「来源：InventoryRisk 查询」）。
+- 数据类交付的配图与看板形态按 `aquilair-data-delivery` 规范叠加执行（结论先行、脚本渲染自包含看板落档、图上名称完整「中文名称（编码）」）。
 - **单据号逐字核对**：单据号（风险单号、PO、预测追踪号）回显前与工具返回原值逐字核对；发现笔误需勘误时，勘误内容同样核对后才可输出，禁止凭印象改号。
 - 表格超 20 行只展示最相关前 10 行，说明可展开。
 - Emoji：📦 仓库｜🏷️ SKU｜🔴 P0 🟠 P1 🟡 P2 🔵 P3｜✅ 无风险｜⚠️ 关注｜📊 指标｜📎 溯源。

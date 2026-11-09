@@ -15,7 +15,7 @@ evals/
 ├── mfg-transfer-allocation/
 │   └── cases.yaml                 # 制造技能用例集（13 条，mature；重点护栏+红队）
 ├── aquilair-data-delivery/
-│   └── cases.yaml                 # 数据交付规范用例集（8 条，mature）
+│   └── cases.yaml                 # 数据交付规范用例集（10 条，mature）
 ├── launch-readiness-diagnosis/
 │   └── cases.yaml                 # 旧上市保障技能用例集（mature；技能已移出插件分发，用例备查）
 ├── launch-dynamic-assurance/
@@ -23,7 +23,7 @@ evals/
 └── runs/                          # 每轮评估结果记录（按日期归档；transcripts/ 为轨迹落盘）
 ```
 
-**套件状态（2026-11-03）**：5 个技能 66/66 全部 `mature: true`（fnb 16 + mfg 13 + ddl 8 + 旧 launch 16 + 新 launch-dynamic-assurance 13）。
+**套件状态（2026-11-09）**：5 个技能 65 条用例（fnb 16 + mfg 13 + ddl 10 + 旧 launch 13 + 新 launch-dynamic-assurance 13；旧 launch 实数 13，此前误记 16）；ddl-009/010 为脚本渲染优先改版配套用例，2026-11-09 回归通过（pass^3）已转正。
 
 ## 跑回归（改技能后必做）
 
