@@ -10,7 +10,7 @@
 | --- | --- | --- | --- |
 | 🍜 `fnb-inventory-analysis` | 餐饮库存诊断：仓群风险总览（P0-P3）、判定依据溯源、SKU/ABC 分类、缺货明细 | `aquilair-mcp-servers`（fnb 本体项目，只读工具） | 只读 |
 | 🏭 `mfg-transfer-allocation` | 生产制造调拨：多工厂缺货、方案/计划/评估、What-if 沙箱分支推演、确认后执行 | `aquilair-mcp-servers`（mfg 本体项目，含写/分支工具） | 只读 + 写（确认卡流程） |
-| 🚀 `launch-dynamic-assurance` | 新品上市动态保障（POC 项目）：上市计划与预测口径、上市事项与齐套、物料缺口、供需分配、采购订单跟踪、上市风险全链问答，数据交付强制可视化 | `aquilair-mcp-servers`（新品上市POC-最新版本体项目，读为主 + 写工具确认卡） | 只读 + 写（确认卡流程） |
+| 🚀 `launch-dynamic-assurance` | 新品上市动态保障（POC 项目）：上市计划与预测口径、上市事项与齐套、物料缺口、供需分配、采购订单跟踪、上市风险全链问答，交付随本体子图伸缩（分析类强制可视化，单对象/单边查看纯文本交付） | `aquilair-mcp-servers`（新品上市POC-最新版本体项目，读为主 + 写工具确认卡） | 只读 + 写（确认卡流程） |
 | 📊 `aquilair-data-delivery` | 数据交付可视化规范：配图铁律、豆包式看板模板、图表选型 | —（交付规范，跨技能叠加） | 规范 |
 
 > 已退役：`launch-readiness-diagnosis`（旧项目六类齐套诊断）与配套顾问 `new-arrival-advisor` 已移出插件分发（2026-11-05），素材在仓库 `retired-skills/` 备查，不再随安装加载。
