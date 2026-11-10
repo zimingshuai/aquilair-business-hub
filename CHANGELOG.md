@@ -6,6 +6,11 @@
 > 自 v0.4.6 起版本漂移由 `tools/check_principles.py` P3 闸门自动拦截（内容变更必 bump，两处清单同步）。
 > 本文件变更不触发 P3（检测范围仅 `plugins/`）。
 
+## v0.4.8（2026-11-10）｜tag `v0.4.8` → facts 实测补录收口
+
+- **facts.md 补三条 2026-11-10 WorkBuddy 实测发现**（99aa5b3）：Warehouse 无 wh_type（42201）、max_purchase_date 第 4 周非法日期（RULE_F8D3E28432C04B4B 计算异常）、relation_counts 首调偶发超时重试即通
+- 流程备注：该补充在 v0.4.7 打 tag 后追加，触发 P3 闸门拦截（内容变更未 bump）——按「只进不退」规则 bump 0.4.8 收口而非重打 tag；v0.4.7 的 facts.md 不含上述三条
+
 ## v0.4.7（2026-11-10）｜tag `v0.4.7` → feat/v8-merge（MR：launch 域 V8 大吸收）
 
 - **launch 域大吸收**：同事包 `aquilair-launch-poc-v2`（V8 rev248 文档基线的 fork 重写版）融合进仓，经用户四项裁决：① 网页兜底（MCP 不可用读已登录网页）**不吸收**——保持「不可达如实报告」纪律，该条款删除；② data-delivery 横切层换其基线（不强制配图 / 图比文字更清楚才配图 / 强制结论可信·口径清楚·数值一致·来源可追）并融合我方子图判据（跨对象/多实体联动分析图更清楚）；③ launch-assurance-actions 吸收后 WorkBuddy 启航专家挂载（WorkBuddy 侧另行处理）；④ 一步到位一个 MR
