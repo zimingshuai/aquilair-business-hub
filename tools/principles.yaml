@@ -33,10 +33,10 @@
 
 principles:
   delivery-shape:
-    note: 交付随子图伸缩——单对象/单边关系查看纯文本表格交付合法，跨对象子图（多实体联动/多维对比/趋势分布等分析类）必配图表看板（2026-11-10 四次回退事故的口径主体）
+    note: 形态服从问题——图比文字更清楚才配图（判据参照问题锚定的本体子图：依赖链/供应传导/跨周跨仓矩阵/方案比较等跨对象/多实体联动分析图更清楚，单对象/单边查看直接文字作答）；强制的是结论可信、口径清楚、数值一致、来源可追（2026-11-10 V8 大吸收新基线，替代旧「分析类必配图」绝对化口径）
     anchors:
-      - 交付随子图伸缩
-      - 单对象或单边关系查看纯文本表格交付合法
+      - 图比文字更清楚
+      - 形态服从问题
     stale_variants:
       - 交付必配图
       - 交付必配可视化看板
@@ -45,30 +45,43 @@ principles:
       - 只回纯 Markdown 表格即违规
       - mandatory visualization
       - 数据类交付必须配图表或看板
+      - 默认必须配可视化图表和看板
+      - 必须配图表或看板
+      - 诊断必配图表看板
+      - 交付随子图伸缩
     surfaces:
       - plugins/business-hub/agents/fnb-inventory-analyst.md
       - plugins/business-hub/agents/mfg-transfer-planner.md
       - plugins/business-hub/agents/launch-poc-advisor.md
+      - plugins/business-hub/skills/launch-dynamic-assurance/SKILL.md
       - path: plugins/business-hub/skills/aquilair-skill-router/SKILL.md
         anchors:
-          - 子图伸缩
+          - 图比文字更清楚
           - 单对象/单边查看纯文本合法
         stale_variants:
           - 交付必配图
           - 交付必配可视化看板
           - mandatory visualization
           - 数据类交付必须配图表或看板
-        note: 路由表行内为「按问题子图伸缩」简写口径；反合理化表的「只回纯 Markdown 表格即违规」带「分析类交付」前置限定（合法语境），故本面剔除该禁词
+          - 默认必须配可视化图表和看板
+          - 必须配图表或看板
+          - 诊断必配图表看板
+          - 交付随子图伸缩
+        note: 路由表行内为「形态服从问题——图比文字更清楚才配图」简写口径；反合理化表的「只回纯 Markdown 表格即违规」带「图比文字更清楚的分析类」前置限定（合法语境），故本面剔除该禁词
       - path: plugins/business-hub/skills/aquilair-data-delivery/SKILL.md
         anchors:
-          - 分析类交付
-          - 交付含分析结论
+          - 图比文字更清楚
+          - 不强制配图
         stale_variants:
           - 交付必配图
           - 交付必配可视化看板
           - mandatory visualization
           - 数据类交付必须配图表或看板
-        note: 横切规范以分析类为触发条件（2026-10-29 上收口径，现行铁律句「任何数据分析类交付，默认必须配可视化图表和看板」）；其「只回纯 Markdown 文本表格视为违规」带分析类前置限定（合法语境），故本面剔除该禁词
+          - 默认必须配可视化图表和看板
+          - 必须配图表或看板
+          - 诊断必配图表看板
+          - 交付随子图伸缩
+        note: 横切规范 2026-11-10 V8 大吸收换基线——不强制配图，强制结论可信/口径清楚/数值一致/来源可追；「只在…图比文字更清楚时配图」为现行口径，旧「分析类必配图」措辞全部入禁词防回潮
   write-confirm-card:
     note: 写操作确认卡——先出卡（执行环境/动作链/关键参数/影响/不可逆性五要素）并等用户明确确认才执行，首条请求消息不构成确认
     anchors:
@@ -85,6 +98,7 @@ principles:
         note: fnb 只读域无写操作亦无确认卡，现行写护栏即「一律礼貌拒绝」（行为约束表与注意事项两处在场）；若裁定 fnb 人设须显式提「确认卡」，先改人设再把本条目收回默认锚点
       - plugins/business-hub/skills/mfg-transfer-allocation/SKILL.md
       - plugins/business-hub/skills/launch-dynamic-assurance/SKILL.md
+      - plugins/business-hub/skills/launch-assurance-actions/SKILL.md
   no-recompute:
     note: 禁自算/禁重算——业务数值（风险等级/齐套状态/缺口/方案 KPI/优先级等）一律引用工具返回与规则回写值，禁止自行计算推导（三域现行措辞并存：禁自算/禁止重算/禁止重判/禁止自行重算/禁止自行计算）
     anchors:

@@ -10,8 +10,9 @@
 | --- | --- | --- | --- |
 | 🍜 `fnb-inventory-analysis` | 餐饮库存诊断：仓群风险总览（P0-P3）、判定依据溯源、SKU/ABC 分类、缺货明细 | `aquilair-mcp-servers`（fnb 本体项目，只读工具） | 只读 |
 | 🏭 `mfg-transfer-allocation` | 生产制造调拨：多工厂缺货、方案/计划/评估、What-if 沙箱分支推演、确认后执行 | `aquilair-mcp-servers`（mfg 本体项目，含写/分支工具） | 只读 + 写（确认卡流程） |
-| 🚀 `launch-dynamic-assurance` | 新品上市动态保障（POC 项目）：上市计划与预测口径、上市事项与齐套、物料缺口、供需分配、采购订单跟踪、上市风险全链问答，交付随本体子图伸缩（分析类强制可视化，单对象/单边查看纯文本交付） | `aquilair-mcp-servers`（新品上市POC-最新版本体项目，读为主 + 写工具确认卡） | 只读 + 写（确认卡流程） |
-| 📊 `aquilair-data-delivery` | 数据交付可视化规范：配图铁律、豆包式看板模板、图表选型 | —（交付规范，跨技能叠加） | 规范 |
+| 🚀 `launch-dynamic-assurance` | 新品上市前问答与供应保障（POC 项目，读写分离之「读」）：上市计划与预测口径、上市事项进度与齐套、物料缺口、供需分配、采购计划三态与到货、上市风险、模拟方案比较 | `aquilair-mcp-servers`（新品上市POC-最新版本体项目） | 只读问答 |
+| ⚙️ `launch-assurance-actions` | 新品上市动作受控执行（读写分离之「写」）：创建/修改上市计划、生成周预测与物料需求、重算齐套、确认/下发采购计划、模拟下发、新建模拟根计划 | `aquilair-mcp-servers`（同上项目，动作工具） | 受控执行（确认卡） |
+| 📊 `aquilair-data-delivery` | 数据交付规范：结论可信·口径清楚·数值一致·来源可追；图比文字更清楚才配图（判据参照子图），脚本渲染 12 图型自包含看板 | —（交付规范，跨技能叠加） | 规范 |
 
 > 已退役：`launch-readiness-diagnosis`（旧项目六类齐套诊断）与配套顾问 `new-arrival-advisor` 已移出插件分发（2026-11-05），素材在仓库 `retired-skills/` 备查，不再随安装加载。
 
@@ -21,7 +22,7 @@
 
 另有 **`plugins/business-hub/agents/`**：宿主无关的 agent 人设源文件，一域一 agent 三足鼎立（`fnb-inventory-analyst` 餐饮库存诊断师、`mfg-transfer-planner` 多工厂调拨专员、`launch-poc-advisor` 新品上市POC动态保障顾问）+ 六宿主接入指南（ZCode / Claude Code / Codex / WorkBuddy / 豆包 / 企业自建的适配对照与自适配指令）。
 
-每个技能遵循渐进式披露：`SKILL.md` 只含核心指令，场景剧本 / Action 明细 / KPI 口径放 `references/` 按需加载；`scripts/fetch_meta.py` 负责首用元数据预取（落盘 `.meta-cache/`，运行时生成不入库）。
+每个技能遵循渐进式披露：`SKILL.md` 只含核心指令，场景剧本 / Action 明细 / KPI 口径放 `references/` 按需加载；`scripts/fetch_meta.py`（fnb/mfg）或 `save_meta.py`（launch）负责首用元数据预取（落盘 `.meta-cache/`，运行时生成不入库）。
 
 ## 快速开始（选你的宿主）
 
@@ -42,7 +43,7 @@
 
   | 服务 | 端点 | 支撑技能 |
   | --- | --- | --- |
-  | `aquilair-mcp-servers` | `https://aquilair.idcs.elitescloud.com/mcp-service/mcp` | fnb-inventory-analysis（fnb 本体项目）＋ mfg-transfer-allocation（mfg 本体项目）＋ launch-dynamic-assurance（新品上市POC-最新版本体项目） |
+  | `aquilair-mcp-servers` | `https://aquilair.idcs.elitescloud.com/mcp-service/mcp` | fnb-inventory-analysis（fnb 本体项目）＋ mfg-transfer-allocation（mfg 本体项目）＋ launch-dynamic-assurance / launch-assurance-actions（新品上市POC-最新版本体项目） |
 
   > 地址唯一源在 `plugins/business-hub/.mcp.json`（2026-11-05 起双名收敛为单名 `aquilair-mcp-servers`，旧名 `aquilair-mcp` 停用）。
 
@@ -50,7 +51,7 @@
 
 ## 可视化工具（按宿主选装）
 
-数据类交付强制配图（技能 `aquilair-data-delivery` 铁律）；出图优先路由到当前宿主已装的可视化工具，均未装时零依赖 HTML 直呈降级——**不装不影响基本使用**。复杂度两档（简单→多图+静态看板落档；复杂→交互看板+落档+数值图）为所有业务技能横切标准（2026-10-29 上收）：
+数据类交付**不强制配图，强制的是结论可信、口径清楚、数值一致、来源可追**（技能 `aquilair-data-delivery`，2026-11-10 V8 基线）——图比文字更清楚才配图（判据参照问题锚定的子图：依赖链/供应传导/跨周跨仓矩阵/方案比较等跨对象分析图更清楚）；出图优先走该技能脚本渲染（规格 JSON→自包含 HTML），宿主可视化工具做交互补充，均未装时零依赖 HTML 直呈降级——**不装不影响基本使用**：
 
 | 宿主 | 可视化工具 | 安装方式 |
 | --- | --- | --- |
@@ -89,7 +90,7 @@ codex plugin marketplace add <仓库地址>
 codex plugin add aquilair-business-hub@aquilair
 ```
 
-装齐后自动生效：5 技能 + MCP 数据网关（`codex mcp list` 应显示 `aquilair-mcp-servers` 为 enabled）+ SessionStart 路由注入。`codex plugin remove aquilair-business-hub@aquilair` 随时卸载；仓库更新后 `codex plugin marketplace upgrade` 刷新。
+装齐后自动生效：6 技能 + MCP 数据网关（`codex mcp list` 应显示 `aquilair-mcp-servers` 为 enabled）+ SessionStart 路由注入。`codex plugin remove aquilair-business-hub@aquilair` 随时卸载；仓库更新后 `codex plugin marketplace upgrade` 刷新。
 
 ### 方式三：通用技能目录（任何 Agent Skills 兼容客户端）
 
@@ -182,7 +183,7 @@ aquilair-business-hub/
 │   ├── .mcp.json              # MCP 数据网关连接（全仓库唯一地址源）
 │   ├── hooks/                 # SessionStart 路由注入
 │   ├── agents/                # 宿主无关人设源 + 六宿主接入指南
-│   └── skills/                # 5 技能（fnb / mfg / launch / data-delivery / router；旧 launch 技能已退役至仓库 retired-skills/）
+│   └── skills/                # 6 技能（fnb / mfg / launch 问答+actions / data-delivery / router；旧 launch 技能已退役至仓库 retired-skills/）
 ├── evals/                     # 评估数据层：cases 用例集 + runs 回归记录（能力层在 forge 仓）
 ├── aquilair-knowledge/        # 知识库源文档区分发快照（主本在 forge 仓，见 SNAPSHOT.md）
 ├── tools/                     # pack_skill 打包 / lint_skills 巡检 / validate_cases 校验（vendored）

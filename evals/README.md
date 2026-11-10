@@ -19,11 +19,13 @@ evals/
 ├── launch-readiness-diagnosis/
 │   └── cases.yaml                 # 旧上市保障技能用例集（mature；技能已移出插件分发，用例备查）
 ├── launch-dynamic-assurance/
-│   └── cases.yaml                 # 新品上市POC动态保障用例集（17 条 = 17 mature；lda-014~017 为 0.1.14 子图锚定伸缩配套，2026-11-09 用户授权转正）
+│   └── cases.yaml                 # 新品上市前问答用例集（35 条 = 17 mature + 18 草稿；lda-018~035 为 2026-11-10 V8 大吸收自同事包转入，待人工逐条复核转正）
+├── launch-assurance-actions/
+│   └── cases.yaml                 # 新品上市动作执行用例集（3 条草稿；2026-11-10 V8 大吸收建集，lax 序列待复核转正）
 └── runs/                          # 每轮评估结果记录（按日期归档；transcripts/ 为轨迹落盘）
 ```
 
-**套件状态（2026-11-09）**：5 个技能 69 条用例（fnb 16 + mfg 13 + ddl 10 + 旧 launch 13 + 新 launch-dynamic-assurance 17；旧 launch 实数 13，此前误记 16）；ddl-009/010 为脚本渲染优先改版配套用例，2026-11-09 回归通过（pass^3）已转正；lda-014~017 为 launch 0.1.14 子图锚定伸缩改版配套，2026-11-09 用户授权转正（17/17 mature）。
+**套件状态（2026-11-10）**：6 个域目录 90 条用例（fnb 16 + mfg 13 + ddl 10 + 旧 launch 13 + launch-dynamic-assurance 35 + launch-assurance-actions 3）；mature 72 条，草稿 18 条（lda-018~035 与 lax-001~003，V8 大吸收转入，人工复核后方可转正）。launch-dynamic-assurance 于 2026-11-10 V8 大吸收改版（SKILL 0.4.0 + references 四件重写）：lda-001~013 断言按 V8 基线口径跟随（逐条注明于 source 字段）、lda-014~017 子图伸缩断言未动——**改版后该技能 35 条全量回归方可发布**。
 
 ## 跑回归（改技能后必做）
 

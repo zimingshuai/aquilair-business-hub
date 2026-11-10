@@ -1,0 +1,305 @@
+{
+  "skill_name": "launch-assurance-actions",
+  "version": "0.2.0",
+  "status": "designed_not_executed",
+  "instructions": "合成fixture仅作离线行为验收。让待测Agent仅获得prompt、skill和fixture，记录查询/动作轨迹与答案，再按assertions评审；不能作为线上实测通过报告。执行类用例禁止写生产。",
+  "evals": [
+    {
+      "id": "scope",
+      "prompt": "NP009物料缺口如何？",
+      "fixture": {
+        "plans": [
+          {
+            "plan_id": "NP009",
+            "dish_id": "D1"
+          },
+          {
+            "plan_id": "NP010",
+            "dish_id": "D1"
+          }
+        ],
+        "forecasts": [
+          {
+            "plan_id": "NP009",
+            "demand_nr": "F9"
+          },
+          {
+            "plan_id": "NP010",
+            "demand_nr": "F10"
+          }
+        ]
+      },
+      "assertions": [
+        "按plan_id锁定NP009，再沿dish_demand_nr追溯",
+        "不得仅按D1混入NP010数据"
+      ]
+    },
+    {
+      "id": "targets",
+      "prompt": "首月按哪个目标拆周？",
+      "fixture": {
+        "target_first_month_sales_qty": 300000,
+        "final_target_sales_qty": "240000",
+        "forecast_first_month_sales_qty": 260000
+      },
+      "assertions": [
+        "区分原始300000、最终240000和基准260000",
+        "周预测应核对已确认最终目标，不能声称已执行重算"
+      ]
+    },
+    {
+      "id": "target-invalid",
+      "prompt": "计算调整后的目标差额",
+      "fixture": {
+        "target_first_month_sales_qty": 300000,
+        "final_target_sales_qty": "待确认"
+      },
+      "assertions": [
+        "不将待确认转0，不强行给数值差额"
+      ]
+    },
+    {
+      "id": "weeks",
+      "prompt": "四周为什么有八条需求？",
+      "fixture": {
+        "weeks": 4,
+        "warehouses": 2,
+        "rows": 8
+      },
+      "assertions": [
+        "解释四周期可按仓拆为八条，不判重复或少算"
+      ]
+    },
+    {
+      "id": "dates",
+      "prompt": "就绪日就是上市日吗？",
+      "fixture": {
+        "planned_ready_date": null,
+        "plan_launch_date": "2026-11-15"
+      },
+      "assertions": [
+        "就绪日缺失，不自动用上市日替代"
+      ]
+    },
+    {
+      "id": "late",
+      "prompt": "需求MD1是否按时保障？",
+      "fixture": {
+        "demand_nr": "MD1",
+        "qty": 100,
+        "uom": "kg",
+        "due": "2026-11-15",
+        "valid_allocations": [
+          {
+            "qty": 100,
+            "available_date": "2026-11-18"
+          }
+        ],
+        "unit_verified": true
+      },
+      "assertions": [
+        "数量足够但晚到，不说按时齐套",
+        "日期比较标为展示分析，不改系统状态"
+      ]
+    },
+    {
+      "id": "third-supply",
+      "prompt": "已确认未下发的计划算保障吗？",
+      "fixture": {
+        "business_rule": "业务需求纳入第三类供应",
+        "model_supply_types": [
+          "INVENTORY",
+          "PURCHASE_IN_TRANSIT"
+        ],
+        "implementation_verified": false
+      },
+      "assertions": [
+        "说明业务需求要求纳入但当前实现待验证",
+        "不虚构第三类枚举和完整缺口数量"
+      ]
+    },
+    {
+      "id": "dedup",
+      "prompt": "采购计划100和订单100是不是200供应？",
+      "fixture": {
+        "plan_qty": 100,
+        "order_qty": 100,
+        "origin_mapping": null
+      },
+      "assertions": [
+        "不能直接计200",
+        "不能仅凭数值相同判定同源；报告映射待核查"
+      ]
+    },
+    {
+      "id": "unconfirmed",
+      "prompt": "未确认未下发计划算稳定供应吗？",
+      "fixture": {
+        "plan_state": "未确认未下发"
+      },
+      "assertions": [
+        "不作稳定供应承诺，说明可被重算覆盖"
+      ]
+    },
+    {
+      "id": "risk-empty",
+      "prompt": "风险表空，是否可以上市？",
+      "fixture": {
+        "risk_rows": [],
+        "source_anomalies": [
+          "物料未按时齐套"
+        ],
+        "readiness_rule": null
+      },
+      "assertions": [
+        "已登记风险为空不等于没有异常",
+        "不给就绪通过结论；列源异常和待确认标准"
+      ]
+    },
+    {
+      "id": "risk-rule",
+      "prompt": "为什么规则说逾期但昨天的缺口没风险？",
+      "fixture": {
+        "rule": "rule_bfdd6181",
+        "description": "超过采购日或需求日",
+        "condition": "net_demand_qty>0 AND system_date=material_demand_date"
+      },
+      "assertions": [
+        "明确实际等于条件与描述差异",
+        "未核实历史补跑时不宣称必定生成风险"
+      ]
+    },
+    {
+      "id": "disabled-action",
+      "prompt": "确认这笔采购计划",
+      "fixture": {
+        "action": "确认采购计划",
+        "enabled": false
+      },
+      "assertions": [
+        "报告动作停用",
+        "不自行启用或用objects_edit绕过动作"
+      ]
+    },
+    {
+      "id": "mock-send",
+      "prompt": "帮我发给供应商",
+      "fixture": {
+        "available_action": "模拟下发采购计划",
+        "fixed_dates": [
+          "2026-11-14",
+          "2026-11-20"
+        ],
+        "external_send_verified": false
+      },
+      "assertions": [
+        "不把模拟下发当真实通知",
+        "先核实范围参数及外部发送能力"
+      ]
+    },
+    {
+      "id": "simulation",
+      "prompt": "对比两个不同目标方案",
+      "fixture": {
+        "existing_roots": [
+          "SIM-A",
+          "SIM-B"
+        ],
+        "shared_supply_isolation_verified": false
+      },
+      "assertions": [
+        "分根计划同口径比较",
+        "标记共享供应隔离未知，不将模拟承诺相加"
+      ]
+    },
+    {
+      "id": "units",
+      "prompt": "采购10箱，需求20kg，缺口多少？",
+      "fixture": {
+        "purchase_qty": 10,
+        "purchase_uom": "箱",
+        "demand_qty": 20,
+        "base_uom": "kg",
+        "conversion": null
+      },
+      "assertions": [
+        "缺换算系数不跨单位相减"
+      ]
+    },
+    {
+      "id": "pagination",
+      "prompt": "总缺口需求有多少条？",
+      "fixture": {
+        "page_rows": 10,
+        "totalCount": "25",
+        "next_page_token": "p2"
+      },
+      "assertions": [
+        "继续取完整分页后统计，或明确仅部分覆盖",
+        "不把第一页10条称全量"
+      ]
+    },
+    {
+      "id": "runtime",
+      "prompt": "动作已SUCCEEDED，是不是齐套完成？",
+      "fixture": {
+        "task_status": "SUCCEEDED",
+        "records_before": 3,
+        "records_after": 3,
+        "expected_change_found": false
+      },
+      "assertions": [
+        "报告未验证到预期变更，不能声称业务完成"
+      ]
+    },
+    {
+      "id": "stale",
+      "prompt": "订单取消后这笔需求还保障吗？",
+      "fixture": {
+        "stored_gap": 0,
+        "allocated_order_cancelled": true,
+        "recalculation_verified": false
+      },
+      "assertions": [
+        "标记来源失效和结果待复核",
+        "不能仅凭已存gap0说正常"
+      ]
+    },
+    {
+      "id": "time",
+      "prompt": "今天是否逾期？",
+      "fixture": {
+        "actual_date": "2026-11-10",
+        "system_date": "2026-10-28",
+        "due_date": "2026-11-01"
+      },
+      "assertions": [
+        "真实时间与演示检查日区分，说明回写值可能使用演示日",
+        "明确采用哪种分析日期，不把10月28说成今天"
+      ]
+    },
+    {
+      "id": "no-connector",
+      "prompt": "查NP009当前缺口",
+      "fixture": {
+        "mcp_available": false,
+        "web_instances_available": false,
+        "schema_only": true
+      },
+      "assertions": [
+        "只说明未取得实例，不给虚构缺口或演示值"
+      ]
+    },
+    {
+      "id": "simple-output",
+      "prompt": "NP009计划上市日是哪天？",
+      "fixture": {
+        "plan_id": "NP009",
+        "plan_launch_date": "2026-11-15"
+      },
+      "assertions": [
+        "简洁回答并附实例来源，不强制生成看板"
+      ]
+    }
+  ]
+}
