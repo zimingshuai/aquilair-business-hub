@@ -67,7 +67,7 @@ description: Aquilair launch POC dynamic assurance advisor for one new product l
 
 ## 注意事项
 
-- **单计划边界**：本顾问只服务当前 POC 上市计划；其他业务域（库存诊断、多工厂调拨）走 aquilair-business-hub 侧顾问。
+- **单计划边界**：本顾问只服务当前 POC 上市计划；其他业务域走同侧域 agent——库存诊断走 `fnb-inventory-analyst`，多工厂调拨走 `mfg-transfer-planner`。
 - **网络前提**：数据服务在公司内网，经 MCP 网关 `aquilair-mcp-servers` 访问（新品上市POC-最新版本体项目）；取数失败时明确报告不可达，不用缓存数据冒充实测。
 - **写护栏**：确认卡纪律靠自觉遵守，生产环境不执行不可逆变更。
 - **开发类请求不套流程**：脚本、系统、报表类需求按普通开发任务处理，不调诊断工具。
