@@ -1,0 +1,121 @@
+# =====================================================================
+# 行为口径唯一权威源（single source of truth）
+# =====================================================================
+# 同一行为口径散布多份文件、改版漏改其一即行为回退——2026-11-09/10 连续
+# 四次同类事故（launch 域技能 → WorkBuddy 成员人设 → team-lead 主理人 →
+# skill-router → fnb/mfg 新 agent 从旧底稿继承旧口径），故把口径从各文档
+# 抽出集中到本文件，由 tools/check_principles.py 执行双检：
+#   正向——任一锚点（anchors）在影响面文件在场；
+#   反向——全部禁词变体（stale_variants）在影响面文件绝迹。
+# 双端挂闸（同一份 yaml，不复制维护两份口径数据）：
+#   hub 端——tools/lint_skills.py 末节自动调用（问题计入 ERROR）；
+#   WorkBuddy 端——install_aquilair_team.py --check 经 --extra-surface
+#   追加 experts-src 三人设镜像，与 hub 侧同源同校验。
+#
+# 【修改口径须先改本文件并跑双端校验】——改锚点 / 禁词 / 影响面只动这里，
+# 再按 --impact <口径id> 输出的影响面清单逐文件同步措辞。禁词变体库随
+# 事故积累：新变体先 grep 现行文件确认只在事故现场出现，再录入。
+#
+# 结构说明（principles.<id> 下各键）：
+#   note            口径一句话定义（治理语义，供 --impact 与报告展示）
+#   anchors         默认正向锚点，任一在场即合格（OR 语义）
+#   stale_variants  默认反向禁词，出现任何一处即违规
+#   surfaces        影响面，相对 hub 仓根的正斜杠路径；两种条目形态：
+#     - 字符串条目：用本口径默认 anchors / stale_variants；
+#     - 对象条目（path + anchors? + stale_variants? + note?）：
+#       提供即整体替换默认（写全量清单，不是合并）——用于横切规范等
+#       措辞形态不同的适配面（如 data-delivery 以「分析类交付」为
+#       触发条件表述配图口径）。
+#   WorkBuddy 镜像不在此登记：surfaces 中 /agents/<name>.md 的镜像人设
+#   （experts-src/<name>/agents/<name>.md）由 check_principles.py 按文件
+#   名对齐复用同一条目（含适配锚点），install 侧负责追加。
+# =====================================================================
+
+principles:
+  delivery-shape:
+    note: 交付随子图伸缩——单对象/单边关系查看纯文本表格交付合法，跨对象子图（多实体联动/多维对比/趋势分布等分析类）必配图表看板（2026-11-10 四次回退事故的口径主体）
+    anchors:
+      - 交付随子图伸缩
+      - 单对象或单边关系查看纯文本表格交付合法
+    stale_variants:
+      - 交付必配图
+      - 交付必配可视化看板
+      - 只回纯 Markdown 表格视为违规
+      - 只回纯 Markdown 文本表格视为违规
+      - 只回纯 Markdown 表格即违规
+      - mandatory visualization
+      - 数据类交付必须配图表或看板
+    surfaces:
+      - plugins/business-hub/agents/fnb-inventory-analyst.md
+      - plugins/business-hub/agents/mfg-transfer-planner.md
+      - plugins/business-hub/agents/launch-poc-advisor.md
+      - path: plugins/business-hub/skills/aquilair-skill-router/SKILL.md
+        anchors:
+          - 子图伸缩
+          - 单对象/单边查看纯文本合法
+        stale_variants:
+          - 交付必配图
+          - 交付必配可视化看板
+          - mandatory visualization
+          - 数据类交付必须配图表或看板
+        note: 路由表行内为「按问题子图伸缩」简写口径；反合理化表的「只回纯 Markdown 表格即违规」带「分析类交付」前置限定（合法语境），故本面剔除该禁词
+      - path: plugins/business-hub/skills/aquilair-data-delivery/SKILL.md
+        anchors:
+          - 分析类交付
+          - 交付含分析结论
+        stale_variants:
+          - 交付必配图
+          - 交付必配可视化看板
+          - mandatory visualization
+          - 数据类交付必须配图表或看板
+        note: 横切规范以分析类为触发条件（2026-10-29 上收口径，现行铁律句「任何数据分析类交付，默认必须配可视化图表和看板」）；其「只回纯 Markdown 文本表格视为违规」带分析类前置限定（合法语境），故本面剔除该禁词
+  write-confirm-card:
+    note: 写操作确认卡——先出卡（执行环境/动作链/关键参数/影响/不可逆性五要素）并等用户明确确认才执行，首条请求消息不构成确认
+    anchors:
+      - 确认卡
+    stale_variants:
+      - 写操作无需确认
+      - 跳过确认直接执行
+    surfaces:
+      - plugins/business-hub/agents/mfg-transfer-planner.md
+      - plugins/business-hub/agents/launch-poc-advisor.md
+      - path: plugins/business-hub/agents/fnb-inventory-analyst.md
+        anchors:
+          - 写回 / 修改 / 创建类请求一律礼貌拒绝
+        note: fnb 只读域无写操作亦无确认卡，现行写护栏即「一律礼貌拒绝」（行为约束表与注意事项两处在场）；若裁定 fnb 人设须显式提「确认卡」，先改人设再把本条目收回默认锚点
+      - plugins/business-hub/skills/mfg-transfer-allocation/SKILL.md
+      - plugins/business-hub/skills/launch-dynamic-assurance/SKILL.md
+  no-recompute:
+    note: 禁自算/禁重算——业务数值（风险等级/齐套状态/缺口/方案 KPI/优先级等）一律引用工具返回与规则回写值，禁止自行计算推导（三域现行措辞并存：禁自算/禁止重算/禁止重判/禁止自行重算/禁止自行计算）
+    anchors:
+      - 禁自算
+      - 禁止重算
+      - 禁止重判
+      - 禁止自行重算
+      - 禁止自行计算
+    stale_variants:
+      - 可自行估算
+      - 允许自行推算
+      - 凭经验推算
+    surfaces:
+      - plugins/business-hub/agents/fnb-inventory-analyst.md
+      - plugins/business-hub/agents/mfg-transfer-planner.md
+      - plugins/business-hub/agents/launch-poc-advisor.md
+      - plugins/business-hub/skills/fnb-inventory-analysis/SKILL.md
+      - plugins/business-hub/skills/mfg-transfer-allocation/SKILL.md
+      - plugins/business-hub/skills/launch-dynamic-assurance/SKILL.md
+  realtime-source:
+    note: 实时为准——以 MCP 实时查询为唯一事实源，缓存与实时冲突以实时为准，不用缓存数据冒充实时结果
+    anchors:
+      - 实时为准
+      - 以 MCP 实时查询为唯一事实源
+    stale_variants:
+      - 以缓存为准
+      - 优先使用缓存
+    surfaces:
+      - plugins/business-hub/agents/fnb-inventory-analyst.md
+      - plugins/business-hub/agents/mfg-transfer-planner.md
+      - plugins/business-hub/agents/launch-poc-advisor.md
+      - plugins/business-hub/skills/fnb-inventory-analysis/SKILL.md
+      - plugins/business-hub/skills/mfg-transfer-allocation/SKILL.md
+      - plugins/business-hub/skills/launch-dynamic-assurance/SKILL.md

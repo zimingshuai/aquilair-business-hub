@@ -28,12 +28,23 @@ skills/aquilair-skill-authoring/references/lint.md 的人工巡检清单）：
       技能内 evals 双件（evals.json + trigger-queries.json）齐、scripts/ 脚本被 SKILL.md
       「可用脚本」入口提及、.py 脚本超 50 行且无 argparse/sys.argv 等 CLI 痕迹
       （以上 WARN——新建技能必配，存量渐进）
+
+附 P 节（行为口径巡检，2026-11-10 立项）：末节自动调 tools/check_principles.py，
+  以 tools/principles.yaml 为单一事实源对 agents/skills 影响面做口径锚点 + 禁词
+  变体双检（2026-11-09/10 四次口径回退事故驱动），问题计入 ERROR 阻断。
 """
 
 import json
 import re
 import sys
 from pathlib import Path
+
+try:
+    # 直接执行本脚本（python tools/lint_skills.py）时 tools/ 在 sys.path[0]
+    from check_principles import run_principles_check
+except ImportError:
+    # 以 tools.lint_skills 模块方式被导入时（如 tests/run_infra_tests.py 同款注入路径）
+    from tools.check_principles import run_principles_check
 
 # LEVEL_ERROR / LEVEL_WARN：问题级别——ERROR 阻断（退出码 1），WARN 仅提示
 LEVEL_ERROR = "ERROR"
@@ -397,16 +408,18 @@ def print_report(
 
 
 def main() -> int:
-    """巡检入口：定位仓库根，执行巡检并打印报告。
+    """巡检入口：定位仓库根，执行巡检并打印报告（末节附行为口径巡检）。
 
     Args:
         无（自动取脚本上级目录为仓库根）。
     Returns:
-        进程退出码：存在 ERROR 为 1，否则为 0。
+        进程退出码：技能巡检或口径巡检任一存在 ERROR 为 1，否则为 0。
     """
     repo_root = Path(__file__).resolve().parent.parent
     per_skill, repo_issues = lint_repo(repo_root)
-    return print_report(per_skill, repo_issues)
+    exit_code = print_report(per_skill, repo_issues)
+    #   P 节：行为口径巡检（principles.yaml 单一事实源；问题计入 ERROR 阻断，不降级为 WARN）
+    return exit_code | run_principles_check(repo_root)
 
 
 if __name__ == "__main__":
