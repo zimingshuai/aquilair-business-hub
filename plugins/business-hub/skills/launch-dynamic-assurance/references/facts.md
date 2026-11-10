@@ -5,6 +5,7 @@
 > 不快照任何数据实态——数值、条数、状态、规模以 `objects_query` 实时结果为准；实体/属性/关系/规则清单以
 > `metadata_list_*` / `metadata_workspace_model` 实时返回为唯一权威，本手册不维护副本。
 > 铁律修改必须先有实测证据；条目挂工单，服务端修复后即删。原始实测记录见 hub 仓 `evals/runs/2026-11-03-launch-poc-probe.md`。
+> 出处：hub 2026-11-03/09 实测为基线；2026-11-10 V8 大吸收自同事包 aquilair-launch-poc-v2 增量并入「类型坑」表行与事项/齐套两清单口径。
 
 ## 工作区接入
 
@@ -48,7 +49,7 @@
   SupplyDemandAllocation.supply_type 实际写值为小写连写 apiCode——purchaseorder（↔业务口径 PURCHASE_IN_TRANSIT）
   / batchinventory（↔INVENTORY）；allocation_status 实测另见 ALLOCATED（业务文档三值 PLANNED/CONFIRMED/CANCELLED
   之外）。**过滤查询传实测值，语义解释沿用业务口径**；按文档大写值 filter 会查空。枚举权威仍以元数据+业务文档
-  出处为准，实测差异如实报告（domain-model「三、决策枚举」已同步映射）。
+  出处为准，实测差异如实报告（business-semantics「决策枚举」表已同步映射）。
 - `metadata_workspace_model`：全量模型完整返回（2026-11-03 观测约 560KB 未截断；实体/关系/规则数当日持续
   变化——规模以实时返回为准，不快照）；载荷大需警惕截断，截断时退回 metadata_list_object_types（轻量）+
   metadata_object_neighborhood(ref_code, depth=0)。
@@ -105,7 +106,8 @@
   采购订单等已有实例，数值随时变化不快照）——回答前先探实例规模；仅大范围 0 实例才报「数据未灌入」，
   禁止用文档演示值（NP009/300000 杯等）冒充查询结果。
 - **无「检查上市齐套」类动作**：15 动作/8 函数中不存在检查上市齐套/重排齐套时间/采购成本测算承载；
-  六类齐套进展以 DishLaunchItem（上市事项）数据 + 已注册规则（metadata_list_rules 实时清单）说明。
+  上市事项进度以 DishLaunchItem（上市事项）数据 + 已注册规则（metadata_list_rules 实时清单）说明，
+  物料齐套进度以物料需求粒度（MaterialKitting / SupplyDemandAllocation）说明，两者不混为一份清单。
 - **算法清单空**（metadata_list_algorithms=[]）：首批采购方案生成/成本测算无算法承载，被要求执行时
   如实说明，不虚构接口。
 - 规则清单中【待处理】规则（价格系数/营销费用系数/计划起止日期/当前交货逾期天数/上市事项执行状态）：
@@ -120,5 +122,6 @@
 | 供应按时判定字段缺失 | SupplyDemandAllocation 无 expected_supply_qty_ontime / expected_gap_qty（文档有公式） | 到货可行性判定改由 supply_available_date vs demand 日期现算展示口径，并注明字段缺失 | TK-sda字段 |
 | 库存指标字段缺失 | MaterialInWarehouse 缺 available_inventory_qty/dii/idd/inventory_holding_cost/remain_forecast_sales_qty | 相关指标不承诺，字段清单以实时元数据为准 | TK-miw字段 |
 | 划线属性未同步清除 | DishLaunchPlan（plan_start_date 等 4 个）、ReferenceDishBinding（系数 9 个）、ForecastSalesDemand（3 个）、MaterialDemand（net_demand_qty 等 3 个）、SupplyDemandAllocation（material_demand_date）——文档删除线但系统仍在 | 引用前双核对（元数据为实、文档为背景）；不因文档划线断言字段不存在 | TK-划线 |
+| 类型坑（V8 基线吸收） | `final_target_sales_qty` 为文本型；`PurchasePlan.confirm_flag / send_flag` 为整型；`PurchaseOrder.cancel_flag / close_flag` 为布尔型；`MaterialDemand.max_purchase_date`、`PurchasePlan.max_purchase_date1`、`PurchaseOrder.latest_delivery_date / delivery_warning_day` 页面为浮点型 | 文本型参与数值计算前校验格式（空值不转 0）；标记按各自类型比较，不混用整型/布尔判断；浮点型字段不能未经定义核实当作日期或默认解析为时间戳，解析不了就报待核查 | — |
 | 关系缺口 | Dish.history_sales_by_day、DishLaunchPlan.ref_launch_plan 自关联、MaterialInWarehouse→purchase_orders/purchase_plan/forecast_sales_demand 3 条缺失 | 参考品历史销量经 Dish→HistorySalesByDay 无关系可走（且该实体查询通道不稳定）；参考计划链经 ReferenceDishBinding.ref_launch_plan_id 属性中转；在途采购经 SupplyDemandAllocation.supply_nr 中转 | TK-关系 |
 | MCP 工具 description 为空 | objects_query 等 description 空串，DSL 用法无内嵌文档 | 技能侧自备方言表（本手册）；平台侧补文档属增强项 | 低优先 |
