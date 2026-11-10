@@ -19,7 +19,7 @@
 
 - 🧭 `aquilair-skill-router`：技能路由入口（使用端元技能）——复合/跨域业务问题先裁决技能叠加顺序再干活；新技能接入走其路由表扩充接口（工厂侧技能 `aquilair-skill-authoring` / `aquilair-knowledge-wiki` 在 aquilair-skill-forge 插件，未安装时路由如实指引，不手工代答）
 
-另有 **`plugins/business-hub/agents/`**：宿主无关的 agent 人设源文件（`aquilair-supply-chain-advisor` 供应链中枢顾问、`launch-poc-advisor` 新品上市POC动态保障顾问）+ 六宿主接入指南（ZCode / Claude Code / Codex / WorkBuddy / 豆包 / 企业自建的适配对照与自适配指令）。
+另有 **`plugins/business-hub/agents/`**：宿主无关的 agent 人设源文件，一域一 agent 三足鼎立（`fnb-inventory-analyst` 餐饮库存诊断师、`mfg-transfer-planner` 多工厂调拨专员、`launch-poc-advisor` 新品上市POC动态保障顾问）+ 六宿主接入指南（ZCode / Claude Code / Codex / WorkBuddy / 豆包 / 企业自建的适配对照与自适配指令）。
 
 每个技能遵循渐进式披露：`SKILL.md` 只含核心指令，场景剧本 / Action 明细 / KPI 口径放 `references/` 按需加载；`scripts/fetch_meta.py` 负责首用元数据预取（落盘 `.meta-cache/`，运行时生成不入库）。
 
@@ -80,7 +80,7 @@
 1. 「插件市场 → 添加 → 添加插件市场」，粘贴 `<仓库地址>`（本地仓库根目录）；
 2. 到「个人 → aquilair」安装「Aquilair 智能应用中枢」（`aquilair-business-hub`）。
 
-注意：**subagent 人设不随插件分发**——要用 `aquilair-supply-chain-advisor` 子代理时，把 `plugins/business-hub/agents/aquilair-supply-chain-advisor.md` 拷至 `~/.zcode/agents/`。**更新流程**：仓库版本递增后，市场页齿轮 →「市场源」→ 刷新 → 「个人 → 插件详情」点更新。
+注意：**subagent 人设不随插件分发**——要用域子代理（`fnb-inventory-analyst` / `mfg-transfer-planner` / `launch-poc-advisor`）时，把 `plugins/business-hub/agents/` 下对应人设文件拷至 `~/.zcode/agents/`。**更新流程**：仓库版本递增后，市场页齿轮 →「市场源」→ 刷新 → 「个人 → 插件详情」点更新。
 
 ### 方式二：Codex（两条命令装齐，实测于 Codex CLI 0.154.0）
 
