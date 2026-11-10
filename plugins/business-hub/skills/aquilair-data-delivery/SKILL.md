@@ -79,7 +79,7 @@ python "<本技能目录>/scripts/render_dashboard.py" --spec <规格>.json --ou
 | 层 | 探测信号（当前会话可见） | 出图通道 |
 | --- | --- | --- |
 | 1 | 技能列表含 `doubao-visualization`（豆包侧安装） | 图表交该技能：精确数值（趋势/占比/排行/对比）→ 其 `echarts` 代码块；结构图解 / 看板 → 其 `html type="renderer"` 块 |
-| 2 | 技能列表含 `visualize`（ZCode 官方插件） | 图表交该技能：HTML fragment 写宿主可视化目录 + `::visualize` 引用。其「用户要表格就直接给表格」条款与本案冲突时**铁律优先**（业务数据交付必须配图） |
+| 2 | 技能列表含 `visualize`（ZCode 官方插件） | 图表交该技能：HTML fragment 写宿主可视化目录 + `::visualize` 引用。其「用户要表格就直接给表格」条款与本案冲突时**铁律优先**（分析类交付必须配图；单对象/单边查看类按第一节与第五节口径纯文本合法，不受此括号约束） |
 | 3 | 宿主原生展示组件（WorkBuddy `show_widget` / `present_files`） | 内联单图走组件；多图 / 交互走 HTML 看板 + 文件预览 |
 
 - **脚本与三层均不可用**：零依赖 HTML / SVG 直呈（内联 CSS/脚本，无外部依赖），不修环境。
