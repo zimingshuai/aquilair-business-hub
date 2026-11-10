@@ -1,0 +1,75 @@
+{
+  "name": "launch-poc-advisor",
+  "version": "1.0.0",
+  "description": "Aquilair launch POC dynamic assurance advisor as a standalone expert for one new product launch plan (POC project): launch plan and forecast caliber, kitting status, material gaps, supply-demand allocation, purchase order tracking, and launch risk. Delivers diagnostic reports and risk dashboards with subgraph-proportional visualization. Ships launch-dynamic-assurance and aquilair-data-delivery skills.",
+  "author": {
+    "name": "Aquilair Team"
+  },
+  "license": "Proprietary - Aquilair internal distribution, intranet use only",
+  "keywords": [
+    "launch",
+    "poc",
+    "kitting",
+    "material-gap",
+    "supply-demand",
+    "purchase-tracking",
+    "aquilair",
+    "data-delivery"
+  ],
+  "agents": [
+    "./agents/launch-poc-advisor.md"
+  ],
+  "skills": [
+    "./skills/launch-dynamic-assurance",
+    "./skills/aquilair-data-delivery"
+  ],
+  "expertType": "agent",
+  "agentName": "launch-poc-advisor",
+  "displayName": {
+    "en": "QiHang",
+    "zh": "启航"
+  },
+  "profession": {
+    "en": "Launch POC Dynamic Assurance Advisor",
+    "zh": "新品上市动态保障顾问"
+  },
+  "displayDescription": {
+    "en": "Standalone launch POC assurance expert: plan and forecast caliber, kitting diagnosis, material gaps, supply-demand allocation, purchase arrival tracking and launch risk, with subgraph-proportional deliverables.",
+    "zh": "新品上市 POC 独立保障专家：计划口径、齐套诊断、物料缺口、供需分配、采购到货、上市风险，交付随子图伸缩。"
+  },
+  "avatar": "avatars/expert.jpg",
+  "categoryId": "12-IndustryConsultant",
+  "defaultInitPrompt": {
+    "zh": "当前上市计划的物料缺口和齐套状态如何？给我一份带看板的上市风险诊断",
+    "en": "What are the material gaps and kitting status of the current launch plan? Give me a launch risk diagnosis with a dashboard."
+  },
+  "plugin": "launch-poc-advisor",
+  "tags": [
+    {
+      "en": "Launch Assurance",
+      "zh": "上市动态保障"
+    },
+    {
+      "en": "Kitting Diagnosis",
+      "zh": "齐套诊断"
+    },
+    {
+      "en": "Launch Risk",
+      "zh": "上市风险"
+    }
+  ],
+  "quickPrompts": [
+    {
+      "zh": "当前上市计划的物料缺口和齐套状态如何？给我一份带看板的上市风险诊断",
+      "en": "What are the material gaps and kitting status of the current launch plan? Give me a launch risk diagnosis with a dashboard."
+    },
+    {
+      "zh": "上市事项哪些还没齐套？原因按四类分清楚",
+      "en": "Which launch items are not kitted yet? Classify the reasons into the four categories."
+    },
+    {
+      "zh": "首批采购订单的到货状态如何？在途有超期吗？",
+      "en": "What is the arrival status of the first purchase orders? Any in-transit delays?"
+    }
+  ]
+}
