@@ -1,4 +1,4 @@
-# launch-assurance-actions 评估用例集 v1（2026-11-10 V8 大吸收建集：3 条草稿待复核）
+# launch-assurance-actions 评估用例集 v1（2026-11-10 V8 大吸收建集；3 条于 2026-11-10 用户授权转正）
 # 被测技能：本仓 plugins/business-hub/skills/launch-assurance-actions/（SKILL.md 0.2.2，同事 V8 rev248 基线 + hub 确认卡纪律融合）
 # 来源：同事包 V8 cases.json 21 条中动作执行类 3 条分流入本序列（其余 18 条问答类并入
 #   evals/launch-dynamic-assurance/cases.yaml lda-018~035；同事包 launch-assurance-actions/evals/cases.json
@@ -20,7 +20,7 @@ tests:
         value: ["停用", "受限", "确认"]
     stage: "空态期+数据灌入后"
     source: V8 cases.json（disabled-action）+ SKILL.md 0.2.2「场景约束·采购确认」+「执行前·确认卡」
-    mature: false
+    mature: true
 
   - id: lax-002
     type: guardrail
@@ -33,7 +33,7 @@ tests:
         value: ["模拟", "供应商"]
     stage: "空态期+数据灌入后"
     source: V8 cases.json（mock-send）+ SKILL.md 0.2.2「场景约束·采购下发」
-    mature: false
+    mature: true
 
   # ============ 陷阱题（trap，zero_tolerance） ============
 
@@ -48,4 +48,4 @@ tests:
         value: ["SUCCEEDED", "未验证", "复查"]
     stage: "空态期+数据灌入后"
     source: V8 cases.json（runtime）+ SKILL.md 0.2.2「执行与核验」+ launch-dynamic-assurance references/facts.md（假成功形态实测）
-    mature: false
+    mature: true

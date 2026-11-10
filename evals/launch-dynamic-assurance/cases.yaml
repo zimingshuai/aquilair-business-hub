@@ -18,7 +18,7 @@
 # 字段说明（validate_cases.py 兼容）：
 #   follow_up —— 追问/施压第二轮消息；fixture —— 合成夹具（离线行为验收前提，不作线上事实）；
 #   stage / expected_loaded —— 同 v1 语义（空态期断言灌入前行为，expected_loaded 断灌入后行为）。
-# 状态：35 条 = 17 mature（lda-001~013 于 2026-11-03 P6 转正+口径跟随；lda-014~017 于 2026-11-09 授权转正）+ 18 草稿。
+# 状态：35 条 = 35 mature（lda-001~013 于 2026-11-03 P6 转正+口径跟随；lda-014~017 于 2026-11-09 授权转正；lda-018~035 V8 大吸收 21 条于 2026-11-10 用户授权转正）。
 
 tests:
   # ============ 正常题（normal） ============
@@ -249,7 +249,7 @@ tests:
         value: ["NP009", "计划"]
     stage: "空态期+数据灌入后"
     source: V8 cases.json（scope）+ SKILL.md 0.4.0「探查循环·锁范围」
-    mature: false
+    mature: true
 
   - id: lda-019
     type: trap
@@ -262,7 +262,7 @@ tests:
         value: ["目标", "最终"]
     stage: "空态期+数据灌入后"
     source: V8 cases.json（targets）+ SKILL.md 0.4.0「计算与不确定性·口径三分离」
-    mature: false
+    mature: true
 
   - id: lda-020
     type: trap
@@ -275,7 +275,7 @@ tests:
         value: ["待确认", "无法", "不能"]
     stage: "空态期+数据灌入后"
     source: V8 cases.json（target-invalid）+ references/facts.md「元数据缺陷」表（类型坑：final_target_sales_qty 文本型）
-    mature: false
+    mature: true
 
   - id: lda-021
     type: normal
@@ -287,7 +287,7 @@ tests:
         value: ["周", "仓"]
     stage: "空态期+数据灌入后"
     source: V8 cases.json（weeks）+ references/storyline-playbook.md「周需求」意图类
-    mature: false
+    mature: true
 
   - id: lda-022
     type: normal
@@ -299,7 +299,7 @@ tests:
         value: ["就绪", "上市"]
     stage: "空态期+数据灌入后"
     source: V8 cases.json（dates）+ references/business-semantics.md「日期与就绪」
-    mature: false
+    mature: true
 
   - id: lda-023
     type: normal
@@ -311,7 +311,7 @@ tests:
         value: ["晚", "时间", "按时"]
     stage: "空态期+数据灌入后"
     source: V8 cases.json（late）+ references/launch-assurance.md「物料需求追溯·物料齐套」
-    mature: false
+    mature: true
 
   - id: lda-024
     type: trap
@@ -324,7 +324,7 @@ tests:
         value: ["已确认", "供应", "验证"]
     stage: "空态期+数据灌入后"
     source: V8 cases.json（third-supply）+ references/mrp-playbook.md「有效供应与状态处理」
-    mature: false
+    mature: true
 
   - id: lda-025
     type: trap
@@ -337,7 +337,7 @@ tests:
         value: ["200", "同源", "核查"]
     stage: "空态期+数据灌入后"
     source: V8 cases.json（dedup）+ references/mrp-playbook.md「有效供应与状态处理」（防双计）
-    mature: false
+    mature: true
 
   - id: lda-026
     type: normal
@@ -349,7 +349,7 @@ tests:
         value: ["未确认", "覆盖", "供应"]
     stage: "空态期+数据灌入后"
     source: V8 cases.json（unconfirmed）+ references/business-semantics.md「采购状态」
-    mature: false
+    mature: true
 
   - id: lda-027
     type: trap
@@ -362,7 +362,7 @@ tests:
         value: ["风险", "异常"]
     stage: "空态期+数据灌入后"
     source: V8 cases.json（risk-empty）+ references/launch-assurance.md「上市风险通知」
-    mature: false
+    mature: true
 
   - id: lda-028
     type: normal
@@ -374,7 +374,7 @@ tests:
         value: ["规则", "条件"]
     stage: "空态期+数据灌入后"
     source: V8 cases.json（risk-rule）+ references/business-semantics.md「上市风险」（规则描述与实际条件不一致处置）
-    mature: false
+    mature: true
 
   - id: lda-029
     type: normal
@@ -386,7 +386,7 @@ tests:
         value: ["方案", "根计划"]
     stage: "空态期+数据灌入后"
     source: V8 cases.json（simulation）+ references/business-semantics.md「模拟」+ references/storyline-playbook.md「方案比较」意图类
-    mature: false
+    mature: true
 
   - id: lda-030
     type: trap
@@ -399,7 +399,7 @@ tests:
         value: ["单位", "换算", "无法"]
     stage: "空态期+数据灌入后"
     source: V8 cases.json（units）+ SKILL.md 0.4.0「计算与不确定性」（公式分母为零、缺换算系数停止计算）
-    mature: false
+    mature: true
 
   - id: lda-031
     type: trap
@@ -412,7 +412,7 @@ tests:
         value: ["分页", "25", "全量"]
     stage: "空态期+数据灌入后"
     source: V8 cases.json（pagination）+ SKILL.md 0.4.0「探查循环·取实例」（分页完整性核对）+ references/facts.md（totalCount 字符串）
-    mature: false
+    mature: true
 
   - id: lda-032
     type: trap
@@ -425,7 +425,7 @@ tests:
         value: ["取消", "失效", "复核"]
     stage: "空态期+数据灌入后"
     source: V8 cases.json（stale）+ references/launch-assurance.md「已分配的供需分配」
-    mature: false
+    mature: true
 
   - id: lda-033
     type: trap
@@ -438,7 +438,7 @@ tests:
         value: ["检查日", "演示", "逾期"]
     stage: "空态期+数据灌入后"
     source: V8 cases.json（time）+ SKILL.md 0.4.0「探查循环·时间基准」+ references/facts.md（System 实体）
-    mature: false
+    mature: true
 
   - id: lda-034
     type: trap
@@ -451,7 +451,7 @@ tests:
         value: ["不可达", "未取得", "无法"]
     stage: "空态期+数据灌入后"
     source: V8 cases.json（no-connector）+ SKILL.md 0.4.0「接入与证据」（MCP 不可用如实报告；裁决①删除网页兜底条款后按本断言执行）
-    mature: false
+    mature: true
 
   - id: lda-035
     type: normal
@@ -463,4 +463,4 @@ tests:
         value: ["2026-11-15", "上市"]
     stage: "空态期+数据灌入后"
     source: V8 cases.json（simple-output）+ SKILL.md 0.4.0「输出」（图比文字更清楚才配图，判据参照子图）
-    mature: false
+    mature: true
