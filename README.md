@@ -151,6 +151,17 @@ python plugins/business-hub/skills/mfg-transfer-allocation/scripts/fetch_meta.py
 - **pre-commit**（cases 格式校验，脚本 `tools/validate_cases.py` vendored 自 forge 仓）：`pip install pre-commit && pre-commit install`；手动全量 `pre-commit run --all-files`。
 - **基础设施测试**（发布前）：`python tests/run_infra_tests.py`——自动发现 `plugins/*/skills/` 全部技能，断言 frontmatter 合规与分发 zip 结构（含知识库快照随包）。
 - **评估回归**：改技能措辞必跑该技能全量用例回归（操作指引与门禁红线见 [`evals/README.md`](evals/README.md)）。
+- **行为口径巡检 + 版本漂移闸门**：`python tools/check_principles.py`（P0~P2 口径一致性 + P3 版本漂移）；hub 侧由 `tools/lint_skills.py` 末节自动带上，WorkBuddy 侧由 `install_aquilair_team.py --check` subprocess 带上，双端生效。
+
+## 发版规则（本仓默认纪律）
+
+1. **版本号不可变**：每个版本打 annotated tag `v<版本>` 锁定不可变锚点（tag message：`aquilair-business-hub v<版本>` + 一行要点）；`plugins/` 内容变更必须 bump 版本号，且**两处清单同步 bump**——`plugins/business-hub/.zcode-plugin/plugin.json`（插件清单）+ `.claude-plugin/marketplace.json`（市场清单，漏 bump 会让市场侧无更新入口，见 CHANGELOG v0.4.3 注记）。
+2. **只进不退**：回退 / 撤销 = revert + bump 新版本，**绝不复用版本号**——同版本号双快照是历史事故源（0.4.6 曾出现半小时窗口，见 CHANGELOG v0.4.6 注记）。
+3. **找回旧做法**：先在 [`CHANGELOG.md`](CHANGELOG.md) 定位版本与要点 → `git diff vA..vB -- plugins/` 比内容差异 → `git show vA:evals/<技能>/...` 比行为断言，三步复原任意历史版本的口径与做法。
+
+> 版本漂移由 `tools/check_principles.py` **P3 闸门自动拦截**：`plugins/` 相对最近 `v*` tag 有变更而两处清单版本未 bump 即 `[ERROR][P3]` 阻断（exit 1，不降级），未提交变更同样拦截；CHANGELOG / README / tools 变更不触发。
+
+**发版 checklist**：改 `plugins/` 内容与两处清单 bump 同 commit 提交 → `git tag -a v<版本> -m "aquilair-business-hub v<版本>" -m "<一行要点>"` → push 分支与 tag → 在 `CHANGELOG.md` 顶部新增该版本一节。
 
 ## ⚠️ 边界（必读）
 
@@ -163,9 +174,9 @@ python plugins/business-hub/skills/mfg-transfer-allocation/scripts/fetch_meta.py
 ```
 aquilair-business-hub/
 ├── .claude-plugin/            # 市场清单（marketplace.json，单插件条目）
-├── .codebuddy-plugin/         # WorkBuddy 专家包清单（双语展示元数据，v1.x 独立版本线）
 ├── avatars/                   # WorkBuddy 专家头像
 ├── vendors/                   # 宿主专属分发资产（doubao-visualization 豆包出图技能包，不随插件分发）
+├── workbuddy/                 # WorkBuddy 接线资产（experts-src 三专家包源：fnb / mfg / launch，2026-11-10 收编入库）
 ├── plugins/business-hub/      # 插件本体
 │   ├── .zcode-plugin/                               # ZCode 插件清单（Claude Code / Codex 清单已于 2026-11-02 弃适配删除）
 │   ├── .mcp.json              # MCP 数据网关连接（全仓库唯一地址源）

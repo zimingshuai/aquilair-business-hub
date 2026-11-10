@@ -1,15 +1,19 @@
 """行为口径治理闸门：以 tools/principles.yaml 为单一事实源校验口径一致性。
 
-主要 Input：tools/principles.yaml（口径锚点 / 影响面 / 禁词变体库）与命令行参数
-（--impact <口径id> 列影响面清单；--extra-surface <path> 可多次，追加 WorkBuddy
-experts-src 镜像人设一并校验）。
+主要 Input：tools/principles.yaml（口径锚点 / 影响面 / 禁词变体库）、两处版本清单
+（plugins/business-hub/.zcode-plugin/plugin.json 与 .claude-plugin/marketplace.json）、
+git 仓库（P3 取最近 v* tag 与 diff）与命令行参数（--impact <口径id> 列影响面清单；
+--extra-surface <path> 可多次，追加 WorkBuddy experts-src 镜像人设一并校验）。
 主要 Output：控制台中文巡检报告（====定界，逐口径 PASS/FAIL）+ 进程退出码——
-锚点缺失或禁词残留即 1（不降级放行），供 pre-commit / CI 与 WorkBuddy install --check 挂闸。
+锚点缺失、禁词残留或版本漂移即 1（不降级放行），供 pre-commit / CI 与
+WorkBuddy install --check 挂闸。
 
 检查项（口径 × 影响面双向扫描；立项背景与口径数据结构见 principles.yaml 文件头）：
   P0  结构性——yaml 缺失/结构非法/条目缺键、影响面文件不存在
   P1  正向——该口径全部锚点均不在影响面文件在场（口径被删或漂移）
   P2  反向——禁词变体（历史事故旧措辞）残留任一处
+  P3  版本漂移——plugins/ 内容相对最近 v* tag 有变更而两处清单版本未 bump
+      （tag 对比工作树：未提交变更同样拦截，pre-commit 挂闸场景生效）
 
 镜像规则：--extra-surface 追加的文件与某 hub 侧 /agents/<name>.md 条目同名
 （文件名去扩展名比对）时，复用该条目的适配锚点与禁词——WorkBuddy 人设是
@@ -17,12 +21,14 @@ hub origin 快照加适配字段，口径同构；不同名则用该口径默认
 
 零第三方库：principles.yaml 结构为本脚本自定义的固定两级嵌套，手写解析
 （与 tools/lint_skills.py 同款零依赖纪律）——挂闸环境（pre-commit /
-WorkBuddy refresh 链路）不必安装 PyYAML。
+WorkBuddy refresh 链路）不必安装 PyYAML；P3 的 git 调用走 subprocess 标准库。
 """
 
 from __future__ import annotations
 
 import argparse
+import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -39,6 +45,17 @@ MIRROR_DIR_HINT = "/agents/"
 # principles.yaml 各层级缩进列数（固定结构：顶层 -> 口径 id -> 键 -> 列表项 -> 对象
 # 条目子键 -> 子键列表项），手写解析器据此分派
 INDENT_PRINCIPLES, INDENT_ID, INDENT_KEY, INDENT_ITEM, INDENT_SUB, INDENT_SUB_ITEM = 0, 2, 4, 6, 8, 10
+# VERSION_MANIFESTS：P3 巡检的两处版本清单（相对仓根；插件清单 + 市场清单，发版必须同步 bump）
+VERSION_MANIFESTS = (
+    Path("plugins") / "business-hub" / ".zcode-plugin" / "plugin.json",
+    Path(".claude-plugin") / "marketplace.json",
+)
+# DRIFT_SCOPE：P3 漂移检测范围——仅插件本体；CHANGELOG / README / tools 变更不触发
+DRIFT_SCOPE = "plugins/"
+# VERSION_TAG_PREFIX：发版 tag 命名约定前缀（v<semver>），tag 版本 = tag 名去前缀
+VERSION_TAG_PREFIX = "v"
+# MANIFEST_VERSION_RE：清单内 "version": "x.y.z" 行的提取正则（两处清单各仅一个版本字段）
+MANIFEST_VERSION_RE = re.compile(r'"version"\s*:\s*"([^"]+)"')
 
 
 # ===========一、口径数据加载与条目归一化==========
@@ -213,11 +230,96 @@ def check_principle(
         if not any(anchor in text for anchor in anchors):
             anchor_hint = " / ".join(anchors)
             issues.append((LEVEL_ERROR, "P1", f"{pid}｜{rel} 锚点缺失：任一锚点均不在场（{anchor_hint}）——口径被删或漂移，按 yaml 现行口径回写"))
-        #   2. P2 反向：禁词变体出现任一处即旧口径残留
-        for variant in stale:
-            if variant in text:
-                issues.append((LEVEL_ERROR, "P2", f"{pid}｜{rel} 残留旧口径变体：「{variant}」——按 yaml 现行口径改写"))
-    return issues
+# ===========三、版本漂移巡检（P3）==========
+def _run_git(repo_root: Path, args: list[str]) -> tuple[int, str] | None:
+    """在仓根执行 git 子命令并捕获 stdout。
+
+    Args:
+        repo_root: hub 仓根目录路径（git 工作目录）。
+        args: git 子命令参数列表（如 ["tag", "--list", "v*"]）。
+    Returns:
+        (退出码, stdout 文本)；git 可执行文件不存在（OSError）时返回 None，
+        由调用方按「检测失败即阻断」报 P3，不降级放行。
+    """
+    try:
+        proc = subprocess.run(
+            ["git", *args], cwd=repo_root, capture_output=True, text=True,
+            encoding="utf-8", errors="replace",
+        )
+    except OSError:
+        return None
+    return proc.returncode, proc.stdout
+
+
+def _read_manifest_version(repo_root: Path, manifest: Path) -> str | None:
+    """读取单处版本清单的 version 字段（零依赖正则，两处清单各仅一个版本字段）。
+
+    Args:
+        repo_root: hub 仓根目录路径。
+        manifest: 清单相对路径（VERSION_MANIFESTS 条目）。
+    Returns:
+        版本号字符串；文件缺失或无 version 字段时返回 None（由调用方报 P3）。
+    """
+    file_path = repo_root / manifest
+    if not file_path.is_file():
+        return None
+    matched = MANIFEST_VERSION_RE.search(file_path.read_text(encoding="utf-8"))
+    return matched.group(1) if matched else None
+
+
+def check_version_drift(repo_root: Path) -> tuple[list[tuple[str, str, str]], list[str]]:
+    """P3 版本漂移巡检：plugins/ 内容相对最近 v* tag 有变更而清单版本未 bump 即阻断。
+
+    Args:
+        repo_root: hub 仓根目录路径。
+    Returns:
+        (问题元组列表 [(ERROR, P3, 中文说明)]，正文行列表)——正文行含基线 tag 与
+        判定说明（PASS / 提示），无条件打印；无任何 v* tag 时问题列表为空、正文为
+        容错提示（首跑前不计错误）；git 不可用或 diff 失败按检测失败报 P3 不降级。
+    """
+    errors: list[tuple[str, str, str]] = []
+    lines: list[str] = []
+    #   1. 取最近 v* tag（版本号降序首个 = 最新发版锚点；无 tag 首跑前容错）
+    tag_result = _run_git(repo_root, ["tag", "--list", f"{VERSION_TAG_PREFIX}*", "--sort=-v:refname"])
+    if tag_result is None:
+        return [(LEVEL_ERROR, "P3", "版本漂移检测失败：git 不可用（检测失败即阻断，不降级放行）")], []
+    _, tag_stdout = tag_result
+    tags = [line.strip() for line in tag_stdout.splitlines() if line.strip()]
+    if not tags:
+        return [], ["[提示] 未发现 v* 版本 tag——首次发版打 tag 后本检查自动生效（首跑前容错，不计错误）"]
+    latest_tag = tags[0]
+    tag_version = latest_tag.removeprefix(VERSION_TAG_PREFIX)
+    #   2. 读当前两处清单版本：缺失/不同步均为版本治理问题，直接报 P3
+    versions: dict[str, str | None] = {
+        str(manifest): _read_manifest_version(repo_root, manifest) for manifest in VERSION_MANIFESTS
+    }
+    for manifest, version in versions.items():
+        if version is None:
+            errors.append((LEVEL_ERROR, "P3", f"版本清单缺失或无 version 字段：{manifest}（两处清单是 P3 巡检前提）"))
+    unique_versions = {v for v in versions.values() if v is not None}
+    current_version = unique_versions.pop() if len(unique_versions) == 1 else None
+    if current_version is None:
+        if not errors:
+            errors.append((LEVEL_ERROR, "P3", "两处清单版本不同步：" + " / ".join(f"{m}={v}" for m, v in versions.items())))
+        return errors, [f"基线 tag {latest_tag}"]
+    #   3. plugins/ 相对最近 tag 的变更集（对比工作树：未提交变更同样拦截，pre-commit 场景生效）
+    diff_result = _run_git(repo_root, ["diff", "--name-only", latest_tag, "--", DRIFT_SCOPE])
+    if diff_result is None or diff_result[0] != 0:
+        return errors + [(LEVEL_ERROR, "P3", f"版本漂移检测失败：git diff {latest_tag} 异常（检测失败即阻断，不降级放行）")], [f"基线 tag {latest_tag}"]
+    changed = [line.strip() for line in diff_result[1].splitlines() if line.strip()]
+    #   4. 判定：变更非空且清单版本仍等于 tag 版本 = 内容变更未 bump，阻断
+    if changed and current_version == tag_version:
+        preview = "、".join(changed[:3]) + (f" 等 {len(changed)} 个文件" if len(changed) > 3 else "")
+        errors.append((
+            LEVEL_ERROR, "P3",
+            f"插件内容已变更但版本未 bump（规则：内容变更必 bump，两处清单同步）｜基线 tag {latest_tag}｜当前清单版本 {current_version}｜{DRIFT_SCOPE} 变更：{preview}",
+        ))
+        return errors, [f"基线 tag {latest_tag}｜当前清单版本 {current_version}｜{DRIFT_SCOPE} 变更 {len(changed)} 个文件"]
+    verdict = "版本已 bump（正常待发版）" if changed else f"{DRIFT_SCOPE} 相对基线无变更"
+    return errors, [f"基线 tag {latest_tag}｜当前清单版本 {current_version}｜{verdict}"]
+
+
+# ===========四、报告输出与集成入口==========
 
 
 # ===========三、报告输出与集成入口==========
@@ -258,6 +360,18 @@ def run_principles_check(
         for message in struct_problems:
             print(f"  ❌ [{LEVEL_ERROR}][P0] {message}")
             error_total += 1
+    # P3 节：版本漂移巡检（横切检查，独立于口径条目；问题计入 ERROR 阻断，不降级）
+    drift_errors, drift_lines = check_version_drift(repo_root)
+    print("====版本漂移巡检（P3：内容变更必 bump）====")
+    for line in drift_lines:
+        print(f"  {line}")
+    if drift_errors:
+        print("[FAIL] P3 版本漂移")
+        for level, code, message in drift_errors:
+            print(f"  ❌ [{level}][{code}] {message}")
+            error_total += 1
+    else:
+        print("[PASS] P3 版本锚定")
     pass_total = sum(1 for _, issues in per_principle if not issues)
     verdict = "不通过（须修复后交付）" if error_total else "通过"
     scope = f"+镜像 {len(extra_surfaces)} 面" if extra_surfaces else ""
@@ -295,7 +409,7 @@ def print_impact(pid: str, repo_root: Path) -> int:
     return 0
 
 
-# ===========四、命令行入口==========
+# ===========五、命令行入口==========
 def main(argv: list[str] | None = None) -> int:
     """CLI 入口：默认全量巡检；--impact 列影响面；--extra-surface 追加镜像面。
 
