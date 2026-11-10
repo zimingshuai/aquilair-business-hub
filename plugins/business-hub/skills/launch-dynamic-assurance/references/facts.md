@@ -125,3 +125,6 @@
 | 类型坑（V8 基线吸收） | `final_target_sales_qty` 为文本型；`PurchasePlan.confirm_flag / send_flag` 为整型；`PurchaseOrder.cancel_flag / close_flag` 为布尔型；`MaterialDemand.max_purchase_date`、`PurchasePlan.max_purchase_date1`、`PurchaseOrder.latest_delivery_date / delivery_warning_day` 页面为浮点型 | 文本型参与数值计算前校验格式（空值不转 0）；标记按各自类型比较，不混用整型/布尔判断；浮点型字段不能未经定义核实当作日期或默认解析为时间戳，解析不了就报待核查 | — |
 | 关系缺口 | Dish.history_sales_by_day、DishLaunchPlan.ref_launch_plan 自关联、MaterialInWarehouse→purchase_orders/purchase_plan/forecast_sales_demand 3 条缺失 | 参考品历史销量经 Dish→HistorySalesByDay 无关系可走（且该实体查询通道不稳定）；参考计划链经 ReferenceDishBinding.ref_launch_plan_id 属性中转；在途采购经 SupplyDemandAllocation.supply_nr 中转 | TK-关系 |
 | MCP 工具 description 为空 | objects_query 等 description 空串，DSL 用法无内嵌文档 | 技能侧自备方言表（本手册）；平台侧补文档属增强项 | 低优先 |
+| Warehouse 无 wh_type 属性 | 2026-11-10 WorkBuddy 实测：query 传 wh_type 报 42201 未知属性，仅 wh_code/wh_name 可用 | 仓库维度过滤用 wh_code；wh_type 不存在不臆造 | — |
+| max_purchase_date 第 4 周非法日期 | 2026-11-10 WorkBuddy 实测：第 4 周期出现 20261199/20261196（规则 RULE_F8D3E28432C04B4B 计算异常产出非法日期） | 原值呈现并标注待核查，不修正不据此排期；建议平台核查该规则 | TK-非法日期 |
+| relation_counts 首调偶发超时 | 2026-11-10 WorkBuddy 实测：首调偶发 data-service ReadTimeout，重试即通 | 超时后重试一次再定性，不把瞬时超时报成不可用 | — |
