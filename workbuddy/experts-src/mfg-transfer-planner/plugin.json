@@ -1,0 +1,74 @@
+{
+  "name": "mfg-transfer-planner",
+  "version": "1.0.0",
+  "description": "Aquilair multi-plant material transfer planner as a standalone expert: plant shortage response, transferable material matching across plants, transfer plan generation and evaluation (total cost / transport days / fulfillment rate), sandbox branch what-if simulation, and controlled execution after confirmation. Ships mfg-transfer-allocation and aquilair-data-delivery skills.",
+  "author": {
+    "name": "Aquilair Team"
+  },
+  "license": "Proprietary - Aquilair internal distribution, intranet use only",
+  "keywords": [
+    "mfg",
+    "transfer",
+    "sandbox",
+    "branch",
+    "shortage-response",
+    "aquilair",
+    "data-delivery"
+  ],
+  "agents": [
+    "./agents/mfg-transfer-planner.md"
+  ],
+  "skills": [
+    "./skills/mfg-transfer-allocation",
+    "./skills/aquilair-data-delivery"
+  ],
+  "expertType": "agent",
+  "agentName": "mfg-transfer-planner",
+  "displayName": {
+    "en": "Bi",
+    "zh": "毕调达"
+  },
+  "profession": {
+    "en": "Multi-Plant Transfer Specialist",
+    "zh": "多工厂调拨专员"
+  },
+  "displayDescription": {
+    "en": "Standalone multi-plant transfer expert: shortage response, transferable stock matching, plan generation with evaluation, sandbox branch simulation and controlled execution via confirmation cards.",
+    "zh": "多工厂调拨独立专家：缺货响应、可调出物料匹配、方案生成与评估、沙箱分支推演、确认卡受控执行。"
+  },
+  "avatar": "avatars/expert.jpg",
+  "categoryId": "12-IndustryConsultant",
+  "defaultInitPrompt": {
+    "zh": "上海工厂反馈缺货，帮我匹配可调出物料并生成调拨方案",
+    "en": "A plant reported a material shortage - match available transferable stock and generate a transfer plan."
+  },
+  "plugin": "mfg-transfer-planner",
+  "tags": [
+    {
+      "en": "Multi-Plant Transfer",
+      "zh": "多工厂调拨"
+    },
+    {
+      "en": "Sandbox Simulation",
+      "zh": "沙箱推演"
+    },
+    {
+      "en": "Controlled Execution",
+      "zh": "受控执行"
+    }
+  ],
+  "quickPrompts": [
+    {
+      "zh": "上海工厂反馈缺货，帮我匹配可调出物料并生成调拨方案",
+      "en": "A plant reported a material shortage - match available transferable stock and generate a transfer plan."
+    },
+    {
+      "zh": "在沙箱分支里推演这个调拨方案，和生产分支对比差异",
+      "en": "Simulate this transfer plan on a sandbox branch and compare the differences with the production branch."
+    },
+    {
+      "zh": "当前调拨方案的总成本、运输天数和满足率评估如何？",
+      "en": "How are the total cost, transport days and fulfillment rate of the current transfer plan evaluated?"
+    }
+  ]
+}

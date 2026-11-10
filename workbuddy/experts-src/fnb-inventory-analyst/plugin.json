@@ -1,0 +1,74 @@
+{
+  "name": "fnb-inventory-analyst",
+  "version": "1.0.0",
+  "description": "Aquilair F&B inventory diagnostician as a standalone expert (read-only): warehouse inventory risk levels P0-P3, judgment basis traceability (rule to metric to risk record), SKU turnover and ABC classification, stockout and slow-moving details. Delivers traceable diagnostic reports with subgraph-proportional visualization. Ships fnb-inventory-analysis and aquilair-data-delivery skills.",
+  "author": {
+    "name": "Aquilair Team"
+  },
+  "license": "Proprietary - Aquilair internal distribution, intranet use only",
+  "keywords": [
+    "fnb",
+    "inventory",
+    "stockout",
+    "abc",
+    "risk-traceability",
+    "aquilair",
+    "data-delivery"
+  ],
+  "agents": [
+    "./agents/fnb-inventory-analyst.md"
+  ],
+  "skills": [
+    "./skills/fnb-inventory-analysis",
+    "./skills/aquilair-data-delivery"
+  ],
+  "expertType": "agent",
+  "agentName": "fnb-inventory-analyst",
+  "displayName": {
+    "en": "Cang",
+    "zh": "仓知秋"
+  },
+  "profession": {
+    "en": "F&B Inventory Diagnostician",
+    "zh": "餐饮库存诊断师"
+  },
+  "displayDescription": {
+    "en": "Standalone F&B inventory diagnostic expert (read-only): warehouse risk P0-P3, judgment basis traceability, SKU turnover and ABC classification, stockout details, with subgraph-proportional deliverables.",
+    "zh": "餐饮库存独立诊断专家（只读）：仓库风险 P0-P3、判定依据溯源、SKU 周转与 ABC 分类、缺货明细，交付随子图伸缩。"
+  },
+  "avatar": "avatars/expert.jpg",
+  "categoryId": "12-IndustryConsultant",
+  "defaultInitPrompt": {
+    "zh": "各仓库目前有哪些库存风险？给我一份带看板的诊断报告",
+    "en": "What inventory risks exist across warehouses? Give me a diagnostic report with a dashboard."
+  },
+  "plugin": "fnb-inventory-analyst",
+  "tags": [
+    {
+      "en": "Inventory Diagnosis",
+      "zh": "库存诊断"
+    },
+    {
+      "en": "SKU Turnover & ABC",
+      "zh": "SKU 周转与 ABC"
+    },
+    {
+      "en": "Risk Traceability",
+      "zh": "风险溯源"
+    }
+  ],
+  "quickPrompts": [
+    {
+      "zh": "各仓库目前有哪些库存风险？给我一份带看板的诊断报告",
+      "en": "What inventory risks exist across warehouses? Give me a diagnostic report with a dashboard."
+    },
+    {
+      "zh": "这个仓库为什么被评为 P1 风险？给我从规则到指标到风险记录的完整溯源链",
+      "en": "Why is this warehouse rated P1 risk? Trace the full chain from rule to metric to risk record."
+    },
+    {
+      "zh": "哪些 SKU 缺货或周转异常？给我明细和 ABC 分类",
+      "en": "Which SKUs are stocked out or have abnormal turnover? Show me the details and ABC classification."
+    }
+  ]
+}
