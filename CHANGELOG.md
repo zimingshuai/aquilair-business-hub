@@ -6,6 +6,13 @@
 > 自 v0.4.6 起版本漂移由 `tools/check_principles.py` P3 闸门自动拦截（内容变更必 bump，两处清单同步）。
 > 本文件变更不触发 P3（检测范围仅 `plugins/`）。
 
+## v0.5.1（2026-11-12）｜tag `v0.5.1` → 出图策略对比期回切
+
+- **出图策略回退一个版本供对比**（用户指令）：data-delivery 横切规范 + 三 agent 配图口径行 + skill-router 三处 + launch SKILL 交付段 + principles.yaml delivery-shape 锚点，整体自 V8 基线（形态服从问题/图比文字更清楚才配图）回切至 v0.4.6 基线（**交付随子图伸缩：单对象/单边查看纯文本合法，跨对象子图分析类必配图表看板**，两档形态与脚本渲染通道不变）
+- **V8 基线备份**：文件 `~/Downloads/data-delivery_SKILL_V8基线_v0.4.8_备份.md` + tag `v0.4.8`（不可变锚点）；对比期 V8 措辞不入 principles 禁词（保护切换自由）
+- 对比方法：`git diff v0.4.8 v0.5.1 -- plugins/business-hub/skills/aquilair-data-delivery/` 看规范差异；宿主实测装 0.5.1 体验子图伸缩基线，切回 V8 = revert 本节回切 + bump
+- xgimi 域配图口径豁免不受影响（不在 delivery-shape 影响面，挂账待统一）
+
 ## v0.5.0（2026-11-12）｜极米供需平衡域并入（新业务域）
 
 - **新技能 `xgimi-sdb`**：极米（XGIMI）BOM 升级供需平衡操作台（受控执行型）——点检→影响→展开→分配→替代→风险→策略→方案→采购计划全链测算＋2×2 多沙箱推演对比；含 knowledge（FACT-CARDS/STATUS/sources）、references 六件、scripts 五件（fire_action/run_plan 等）。**以 xgimi-sdb 0.3.9 全量 zip 包为基底并入**（用户裁决 2026-11-12：以 zip 为准，0.3.10~0.3.12 瘦身线不采，独立插件 `xgimi-supply-demand-balance` 形态终结、本机缓存删除）
