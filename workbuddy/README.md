@@ -7,8 +7,8 @@ hub 仓技能 / 人设 origin / 口径闸门是共生资产，同仓后一处克
 
 - **experts-src/**：四个业务域独立专家包（fnb-inventory-analyst / mfg-transfer-planner /
   launch-poc-advisor / xgimi-supply-demand-balancer，各含 plugin.json + agents/ + avatars/ + README.md；
-  xgimi 包 2026-11-12 随技能并入建包，头像暂占位待设计替换，且不进 delivery-shape 口径闸门——
-  域内配图口径挂账待统一，见包 README）。本机装配脚本
+  头像 2026-11-12 起四包统一共用同一张业务应用头像（用户裁决）；xgimi 包不进 delivery-shape
+  口径闸门——域内配图口径挂账待统一，见包 README）。本机装配脚本
   `C:\Users\zishuai\.workbuddy\aquilair-tools\install_aquilair_team.py` 从本目录读取骨架源装配
   （技能 / .mcp.json / 域知识库快照仍取本仓 plugins/ 与 aquilair-knowledge/），
   改包内容请直接改本目录后重跑该脚本。
