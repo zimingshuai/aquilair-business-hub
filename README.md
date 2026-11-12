@@ -12,6 +12,7 @@
 | 🏭 `mfg-transfer-allocation` | 生产制造调拨：多工厂缺货、方案/计划/评估、What-if 沙箱分支推演、确认后执行 | `aquilair-mcp-servers`（mfg 本体项目，含写/分支工具） | 只读 + 写（确认卡流程） |
 | 🚀 `launch-dynamic-assurance` | 新品上市前问答与供应保障（POC 项目，读写分离之「读」）：上市计划与预测口径、上市事项进度与齐套、物料缺口、供需分配、采购计划三态与到货、上市风险、模拟方案比较 | `aquilair-mcp-servers`（新品上市POC-最新版本体项目） | 只读问答 |
 | ⚙️ `launch-assurance-actions` | 新品上市动作受控执行（读写分离之「写」）：创建/修改上市计划、生成周预测与物料需求、重算齐套、确认/下发采购计划、模拟下发、新建模拟根计划 | `aquilair-mcp-servers`（同上项目，动作工具） | 受控执行（确认卡） |
+| 📦 `xgimi-sdb` | 极米 BOM 升级供需平衡（受控执行型操作台）：点检差异、影响范围与受影响订单、毛需求/净缺口、替代料填补、呆滞与缺口风险、策略测算、2×2 多沙箱推演对比、选定方案生成采购计划 | `aquilair-mcp-servers`（极米POC-NEW 本体项目，含写/分支/fire 动作工具） | 只读 + 受控执行（确认卡） |
 | 📊 `aquilair-data-delivery` | 数据交付规范：结论可信·口径清楚·数值一致·来源可追；图比文字更清楚才配图（判据参照子图），脚本渲染 12 图型自包含看板 | —（交付规范，跨技能叠加） | 规范 |
 
 > 已退役：`launch-readiness-diagnosis`（旧项目六类齐套诊断）与配套顾问 `new-arrival-advisor` 已移出插件分发（2026-11-05），素材在仓库 `retired-skills/` 备查，不再随安装加载。
@@ -20,7 +21,7 @@
 
 - 🧭 `aquilair-skill-router`：技能路由入口（使用端元技能）——复合/跨域业务问题先裁决技能叠加顺序再干活；新技能接入走其路由表扩充接口（工厂侧技能 `aquilair-skill-authoring` / `aquilair-knowledge-wiki` 在 aquilair-skill-forge 插件，未安装时路由如实指引，不手工代答）
 
-另有 **`plugins/business-hub/agents/`**：宿主无关的 agent 人设源文件，一域一 agent 三足鼎立（`fnb-inventory-analyst` 餐饮库存诊断师、`mfg-transfer-planner` 多工厂调拨专员、`launch-poc-advisor` 新品上市POC动态保障顾问）+ 六宿主接入指南（ZCode / Claude Code / Codex / WorkBuddy / 豆包 / 企业自建的适配对照与自适配指令）。
+另有 **`plugins/business-hub/agents/`**：宿主无关的 agent 人设源文件，一域一 agent 四域四专家（`fnb-inventory-analyst` 餐饮库存诊断师、`mfg-transfer-planner` 多工厂调拨专员、`launch-poc-advisor` 新品上市POC动态保障顾问、`xgimi-supply-demand-balancer` 极米供需平衡师）+ 六宿主接入指南（ZCode / Claude Code / Codex / WorkBuddy / 豆包 / 企业自建的适配对照与自适配指令）。
 
 每个技能遵循渐进式披露：`SKILL.md` 只含核心指令，场景剧本 / Action 明细 / KPI 口径放 `references/` 按需加载；`scripts/fetch_meta.py`（fnb/mfg）或 `save_meta.py`（launch）负责首用元数据预取（落盘 `.meta-cache/`，运行时生成不入库）。
 
@@ -43,7 +44,7 @@
 
   | 服务 | 端点 | 支撑技能 |
   | --- | --- | --- |
-  | `aquilair-mcp-servers` | `https://aquilair.idcs.elitescloud.com/mcp-service/mcp` | fnb-inventory-analysis（fnb 本体项目）＋ mfg-transfer-allocation（mfg 本体项目）＋ launch-dynamic-assurance / launch-assurance-actions（新品上市POC-最新版本体项目） |
+  | `aquilair-mcp-servers` | `https://aquilair.idcs.elitescloud.com/mcp-service/mcp` | fnb-inventory-analysis（fnb 本体项目）＋ mfg-transfer-allocation（mfg 本体项目）＋ launch-dynamic-assurance / launch-assurance-actions（新品上市POC-最新版本体项目）＋ xgimi-sdb（极米POC-NEW 本体项目） |
 
   > 地址唯一源在 `plugins/business-hub/.mcp.json`（2026-11-05 起双名收敛为单名 `aquilair-mcp-servers`，旧名 `aquilair-mcp` 停用）。
 

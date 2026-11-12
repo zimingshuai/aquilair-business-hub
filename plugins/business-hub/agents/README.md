@@ -3,7 +3,8 @@
 > 本目录存放**宿主无关的 agent 人设源文件**，一域一 agent（2026-11-10 起，与 WorkBuddy 侧编成同构）：
 > `fnb-inventory-analyst.md`（餐饮库存诊断师，配套技能 `fnb-inventory-analysis`）、
 > `mfg-transfer-planner.md`（多工厂调拨专员，配套技能 `mfg-transfer-allocation`）、
-> `launch-poc-advisor.md`（新品上市POC动态保障顾问，配套技能 `launch-dynamic-assurance` 问答 + `launch-assurance-actions` 动作执行）。
+> `launch-poc-advisor.md`（新品上市POC动态保障顾问，配套技能 `launch-dynamic-assurance` 问答 + `launch-assurance-actions` 动作执行）、
+> `xgimi-supply-demand-balancer.md`（极米供需平衡师，配套技能 `xgimi-sdb`，2026-11-12 第四域加入）。
 > 正文是各宿主通用的系统提示词；frontmatter 遵循 Claude Code / ZCode subagent 规范。
 > 把整个仓库交给任何智能体（或其使用者）后，按本文件第三节宿主对照表与第四节字段映射即可自行适配接入。
 
@@ -26,10 +27,10 @@
 
 | 宿主 | 接入方法 | 已验证 |
 | --- | --- | --- |
-| **ZCode** | **推荐插件**（2026-09-24 实测，拆分后双插件）：「插件市场 → 添加 → 添加插件市场」粘贴本仓库根目录 → 「个人 → aquilair」按需安装 `aquilair-business-hub`（业务 6 技能 + MCP + SessionStart hook 一次装齐）与 `aquilair-skill-forge`（技能工厂元技能，开发者装）；更新走「市场源刷新 → 插件详情更新」。**出图建议同市场加装官方 `visualize` 插件**（Gen UI 内联渲染，见第六节）。人设拷至 `~/.zcode/agents/`（插件清单不含 agents，subagent 人设需单独拷）。备选：技能拷 `~/.zcode/skills/` + `plugins/business-hub/.mcp.json` 抄 `~/.agents/mcp.json`（新会话生效） | ✅ 2026-09-24 插件闭环（双插件结构待实测） |
+| **ZCode** | **推荐插件**（2026-09-24 实测，拆分后双插件）：「插件市场 → 添加 → 添加插件市场」粘贴本仓库根目录 → 「个人 → aquilair」按需安装 `aquilair-business-hub`（业务 7 技能 + MCP + SessionStart hook 一次装齐）与 `aquilair-skill-forge`（技能工厂元技能，开发者装）；更新走「市场源刷新 → 插件详情更新」。**出图建议同市场加装官方 `visualize` 插件**（Gen UI 内联渲染，见第六节）。人设拷至 `~/.zcode/agents/`（插件清单不含 agents，subagent 人设需单独拷）。备选：技能拷 `~/.zcode/skills/` + `plugins/business-hub/.mcp.json` 抄 `~/.agents/mcp.json`（新会话生效） | ✅ 2026-09-24 插件闭环（双插件结构待实测） |
 | **Claude Code** | 人设拷至 `~/.claude/agents/`（或项目 `.claude/agents/`）；插件方式 `/plugin marketplace add <本仓库>`；技能目录拷 `~/.claude/skills/`；MCP 加进 `claude mcp add` 或项目 `.mcp.json` | ✅ 插件格式即为此设计 |
 | **Codex** | 插件市场两条命令（Codex CLI 0.154.0 实测，拆分后双插件）：`codex plugin marketplace add <仓库地址>` → `codex plugin add aquilair-business-hub@aquilair`（业务技能 + MCP + SessionStart hook 全自动装齐；开发者再加装 `aquilair-skill-forge@aquilair`）——0.15x 兼容 Claude Code 市场清单。备选：技能目录拷 `~/.codex/skills/` + MCP 手写 `~/.codex/config.toml`（片段见主 README「MCP 手动配置」节） | ✅ 2026-09-24 验证（双插件结构待实测） |
-| **WorkBuddy / CodeBuddy** | WorkBuddy 侧编成已同构为**一域一成员**（供应链专家团 v1.4.x：主理人 + `fnb-inventory-analyst` / `mfg-transfer-planner` / `launch-poc-advisor`；人设源在 WorkBuddy 侧 team-src，另含回传要求等团队适配条款）。本仓库 `.codebuddy-plugin/` 为其早期市场包清单（v1.x 独立版本线，尚指向前代中枢人设，待 WorkBuddy 侧工作令对齐拆分）；`avatars/` 头像共用 | ✅ 运行中（v1.4.4 一域一成员） |
+| **WorkBuddy / CodeBuddy** | WorkBuddy 侧编成为**一域一独立专家包**（骨架源在本仓 `workbuddy/experts-src/`：`fnb-inventory-analyst` / `mfg-transfer-planner` / `launch-poc-advisor` / `xgimi-supply-demand-balancer` 四包，各含 plugin.json + 镜像人设 + 头像；镜像行为约束与 origin 逐字同步由装配脚本 `install_aquilair_team.py` 的 AGENT_SYNC_RULES 校验）；本机 git push 经 pre-push hook 自动装配刷新（链路手册见桌面《Aquilair → WorkBuddy 自动同步链路》） | ✅ 运行中（2026-11-12 四包装配验证） |
 | **豆包工作伙伴 / 豆包智能体** | 平台无文件导入：按业务域新建智能体 → 把对应人设（`fnb-inventory-analyst.md` / `mfg-transfer-planner.md` / `launch-poc-advisor.md`）的**正文**（frontmatter 以下）粘贴为系统提示词 → 技能按平台「沉淀为技能」机制录入（`aquilair-data-delivery` 源自豆包侧，天然兼容）；**出图技能另装**：本仓库 `vendors/doubao-visualization.zip` 按平台技能机制导入（`echarts` / `renderer` 出图方言，见第六节） | 🟡 平台操作（[功能手册](https://aily.feishu.cn)） |
 | **企业自建 agent**（Dify / Coze / 自研） | 同上：正文作系统提示词；MCP 端点见 `.mcp.json`（需内网可达）；技能文件可作为知识库/工作流提示词挂载 | 🟡 按平台能力 |
 
@@ -50,11 +51,11 @@
 ## 五、给接收方智能体的自适配指令（可直接粘贴）
 
 > 你收到了 aquilair-skills 仓库。请为本环境接入 Aquilair 供应链顾问：
-> 1. 按业务域读 `plugins/business-hub/agents/` 下对应人设（餐饮库存 `fnb-inventory-analyst.md`、多工厂调拨 `mfg-transfer-planner.md`、新品上市POC `launch-poc-advisor.md`），正文即系统提示词；
+> 1. 按业务域读 `plugins/business-hub/agents/` 下对应人设（餐饮库存 `fnb-inventory-analyst.md`、多工厂调拨 `mfg-transfer-planner.md`、新品上市POC `launch-poc-advisor.md`、极米供需平衡 `xgimi-supply-demand-balancer.md`），正文即系统提示词；
 > 2. 按本环境的 agent 定义机制创建智能体，frontmatter/配置字段按 `agents/README.md` 第四节映射；
-> 3. 把 `plugins/business-hub/skills/` 下 6 个业务技能安装到本环境的技能位置（终端用户必装；`plugins/skill-forge/skills/` 3 个元技能供开发者按需；无技能机制则作为系统提示词附件/知识库挂载）；
+> 3. 把 `plugins/business-hub/skills/` 下 7 个业务技能安装到本环境的技能位置（终端用户必装；`plugins/skill-forge/skills/` 3 个元技能供开发者按需；无技能机制则作为系统提示词附件/知识库挂载）；
 > 4. 在本环境的 MCP 配置中注册 `plugins/business-hub/.mcp.json` 里的统一数据网关（`aquilair-mcp-servers`，需内网可达；旧名 `aquilair-mcp` 已于 2026-11-05 停用）；
-> 5. 验证：问「各仓库有没有库存风险？」应触发 fnb 技能；问「工厂缺货情况」应触发 mfg 技能；验证清单见仓库 `evals/`（37 条评估用例全部 mature，其中护栏/红队用例零容忍）。
+> 5. 验证：问「各仓库有没有库存风险？」应触发 fnb 技能；问「工厂缺货情况」应触发 mfg 技能；问「X20 BOM 升级点检差异」应触发 xgimi 技能；验证清单见仓库 `evals/`（106 条评估用例，90 条 mature + xgimi 16 条草稿待回归，护栏/红队用例零容忍）。
 
 ## 六、可视化出图通道（宿主工具路由）
 

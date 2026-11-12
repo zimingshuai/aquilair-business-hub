@@ -1,0 +1,61 @@
+{
+  "_comment": "触发评估用例集（agentskills.io 触发评估惯例：正例+负例，评估时每条采样多次运行统计触发率，正例应触发、负例不应触发）。边界口径：极米（XGIMI/X20/X30）BOM 升级语境的供需/呆滞/推演/采购计划问句触发本技能；负例覆盖近域字面重叠（launch 域「供需分配」=新品上市物料分配、fnb 库存诊断、mfg 多工厂调拨）与开发任务。",
+  "skill_name": "xgimi-sdb",
+  "queries": [
+    {
+      "query": "X20 要从 BOM V1 升到 V2 了，帮我点检一下两版有什么差异",
+      "should_trigger": true,
+      "note": "BOM 升级+点检=description 明列场景，直接触发"
+    },
+    {
+      "query": "极米这次 BOM 升级会产生多少呆滞？缺口要采购多少钱？",
+      "should_trigger": true,
+      "note": "BOM 升级+呆滞/缺口=description 明列"
+    },
+    {
+      "query": "替代料用不用、缺口采不采购，四种组合都推演一遍",
+      "should_trigger": true,
+      "note": "策略组合推演（2×2 沙箱）=description 明列 what-if"
+    },
+    {
+      "query": "XGIMI X30 新版物料的毛需求算出来了吗，受影响订单有哪些",
+      "should_trigger": true,
+      "note": "XGIMI+毛需求/影响范围=description 明列"
+    },
+    {
+      "query": "四个沙箱对比结果给我看下，选定的方案生成采购计划吧",
+      "should_trigger": true,
+      "note": "方案对比+选定生成采购计划=description 明列"
+    },
+    {
+      "query": "CAP-100T 的替代关系变化影响哪些料",
+      "should_trigger": true,
+      "note": "替代关系变化=点检差异场景，口语化说法"
+    },
+    {
+      "query": "新品上市的物料供需分配结果出来了吗",
+      "should_trigger": false,
+      "note": "「供需分配」字面重叠但语境=新品上市（launch-dynamic-assurance），非 BOM 升级，不应触发本技能"
+    },
+    {
+      "query": "各仓库有没有库存风险？周转天数怎么样",
+      "should_trigger": false,
+      "note": "仓库库存诊断=fnb-inventory-analysis 域"
+    },
+    {
+      "query": "A 工厂缺料了，从 B 工厂调拨多少过去，帮我出个调拨方案",
+      "should_trigger": false,
+      "note": "多工厂调拨=mfg-transfer-allocation 域"
+    },
+    {
+      "query": "帮我写个 Python 脚本把 BOM 差异导出成 Excel",
+      "should_trigger": false,
+      "note": "开发/脚本类请求，description 明列 not for——按普通开发任务处理"
+    },
+    {
+      "query": "这次 BOM 点检的函数调用报 42201 了，帮我看看 fire_action.py 的代码哪里有问题",
+      "should_trigger": false,
+      "note": "主题涉及 BOM 但诉求=脚本调试（开发任务），not for 边界"
+    }
+  ]
+}

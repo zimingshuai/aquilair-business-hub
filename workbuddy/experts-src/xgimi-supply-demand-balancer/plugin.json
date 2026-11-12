@@ -1,0 +1,74 @@
+{
+  "name": "xgimi-supply-demand-balancer",
+  "version": "1.0.0",
+  "description": "Aquilair XGIMI BOM-upgrade supply-demand balance expert as a standalone operator: BOM check diff, impact scope, gross demand and gap, substitution fill, deadstock/shortage risk lists, strategy simulation, 2x2 four-world sandbox comparison, and confirmation-card controlled purchase planning. Ships xgimi-sdb skill (domain delivery spec built in, no data-delivery stacking).",
+  "author": {
+    "name": "Aquilair Team"
+  },
+  "license": "Proprietary - Aquilair internal distribution, intranet use only",
+  "keywords": [
+    "xgimi",
+    "bom-upgrade",
+    "supply-demand-balance",
+    "sandbox",
+    "four-world",
+    "deadstock",
+    "purchase-plan",
+    "aquilair"
+  ],
+  "agents": [
+    "./agents/xgimi-supply-demand-balancer.md"
+  ],
+  "skills": [
+    "./skills/xgimi-sdb"
+  ],
+  "expertType": "agent",
+  "agentName": "xgimi-supply-demand-balancer",
+  "displayName": {
+    "en": "Gong Hengping",
+    "zh": "龚衡平"
+  },
+  "profession": {
+    "en": "XGIMI Supply-Demand Balance Specialist",
+    "zh": "极米供需平衡师"
+  },
+  "displayDescription": {
+    "en": "Standalone XGIMI BOM-upgrade supply-demand balance expert: check diff, impact and gap analysis, substitution and deadstock risk, 2x2 four-world sandbox comparison, controlled purchase planning via confirmation cards.",
+    "zh": "极米 BOM 升级供需平衡独立专家：点检差异、影响与缺口分析、替代与呆滞风险、2×2 四世界沙箱对比、确认卡受控采购计划。"
+  },
+  "avatar": "avatars/expert.jpg",
+  "categoryId": "12-IndustryConsultant",
+  "defaultInitPrompt": {
+    "zh": "X20 要从 BOM V1 升到 V2，帮我点检两版差异，再推演呆滞和缺口",
+    "en": "X20 is upgrading from BOM V1 to V2 - check the diffs and simulate deadstock and gaps."
+  },
+  "plugin": "xgimi-supply-demand-balancer",
+  "tags": [
+    {
+      "en": "BOM Upgrade",
+      "zh": "BOM 升级"
+    },
+    {
+      "en": "Four-World Sandbox",
+      "zh": "四世界推演"
+    },
+    {
+      "en": "Controlled Execution",
+      "zh": "受控执行"
+    }
+  ],
+  "quickPrompts": [
+    {
+      "zh": "X20 的 BOM 从 V1 升 V2，先点检差异，再看影响哪些订单",
+      "en": "Check the BOM V1-to-V2 diffs for X20 and see which orders are impacted."
+    },
+    {
+      "zh": "替代用不用、缺口采不采购，四个组合都推演一遍，对比各世界的呆滞和缺口",
+      "en": "Simulate all four combinations of substitution x purchase and compare deadstock and gaps across worlds."
+    },
+    {
+      "zh": "风险清单里的缺口和采购计划对不上，帮我解释一下口径",
+      "en": "The gap in the risk list does not match the purchase plan - explain the calibers."
+    }
+  ]
+}

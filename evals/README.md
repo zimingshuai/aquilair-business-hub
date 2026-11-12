@@ -22,10 +22,14 @@ evals/
 │   └── cases.yaml                 # 新品上市前问答用例集（35 条全 mature；lda-018~035 为 2026-11-10 V8 大吸收转入，同日用户授权转正）
 ├── launch-assurance-actions/
 │   └── cases.yaml                 # 新品上市动作执行用例集（3 条 mature；2026-11-10 V8 大吸收建集，同日用户授权转正）
+├── xgimi-sdb/
+│   ├── cases.yaml                 # 极米供需平衡用例集（16 条草稿 mature: false；2026-11-12 随技能并入自旧独立插件迁入，未在本仓回归）
+│   ├── demo-case.md               # 演示测试基线（xgimi-006 勘误对照用例的判定背景，自旧插件 knowledge/sources 迁入）
+│   └── demo-script.md             # 演示脚本（同上，勘误对照用例的判定背景）
 └── runs/                          # 每轮评估结果记录（按日期归档；transcripts/ 为轨迹落盘）
 ```
 
-**套件状态（2026-11-10）**：6 个域目录 90 条用例全 mature（fnb 16 + mfg 13 + ddl 10 + 旧 launch 13 + launch-dynamic-assurance 35 + launch-assurance-actions 3）；lda-018~035 与 lax-001~003（V8 大吸收 21 条）于 2026-11-10 用户授权转正。launch-dynamic-assurance 于 2026-11-10 V8 大吸收改版（SKILL 0.4.0 + references 四件重写）：lda-001~013 断言按 V8 基线口径跟随（逐条注明于 source 字段）、lda-014~017 子图伸缩断言未动——**改版后该技能 35 条全量回归方可发布**。
+**套件状态（2026-11-12）**：6 个域目录 90 条用例全 mature（fnb 16 + mfg 13 + ddl 10 + 旧 launch 13 + launch-dynamic-assurance 35 + launch-assurance-actions 3）；lda-018~035 与 lax-001~003（V8 大吸收 21 条）于 2026-11-10 用户授权转正。launch-dynamic-assurance 于 2026-11-10 V8 大吸收改版（SKILL 0.4.0 + references 四件重写）：lda-001~013 断言按 V8 基线口径跟随（逐条注明于 source 字段）、lda-014~017 子图伸缩断言未动——**改版后该技能 35 条全量回归方可发布**。xgimi-sdb 16 条为 2026-11-12 并入迁入的草稿（mature: false，锚定技能 0.3.9 形态），转正前须在本仓跑全量 pass^3 回归。
 
 ## 跑回归（改技能后必做）
 

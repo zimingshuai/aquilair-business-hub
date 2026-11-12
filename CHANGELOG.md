@@ -6,6 +6,16 @@
 > 自 v0.4.6 起版本漂移由 `tools/check_principles.py` P3 闸门自动拦截（内容变更必 bump，两处清单同步）。
 > 本文件变更不触发 P3（检测范围仅 `plugins/`）。
 
+## v0.5.0（2026-11-12）｜极米供需平衡域并入（新业务域）
+
+- **新技能 `xgimi-sdb`**：极米（XGIMI）BOM 升级供需平衡操作台（受控执行型）——点检→影响→展开→分配→替代→风险→策略→方案→采购计划全链测算＋2×2 多沙箱推演对比；含 knowledge（FACT-CARDS/STATUS/sources）、references 六件、scripts 五件（fire_action/run_plan 等）。**以 xgimi-sdb 0.3.9 全量 zip 包为基底并入**（用户裁决 2026-11-12：以 zip 为准，0.3.10~0.3.12 瘦身线不采，独立插件 `xgimi-supply-demand-balance` 形态终结、本机缓存删除）
+- **第四域专家（同日）**：origin 人设 `agents/xgimi-supply-demand-balancer.md`（极米供需平衡师，受控执行型样板重铸）＋ WorkBuddy 独立专家包 `workbuddy/experts-src/xgimi-supply-demand-balancer/` v1.0.0（龚衡平，四件套齐，头像暂占位复用 mfg 待设计替换）；装配脚本 `install_aquilair_team.py` 加第四包＋xgimi 口径闸门豁免（PRINCIPLES_GATED_PKGS 分离，与 hub 仓 surfaces 不登记对称）；本机真装配全绿（四包校验通过、AGENT_SYNC 逐字一致、旧团队包 marketplace 残留登记顺手摘净）；hub README/agents README/workbuddy README 同步四域四专家
+- **接线适配仅 4 处**（其余内容零改动）：SKILL.md 两处 MCP 服务名 `aquilair-mcp` → `aquilair-mcp-servers`（旧名 2026-11-05 停用）；knowledge 位置说明「插件根目录」→「技能目录内」；FC-25 备用通道卡改记并入后新事实（与各域共用同一网关连接，独立备用通道不复存在）
+- **evals 资产抢救入库**：`evals/xgimi-sdb/cases.yaml`（16 条草稿 mature: false，锚定 0.3.9 形态）＋ 11 份实测 runs（2026-10-26~11-02，自旧独立插件 0.3.12 缓存迁出）＋ demo-case/demo-script 两知识源（xgimi-006 勘误对照用例的判定背景）；技能内 evals 双件（evals.json 16 条 + trigger-queries.json 正 6 负 5）按 agentskills.io 出厂标准补齐；evals/README 目录树与套件状态同步
+- **接线五处**：README 技能表＋workspace 表加行；skill-router 路由表加行（特征词「极米/XGIMI/X20/X30 BOM 升级」与 launch 域「供需分配」区分）；plugin.json＋marketplace.json description 加域、version bump 0.5.0（两处同步）
+- **已知口径差异挂账**：xgimi 0.3.9 交付口径为「凡呈现查询数据必可视化」（域内 delivery.md 五段式），与 V8 横切基线「图比文字更清楚才配图」不同——路由表已声明 xgimi 行「不恒叠加 aquilair-data-delivery」如实隔离，统一裁决留待后续
+- 后续项：技能内 evals 双件（evals.json + trigger-queries.json）待补齐；16 条用例本仓 pass^3 回归转正前不视为 mature
+
 ## v0.4.8（2026-11-10）｜tag `v0.4.8` → facts 实测补录收口
 
 - **facts.md 补三条 2026-11-10 WorkBuddy 实测发现**（99aa5b3）：Warehouse 无 wh_type（42201）、max_purchase_date 第 4 周非法日期（RULE_F8D3E28432C04B4B 计算异常）、relation_counts 首调偶发超时重试即通

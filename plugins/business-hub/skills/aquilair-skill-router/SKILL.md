@@ -24,6 +24,7 @@ Aquilair 技能工厂的「使用端」入口：**先路由，再干活**。本�
 | 可调出量、调拨方案、沙箱推演、确认执行 | `mfg-transfer-allocation` | 业务技能（本插件） |
 | 新品上市计划与预测口径、上市事项进度与齐套、物料缺口、供需分配、采购计划三态与到货、上市风险、模拟方案比较（数据交付恒叠加 aquilair-data-delivery，同 fnb/mfg） | `launch-dynamic-assurance` | 业务技能（本插件） |
 | 新品上市动作执行：创建/修改上市计划、调整目标、生成周预测与物料需求、重算齐套、生成/确认/下发采购计划、模拟下发、新建模拟根计划 | `launch-assurance-actions` | 业务技能（本插件） |
+| 极米（XGIMI/X20/X30）BOM 升级供需平衡：点检差异、影响范围与受影响订单、毛需求/净缺口、替代料填补、呆滞与缺口风险清单、策略测算、组合方案对比、沙箱推演 what-if、选定方案生成采购计划（交付按本技能域内 delivery 规范五段式执行，不恒叠加 aquilair-data-delivery） | `xgimi-sdb` | 业务技能（本插件） |
 | 旧项目「新品上市保障」（workspace 01a15c77）的历史数据问答——已下线：旧技能已移出插件分发（仓库 retired-skills/ 备查），新项目一律走上行 | —（已退役下线） | 已下线 |
 | 任何含数据表格、图表、交付物的回复 | `aquilair-data-delivery` | 横切技能（本插件，恒叠加；形态服从问题——图比文字更清楚才配图，判据参照子图：分析类配图，单对象/单边查看纯文本合法） |
 | 开发、改进、评估 Aquilair 技能本身（工厂任务） | `aquilair-skill-authoring` | 开发者元技能（aquilair-skill-forge 插件） |

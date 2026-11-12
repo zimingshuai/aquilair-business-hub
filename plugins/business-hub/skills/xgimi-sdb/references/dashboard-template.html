@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>供需平衡对比看板（模板）</title>
+<style>
+  :root { --ok:#2e9e5b; --risk:#d64545; --dead:#d9a13b; --na:#9aa0a6; --ink:#22262b; --line:#e4e7eb; --bg:#f7f8fa; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; color: var(--ink); background: var(--bg); padding: 24px; }
+  header h1 { font-size: 20px; }
+  header .sub { color: #667085; font-size: 12px; margin-top: 4px; }
+  nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+  nav button { border: 1px solid var(--line); background: #fff; border-radius: 6px; padding: 6px 12px; font-size: 13px; cursor: pointer; }
+  nav button.active { background: #1f6feb; color: #fff; border-color: #1f6feb; }
+  #groups { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; font-size: 13px; }
+  #groups label { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; cursor: pointer; user-select: none; }
+  section.metric { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  section.metric h2 { font-size: 14px; margin-bottom: 10px; }
+  .row { display: grid; grid-template-columns: 180px 1fr 110px; align-items: center; gap: 10px; margin: 6px 0; font-size: 13px; }
+  .bar-wrap { background: var(--bg); border-radius: 4px; height: 18px; }
+  .bar { height: 100%; border-radius: 4px; min-width: 2px; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  table { width: 100%; border-collapse: collapse; background: #fff; font-size: 12px; margin-top: 6px; }
+  th, td { border: 1px solid var(--line); padding: 6px 8px; text-align: right; }
+  th:first-child, td:first-child { text-align: left; }
+  footer { color: #667085; font-size: 12px; margin-top: 16px; }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">（模板标题：四世界对比看板）</h1>
+  <div class="sub" id="source">（来源：实体/查询 ｜ 批次号 ｜ 分支名 ｜ 时间口径）</div>
+</header>
+<nav id="metric-nav"></nav>
+<div id="groups"></div>
+<main id="charts"></main>
+<section>
+  <h2 style="font-size:14px;margin:8px 0;">数值附表</h2>
+  <div style="overflow:auto"><table id="data-table"></table></div>
+</section>
+<footer id="footer"></footer>
+
+<script>
+/* ======================= DATA 区（生成时只替换这里） ======================= */
+const DATA = {
+  title: "四世界对比看板",
+  source: "来源：SchemeObjectiveValue ｜ 批次 CHK-… ｜ 分支 sb-… ｜ 数据口径日 2026-10-29",
+  generatedAt: "2026-10-29",   // 生成日（与数据口径日分开写）
+  // metrics：看板维度（来自 SupplyDemandObjective 目标目录）。direction: higher=越大越好 / lower=越小越好
+  metrics: [
+    { key: "on_time",  label: "按期交付台数", unit: "台",  direction: "higher" },
+    { key: "delay",    label: "延迟交付台数", unit: "台",  direction: "lower"  },
+    { key: "shortage", label: "剩余缺口数量", unit: "件",  direction: "lower", tone: "risk" },
+    { key: "deadstock",label: "剩余呆滞数量", unit: "件",  direction: "lower", tone: "dead" },
+    { key: "pur_qty",  label: "采购数量",     unit: "件",  direction: "lower"  },
+    { key: "pur_amt",  label: "采购金额",     unit: "元",  direction: "lower"  },
+    { key: "extra",    label: "附带成本",     unit: "元",  direction: "lower"  },
+    { key: "duration", label: "预计周期",     unit: "天",  direction: "lower"  }
+  ],
+  // groups：每个世界/方案一行。values 的 key 对应 metrics.key；tone: ok|risk|dead|na（语义色，可选）
+  groups: [
+    { name: "世界1 sub-buy（替代开·采购开）", tone: "ok",   values: { on_time: 0, delay: 0, shortage: 0, deadstock: 0, pur_qty: 0, pur_amt: 0, extra: 0, duration: 0 } },
+    { name: "世界2 sub-nobuy（替代开·采购关）", tone: "risk", values: { on_time: 0, delay: 0, shortage: 0, deadstock: 0, pur_qty: 0, pur_amt: 0, extra: 0, duration: 0 } },
+    { name: "世界3 nosub-buy（替代关·采购开）", tone: "ok",   values: { on_time: 0, delay: 0, shortage: 0, deadstock: 0, pur_qty: 0, pur_amt: 0, extra: 0, duration: 0 } },
+    { name: "世界4 nosub-nobuy（双关·维持现状）", tone: "dead", values: { on_time: 0, delay: 0, shortage: 0, deadstock: 0, pur_qty: 0, pur_amt: 0, extra: 0, duration: 0 } }
+  ]
+};
+/* ======================= 以下为渲染逻辑（模板内置，不改） ======================= */
+const TONE = { ok: "var(--ok)", risk: "var(--risk)", dead: "var(--dead)", na: "var(--na)" };
+const enabled = new Set(DATA.groups.map(g => g.name));
+
+function fmtNum(v, unit) {
+  if (v === null || v === undefined || Number.isNaN(v)) return "—";
+  const n = Number(v);
+  return (Number.isInteger(n) ? n.toLocaleString("zh-CN") : n.toLocaleString("zh-CN", { maximumFractionDigits: 2 })) + (unit ? " " + unit : "");
+}
+
+function renderNav() {
+  const nav = document.getElementById("metric-nav");
+  nav.innerHTML = "";
+  DATA.metrics.forEach((m, i) => {
+    const btn = document.createElement("button");
+    btn.textContent = m.label;
+    btn.onclick = () => {
+      document.getElementById("m-" + m.key)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      nav.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+    };
+    if (i === 0) btn.classList.add("active");
+    nav.appendChild(btn);
+  });
+}
+
+function renderGroupFilter() {
+  const box = document.getElementById("groups");
+  box.innerHTML = "<span style='align-self:center;color:#667085'>显示：</span>";
+  DATA.groups.forEach(g => {
+    const label = document.createElement("label");
+    const cb = document.createElement("input");
+    cb.type = "checkbox"; cb.checked = true;
+    cb.onchange = () => { cb.checked ? enabled.add(g.name) : enabled.delete(g.name); renderCharts(); renderTable(); };
+    label.appendChild(cb);
+    label.appendChild(document.createTextNode(g.name));
+    box.appendChild(label);
+  });
+}
+
+function renderCharts() {
+  const charts = document.getElementById("charts");
+  charts.innerHTML = "";
+  DATA.metrics.forEach(m => {
+    const shown = DATA.groups.filter(g => enabled.has(g.name));
+    const max = Math.max(...shown.map(g => Number(g.values[m.key]) || 0), 1);
+    const sec = document.createElement("section");
+    sec.className = "metric"; sec.id = "m-" + m.key;
+    const better = m.direction === "higher" ? "越大越优" : "越小越优";
+    sec.innerHTML = `<h2>${m.label}（单位：${m.unit}，${better}）</h2>`;
+    shown.forEach(g => {
+      const v = Number(g.values[m.key]) || 0;
+      const tone = g.tone && TONE[g.tone] ? TONE[g.tone] : "var(--na)";
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML = `<div>${g.name}</div>
+        <div class="bar-wrap"><div class="bar" style="width:${(v / max * 100).toFixed(1)}%;background:${tone}"></div></div>
+        <div class="num">${fmtNum(v, "")}</div>`;
+      sec.appendChild(row);
+    });
+    charts.appendChild(sec);
+  });
+}
+
+function renderTable() {
+  const table = document.getElementById("data-table");
+  const head = "<tr><th>世界/方案</th>" + DATA.metrics.map(m => m.label + "（" + m.unit + "）").join("") + "</tr>";
+  const body = DATA.groups.filter(g => enabled.has(g.name)).map(g =>
+    "<tr><td>" + g.name + "</td>" +
+    DATA.metrics.map(m => "<td>" + fmtNum(g.values[m.key], "") + "</td>").join("") + "</tr>"
+  ).join("");
+  table.innerHTML = head + body;
+}
+
+document.getElementById("title").textContent = DATA.title;
+document.getElementById("source").textContent = DATA.source;
+document.getElementById("footer").textContent = "生成日 " + DATA.generatedAt + " ｜ " + DATA.source + " ｜ 图上数值与附表同源同值（同一数据只算一次）";
+renderNav(); renderGroupFilter(); renderCharts(); renderTable();
+</script>
+</body>
+</html>
