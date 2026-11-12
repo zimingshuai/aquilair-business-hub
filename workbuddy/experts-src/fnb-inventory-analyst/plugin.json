@@ -1,6 +1,6 @@
 {
   "name": "fnb-inventory-analyst",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Aquilair F&B inventory diagnostician as a standalone expert (read-only): warehouse inventory risk levels P0-P3, judgment basis traceability (rule to metric to risk record), SKU turnover and ABC classification, stockout and slow-moving details. Delivers traceable diagnostic reports with subgraph-proportional visualization. Ships fnb-inventory-analysis and aquilair-data-delivery skills.",
   "author": {
     "name": "Aquilair Team"

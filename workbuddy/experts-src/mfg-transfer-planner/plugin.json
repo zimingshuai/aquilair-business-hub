@@ -1,6 +1,6 @@
 {
   "name": "mfg-transfer-planner",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Aquilair multi-plant material transfer planner as a standalone expert: plant shortage response, transferable material matching across plants, transfer plan generation and evaluation (total cost / transport days / fulfillment rate), sandbox branch what-if simulation, and controlled execution after confirmation. Ships mfg-transfer-allocation and aquilair-data-delivery skills.",
   "author": {
     "name": "Aquilair Team"

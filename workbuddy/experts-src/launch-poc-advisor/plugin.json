@@ -1,6 +1,6 @@
 {
   "name": "launch-poc-advisor",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Aquilair launch POC dynamic assurance advisor as a standalone expert for one new product launch plan (POC project): launch plan and forecast caliber, kitting status, material gaps, supply-demand allocation, purchase order tracking, and launch risk. Delivers diagnostic reports and risk dashboards with subgraph-proportional visualization. Ships launch-dynamic-assurance and aquilair-data-delivery skills.",
   "author": {
     "name": "Aquilair Team"
