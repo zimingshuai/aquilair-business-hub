@@ -6,6 +6,11 @@
 > 自 v0.4.6 起版本漂移由 `tools/check_principles.py` P3 闸门自动拦截（内容变更必 bump，两处清单同步）。
 > 本文件变更不触发 P3（检测范围仅 `plugins/`）。
 
+## v0.5.2（2026-11-13）｜tag `v0.5.2` → 出图策略对比结束，切回 V8 基线
+
+- **出图策略切回 V8**（用户裁决）：data-delivery + 三 agent 配图行 + launch SKILL 交付段整文件恢复 v0.4.8 内容，router 三处配图行恢复（保留 xgimi 行），principles delivery-shape 锚点恢复「形态服从问题/图比文字更清楚」——对比期（v0.5.1）结束，回切口径措辞留在禁词库防回潮
+- 对比材料：v0.5.1（子图伸缩基线）与 v0.4.8（V8 基线）各有完整 tag；Downloads 备份文件保留
+
 ## v0.5.1（2026-11-12）｜tag `v0.5.1` → 出图策略对比期回切
 
 - **出图策略回退一个版本供对比**（用户指令）：data-delivery 横切规范 + 三 agent 配图口径行 + skill-router 三处 + launch SKILL 交付段 + principles.yaml delivery-shape 锚点，整体自 V8 基线（形态服从问题/图比文字更清楚才配图）回切至 v0.4.6 基线（**交付随子图伸缩：单对象/单边查看纯文本合法，跨对象子图分析类必配图表看板**，两档形态与脚本渲染通道不变）
